@@ -30,7 +30,7 @@ module.exports.adapters = {
         port     : 27017,
         user     : '',
         password : '',
-        database : 'inbox-swarm'
+        database : 'mobile-gift-card'
     },
 
 
