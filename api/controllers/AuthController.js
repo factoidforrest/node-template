@@ -35,7 +35,7 @@ module.exports = {
                     }
 
 
-                    res.redirect('/');
+                    res.redirect('http://localhost:9000/');
                     return;
                 });
             })(req, res);

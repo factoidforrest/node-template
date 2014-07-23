@@ -21,6 +21,7 @@ var googleapis = require('googleapis'),
 
 var getClient = function (req) {
     var d = q.defer();
+    console.log("failing here?");
 
     var auth = new googleapis.OAuth2Client('200927102479-37l48tk8uamrushob22ff8rg9dv9kl4n.apps.googleusercontent.com', 'lhpefdZAZQry95cokNDHj7DR', 'http://localhost:1337/auth/google/callback');
     auth.setCredentials({
