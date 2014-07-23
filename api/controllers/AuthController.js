@@ -15,28 +15,39 @@
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
 
-var passport = require("passport");
+var passport = require('passport');
+
 module.exports = {
-    login: function(req,res){
-        res.json({user: req.username});
+
+    google : function (req, res) {
+        var options = { failureRedirect: '/login',
+            scope:['https://www.googleapis.com/auth/plus.login','https://www.googleapis.com/auth/userinfo.profile','https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/gmail.modify'],
+            accessType: 'offline',
+            state: 'profile'
+        };
+        passport.authenticate('google',options,
+            function (err, user) {
+                req.logIn(user, function (err) {
+                    if (err) {
+                        console.log(err);
+                        res.view('500');
+                        return;
+                    }
+
+
+                    res.redirect('/');
+                    return;
+                });
+            })(req, res);
     },
 
-    process: function(req,res){
-        passport.authenticate('local', function(err, user, info){
-            if ((err) || (!user)) {
-                res.redirect('/login');
-                return;
-            }
-            req.logIn(user, function(err){
-                if (err) res.redirect('/login');
-                return res.redirect('/');
-            });
-        })(req, res);
-    },
 
-    logout: function (req,res){
-        req.logout();
-        res.send('logout successful');
-    },
-    _config: {}
+
+/**
+   * Overrides for the settings in `config/controllers.js`
+   * (specific to AuthController)
+   */
+  _config: {}
+
+  
 };

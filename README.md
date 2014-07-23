@@ -1,2 +1,2 @@
-# MobileGiftCardPlatform
+# platform
 ### a Sails application
