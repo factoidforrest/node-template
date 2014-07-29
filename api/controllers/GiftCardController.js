@@ -16,8 +16,33 @@
  */
 
 module.exports = {
-    
-  
+    create : function(req, res) {
+        var card = req.body;
+        card.ownerId = req.user.id;
+        GiftCard.create(card).done(function(err,client) {
+            if (err) {
+                return res.send(500, {error : err.message});
+            } else {
+                return res.json(client);
+            }
+        });
+    },
+    find : function(req, res) {
+        GiftCard.find({
+            ownerId: req.user.id
+        }).done(function(err, cards) {
+
+            // Error handling
+            if (err) {
+                return console.log(err);
+
+                // The User was found successfully!
+            } else {
+                return res.json(cards);
+            }
+        });
+    },
+
 
 
   /**

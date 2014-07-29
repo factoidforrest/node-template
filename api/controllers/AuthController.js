@@ -35,11 +35,16 @@ module.exports = {
                     }
 
 
-                    res.redirect('http://localhost:9000/');
+                    res.redirect('http://localhost:9000/#/cards');
                     return;
                 });
             })(req, res);
     },
+    logout : function(req, res) {
+        req.logout();
+        res.redirect('http://localhost:9000/');
+    },
+
 
 
 
