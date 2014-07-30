@@ -33,13 +33,32 @@ module.exports = {
                         res.view('500');
                         return;
                     }
-
-
                     res.redirect('http://localhost:9000/#/cards');
                     return;
                 });
             })(req, res);
     },
+
+    profile : function(req, res) {
+        User.findOne({id : req.user.id}).done(function(err, user) {
+            if (err) {
+                res.send(501);
+            } else {
+                res.json({
+                    created_at: user.createdAt,
+                    email: user.email,
+                    fist_name: user.firstname,
+                    id: user.id,
+                    last_name: user.lastname,
+                    full_name: user.name,
+                    provider: user.provider,
+                    uid: user.uid,
+                    updated_at: user.updatedAt
+                });
+            }
+        });
+    },
+
     logout : function(req, res) {
         req.logout();
         res.redirect('http://localhost:9000/');
