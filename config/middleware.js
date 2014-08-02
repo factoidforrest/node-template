@@ -83,8 +83,8 @@ module.exports = {
             passport.use(new GoogleStrategy({
                     clientID: '200927102479-37l48tk8uamrushob22ff8rg9dv9kl4n.apps.googleusercontent.com',
                     clientSecret: 'lhpefdZAZQry95cokNDHj7DR',
-                    callbackURL: 'http://localhost:1337/auth/google/callback',
-//                    callbackURL: 'http://api.mobilegiftcard.com/auth/google/callback'
+//                    callbackURL: 'http://localhost:1337/auth/google/callback',
+                    callbackURL: 'http://api.mobilegiftcard.com/auth/google/callback'
                 },
                 verifyHandler
             ));
