@@ -33,7 +33,7 @@ module.exports = {
                         res.view('500');
                         return;
                     }
-                    res.redirect('http://localhost:9000/#/cards');
+                    res.redirect('//app.mobilegiftcard.com/#/cards');
                     return;
                 });
             })(req, res);
