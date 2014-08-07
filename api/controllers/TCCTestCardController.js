@@ -18,11 +18,54 @@
 
 module.exports = {
 
-    find : function(req, res) {
+    findOne : function(req, res) {
         TCCTestCard.findOne({
             id: req.params.id
         }).done(function(err, card) {
             TCCProxy.getTCCInquiry(card.card_number).then(function(tcc_card) {
+                // Error handling
+                if (err) {
+                    return console.log(err);
+
+                    // The User was found successfully!
+                } else {
+                    tcc_card.id = req.params.id;
+                    return res.json(tcc_card);
+                }
+            });
+
+
+        });
+
+    },
+
+    activate : function(req, res) {
+        var amount = req.params.amount;
+        TCCTestCard.findOne({
+            id: req.params.id
+        }).done(function(err, card) {
+            TCCProxy.activateTCCCard(card.card_number, amount).then(function(tcc_card) {
+                // Error handling
+                if (err) {
+                    return console.log(err);
+
+                    // The User was found successfully!
+                } else {
+                    return res.json(tcc_card);
+                }
+            });
+
+
+        });
+
+    },
+
+    redeem : function(req, res) {
+        var amount = req.params.amount;
+        TCCTestCard.findOne({
+            id: req.params.id
+        }).done(function(err, card) {
+            TCCProxy.redeemTCCCard(card.card_number, amount).then(function(tcc_card) {
                 // Error handling
                 if (err) {
                     return console.log(err);
@@ -39,7 +82,7 @@ module.exports = {
     },
 
 
-  /**
+    /**
    * Overrides for the settings in `config/controllers.js`
    * (specific to TCCTestCardController)
    */
