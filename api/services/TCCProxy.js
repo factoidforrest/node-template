@@ -15,7 +15,8 @@
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
 
-var request = require("request");
+var request = require("request"),
+    q = require("Q");
 
 var inquiryBodyForCard = function(card) {
     return {
@@ -50,31 +51,32 @@ var inquiryBodyForCard = function(card) {
 
 module.exports = {
 
-    getTCCInquiry : function(req, res) {
+    getTCCInquiry : function(card_number) {
+        var deferred = q.defer();
 
         var url = 'http://64.73.249.146/Partner/ProcessJson';
         var options = {
             method: 'post',
-            body: inquiryBodyForCard(req.body.card_number),
+            body: inquiryBodyForCard(card_number),
             json: true,
             url: url
         };
         request(options, function (err, httpResponse, body) {
 
             if (err || body.txs.length === 0) {
-//                return res.send(500, {error : err.message});
-                return res.send(500);
+                deferred.reject(err);
             }
 
             var txn = body.txs[0];
-            return res.json({
+            deferred.resolve({
                 card_number : txn.crd,
                 status : txn.crdStat,
                 balance : txn.bal,
                 previousBalance : txn.prevBal
             });
         })
-    },
+        return deferred.promise;
+    }
 
 
 };

@@ -19,19 +19,21 @@
 module.exports = {
 
     find : function(req, res) {
-        TCCTestCard.find({
+        TCCTestCard.findOne({
             id: req.params.id
         }).done(function(err, card) {
+            TCCProxy.getTCCInquiry(card.card_number).then(function(tcc_card) {
+                // Error handling
+                if (err) {
+                    return console.log(err);
 
-            // Error handling
-            if (err) {
-                return console.log(err);
+                    // The User was found successfully!
+                } else {
+                    return res.json(tcc_card);
+                }
+            });
 
-                // The User was found successfully!
-            } else {
-                card.booya = "yeah";
-                return res.json(card);
-            }
+
         });
 
     },
