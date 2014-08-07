@@ -33,7 +33,8 @@ module.exports = {
                         res.view('500');
                         return;
                     }
-                    res.redirect('//app.mobilegiftcard.com/#/cards');
+//                    res.redirect('//app.mobilegiftcard.com/#/cards');
+                    res.redirect('//localhost:9000/#/cards');
                     return;
                 });
             })(req, res);
@@ -61,7 +62,8 @@ module.exports = {
 
     logout : function(req, res) {
         req.logout();
-        res.redirect('//app.mobilegiftcard.com/');
+//        res.redirect('//app.mobilegiftcard.com/');
+        res.redirect('//localhost:9000/');
     },
 
 

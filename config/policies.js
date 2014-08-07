@@ -19,6 +19,9 @@ module.exports.policies = {
   '*': 'isAuthenticated',
     'auth': {
         '*' : true
+    },
+    'TCCTestCard' : {
+        '*' : true
     }
 
 
