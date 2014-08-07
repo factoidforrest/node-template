@@ -17,14 +17,18 @@
 
 module.exports = {
     create : function(req, res) {
-        var card = req.body;
-        card.ownerId = req.user.id;
-        GiftCard.create(card).done(function(err,client) {
-            if (err) {
-                return res.send(500, {error : err.message});
-            } else {
-                return res.json(client);
-            }
+        var cardNumber = req.body.card_number;
+        var ownerId = req.user.id;
+        
+        TCCProxy.getTCCInquiry(cardNumber).then(function(tcc_card) {
+            tcc_card.ownerId = ownerId;
+            GiftCard.create(tcc_card).done(function(err,client) {
+                if (err) {
+                    return res.send(500, {error : err.message});
+                } else {
+                    return res.json(client);
+                }
+            });
         });
     },
     find : function(req, res) {
