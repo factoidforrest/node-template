@@ -15,65 +15,25 @@
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
 
-var request = require("request");
-
-var inquiryBodyForCard = function(card) {
-    return {
-        'hdr':
-        {
-            'live':'',
-            'fmt':'MGC',
-            'ver':'1.0.0',
-            'uid':'14d4fd5a-488e-4544-ba4a-c73cd978c5bb',
-            'cliUid':'59344556-3C62-42B0-81A1-284EACCFF949',
-            'cliId':93,
-            'locId':1,
-            'rcId':0,
-            'term':'1',
-            'srvId':518,
-            'srvNm':'',
-            'txDtTm':'04/14/2014',
-            'key':'',
-            'chk':'12345'
-        },
-        'txs':
-        [
-            {
-                'typ':2,
-                'crd':card,
-                'amt':''
-            }
-        ]
-    }
-};
-
 
 module.exports = {
 
-    getTCCInquiry : function(req, res) {
+    find : function(req, res) {
+        TCCTestCard.find({
+            id: req.params.id
+        }).done(function(err, card) {
 
-        var url = 'http://64.73.249.146/Partner/ProcessJson';
-        var options = {
-            method: 'post',
-            body: inquiryBodyForCard(req.body.card_number),
-            json: true,
-            url: url
-        };
-        request(options, function (err, httpResponse, body) {
+            // Error handling
+            if (err) {
+                return console.log(err);
 
-            if (err || body.txs.length === 0) {
-//                return res.send(500, {error : err.message});
-                return res.send(500);
+                // The User was found successfully!
+            } else {
+                card.booya = "yeah";
+                return res.json(card);
             }
+        });
 
-            var txn = body.txs[0];
-            return res.json({
-                card_number : txn.crd,
-                status : txn.crdStat,
-                balance : txn.bal,
-                previousBalance : txn.prevBal
-            });
-        })
     },
 
 
@@ -83,5 +43,5 @@ module.exports = {
    */
   _config: {}
 
-  
+
 };
