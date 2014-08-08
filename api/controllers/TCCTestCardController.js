@@ -18,6 +18,15 @@
 
 module.exports = {
 
+    find : function(req, res) {
+        TCCTestCard.find().sort('card_number').done(function(err, cards) {
+            if (err) {
+                return res.send(500);
+            }
+            return res.json(cards);
+        });
+    },
+
     findOne : function(req, res) {
         TCCTestCard.findOne({
             id: req.params.id
@@ -25,13 +34,21 @@ module.exports = {
             TCCProxy.getTCCInquiry(card.card_number).then(function(tcc_card) {
                 // Error handling
                 if (err) {
-                    return console.log(err);
+                    return res.send(500);
 
                     // The User was found successfully!
                 } else {
-                    tcc_card.id = req.params.id;
-                    return res.json(tcc_card);
+                    card.status = tcc_card.status;
+                    card.balance = tcc_card.balance;
+                    card.previousBalance = tcc_card.previousBalance;
+                    card.save(function(err) {
+                        tcc_card.id = req.params.id;
+                        return res.json(tcc_card);
+                    });
+
+
                 }
+
             });
 
 
