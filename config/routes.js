@@ -35,8 +35,6 @@ module.exports.routes = {
   '/': {
     view: 'home/index'
   },
-  'get /threads/mine' : 'ThreadController.getMine',
-  'get /threads/:id' : 'ThreadController.get',
   'get /TCCTestCard/:id/activate/:amount' : 'TCCTestCardController.activate',
   'get /TCCTestCard/:id' : 'TCCTestCardController.findOne',
   'get /TCCTestCard/:id/redeem/:amount' : 'TCCTestCardController.redeem'
