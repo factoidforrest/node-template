@@ -16,7 +16,7 @@
  */
 
 var request = require("request"),
-    q = require("Q");
+    q = require("q");
 
 var inquiryBodyForCard = function(card) {
     return {
