@@ -33,8 +33,12 @@ module.exports = {
                         res.view('500');
                         return;
                     }
+
+                    var conf = sails.config;
+
+
 //                    res.redirect('//app.mobilegiftcard.com/#/cards');
-                    res.redirect('//localhost:9000/#/cards');
+                    res.redirect(conf.apiRoot + '#/cards');
                     return;
                 });
             })(req, res);
@@ -63,7 +67,7 @@ module.exports = {
     logout : function(req, res) {
         req.logout();
 //        res.redirect('//app.mobilegiftcard.com/');
-        res.redirect('//localhost:9000/');
+        res.redirect(conf.apiRoot);
     },
 
 
