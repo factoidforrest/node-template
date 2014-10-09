@@ -51,12 +51,21 @@ module.exports = {
             ownerId: req.user.id,
             id : req.param("id")
         }).done(function(err, card) {
-            // Error handling
-            if (err) {
-                return console.log(err);
-            } else {
-                return res.json(card);
+
+            if(card.giftStatus === 'gifted') {
+                return res.send(409, {error : 'Card Already Gifted'});
             }
+            GiftCardGift.create({giftRecipientEmail : req.body.email, giftMessage : req.body.message, giftStatus : 'gifted', giftCardId : card.id}).done(function(){
+                card.giftStatus = "gifted";
+                card.save(function(err, saved){
+                    // Error handling
+                    if (err) {
+                        return console.log(err);
+                    } else {
+                        return res.json(saved);
+                    }
+                });
+            })
         });
     },
 
