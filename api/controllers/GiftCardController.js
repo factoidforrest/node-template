@@ -46,6 +46,19 @@ module.exports = {
             }
         });
     },
+    gift : function(req, res) {
+        GiftCard.findOne({
+            ownerId: req.user.id,
+            id : req.param("id")
+        }).done(function(err, card) {
+            // Error handling
+            if (err) {
+                return console.log(err);
+            } else {
+                return res.json(card);
+            }
+        });
+    },
 
 
 

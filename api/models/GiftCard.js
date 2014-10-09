@@ -11,7 +11,8 @@ module.exports = {
   attributes: {
   	cardNumber: 'string',
     cardInitialValue: 'float',
-    cardRemainingValue: 'float'
+    cardRemainingValue: 'float',
+    giftStatus: 'string'
   	/* e.g.
   	nickname: 'string'
   	*/

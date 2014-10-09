@@ -35,7 +35,8 @@ module.exports.routes = {
     'get /TCCTestCard/:id/activate/:amount': 'TCCTestCardController.activate',
     'get /TCCTestCard/:id': 'TCCTestCardController.findOne',
     'get /TCCTestCard/:id/redeem/:amount': 'TCCTestCardController.redeem',
-    'post /echoMessage': 'EchoController.echoMessage'
+    'post /echoMessage': 'EchoController.echoMessage',
+    'get /GiftCard/:id/gift': 'GiftCardController.gift'
 
     /*
      // But what if you want your home page to display
