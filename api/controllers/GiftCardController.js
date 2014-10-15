@@ -39,8 +39,19 @@ module.exports = {
             // Error handling
             if (err) {
                 return console.log(err);
+            } else {
+                return res.json(cards);
+            }
+        });
+    },
+    GiftCardsToAccept : function(req, res) {
+        GiftCardGift.find({
+            giftRecipientEmail: req.user.email
+        }).done(function(err, cards) {
 
-                // The User was found successfully!
+            // Error handling
+            if (err) {
+                return console.log(err);
             } else {
                 return res.json(cards);
             }
@@ -55,7 +66,7 @@ module.exports = {
             if(card.giftStatus === 'gifted') {
                 return res.send(409, {error : 'Card Already Gifted'});
             }
-            GiftCardGift.create({giftRecipientEmail : req.body.email, giftMessage : req.body.message, giftStatus : 'gifted', giftCardId : card.id}).done(function(){
+            GiftCardGift.create({giftRecipientEmail : req.body.email, giftMessage : req.body.message, giftStatus : 'gifted', giftCardId : card.id, cardRemainingValue : card.cardRemainingValue}).done(function(){
                 card.giftStatus = "gifted";
                 card.save(function(err, saved){
                     // Error handling
@@ -65,6 +76,33 @@ module.exports = {
                         return res.json(saved);
                     }
                 });
+            })
+        });
+    },
+    ungift : function(req, res) {
+        GiftCard.findOne({
+            ownerId: req.user.id,
+            id : req.param("id")
+        }).done(function(err, card) {
+
+            if(card.giftStatus === 'retracted') {
+                return res.send(409, {error : 'Card Already retracted'});
+            }
+            GiftCardGift.findOne({giftCardId : card.id, giftStatus : 'gifted'}).done(function(err, gift){
+                //delete card.giftStatus;
+                card.giftStatus = undefined;
+
+                card.save(function(err, saved){
+                    // Error handling
+                    if (err) {
+                        return res.send(409, {error : err.message});
+                    }
+                    gift.giftStatus = "retracted";
+                    gift.save(function() {
+                        return res.json(saved);
+                    });
+                });
+
             })
         });
     },
