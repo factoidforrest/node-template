@@ -37,6 +37,8 @@ module.exports.routes = {
     'get /TCCTestCard/:id/redeem/:amount': 'TCCTestCardController.redeem',
     'post /echoMessage': 'EchoController.echoMessage',
     'get /GiftCard/waiting': 'GiftCardController.GiftCardsToAccept',
+    'post /GiftCard/:id/acceptgift': 'GiftCardController.acceptgift',
+    'post /GiftCard/:id/rejectgift': 'GiftCardController.rejectgift',
     'post /GiftCard/:id/gift': 'GiftCardController.gift',
     'post /GiftCard/:id/ungift': 'GiftCardController.ungift'
 

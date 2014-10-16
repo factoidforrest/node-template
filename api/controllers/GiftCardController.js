@@ -66,7 +66,7 @@ module.exports = {
             if(card.giftStatus === 'gifted') {
                 return res.send(409, {error : 'Card Already Gifted'});
             }
-            GiftCardGift.create({giftRecipientEmail : req.body.email, giftMessage : req.body.message, giftStatus : 'gifted', giftCardId : card.id, cardRemainingValue : card.cardRemainingValue}).done(function(){
+            GiftCardGift.create({giftRecipientEmail : req.body.email, giftMessage : req.body.message, giftStatus : 'gifted', giftCardId : card.id, cardRemainingValue : card.balance}).done(function(){
                 card.giftStatus = "gifted";
                 card.save(function(err, saved){
                     // Error handling
@@ -106,6 +106,58 @@ module.exports = {
             })
         });
     },
+    acceptgift : function(req, res) {
+        GiftCardGift.findOne({
+            id : req.param("id")
+        }).done(function(err, gift) {
+            if (gift.giftStatus === 'giftaccepted') {
+                return res.send(409, {error: 'Card Already been Accepted'});
+            }
+            gift.giftStatus = "giftaccepted";
+            gift.save(function(err, gift) {
+                GiftCard.findOne({
+                    id: gift.giftCardId
+                }).done(function(err, card){
+                    card.giftStatus = "giftaccepted";
+                    card.save(function(err, card) {
+                        delete card.giftStatus;
+                        delete card.id;
+
+                        card.ownerId = req.user.id;
+                        GiftCard.create(card).done(function(err, card) {
+                            return res.json(card);
+                        })
+                    });
+                });
+            });
+        })
+   },
+   rejectgift : function(req, res) {
+        GiftCard.findOne({
+            id : req.param("id")
+        }).done(function(err, card) {
+
+        if(card.giftStatus === 'rejected') {
+            return res.send(409, {error : 'Card Already rejected'});
+        }
+        GiftCardGift.findOne({giftCardId : card.id, giftStatus : 'gifted'}).done(function(err, gift){
+            //delete card.giftStatus;
+            card.giftStatus = undefined;
+
+            card.save(function(err, saved){
+                // Error handling
+                if (err) {
+                    return res.send(409, {error : err.message});
+                }
+                gift.giftStatus = "rejected";
+                gift.save(function() {
+                    return res.json(saved);
+                });
+            });
+
+        })
+    });
+},
 
 
 
