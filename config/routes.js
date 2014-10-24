@@ -40,7 +40,8 @@ module.exports.routes = {
     'post /GiftCard/:id/acceptgift': 'GiftCardController.acceptgift',
     'post /GiftCard/:id/rejectgift': 'GiftCardController.rejectgift',
     'post /GiftCard/:id/gift': 'GiftCardController.gift',
-    'post /GiftCard/:id/ungift': 'GiftCardController.ungift'
+    'post /GiftCard/:id/ungift': 'GiftCardController.ungift',
+    'post /GiftCard/buy' : 'GiftCardController.buy'
 
     /*
      // But what if you want your home page to display

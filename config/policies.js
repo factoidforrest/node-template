@@ -25,6 +25,9 @@ module.exports.policies = {
     },
     'echoMessage' : {
         '*' : true
+    },
+    'GiftCardGift' : {
+        '*' : true
     }
 
 

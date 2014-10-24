@@ -19,7 +19,7 @@ module.exports = {
     create : function(req, res) {
         var cardNumber = req.body.card_number;
         var ownerId = req.user.id;
-        
+
         TCCProxy.getTCCInquiry(cardNumber).then(function(tcc_card) {
             tcc_card.ownerId = ownerId;
             GiftCard.create(tcc_card).done(function(err,client) {
@@ -28,6 +28,29 @@ module.exports = {
                 } else {
                     return res.json(client);
                 }
+            });
+        });
+    },
+    buy : function(req, res) {
+        var amount = req.body.amount;
+        var ownerId = req.user.id;
+
+        TCCTestCard.findOne({status : {$exists : 0}}).done(function(err, card) {
+            TCCProxy.activateTCCCard(card.card_number, amount).then(function(activeCard) {
+                TCCProxy.getTCCInquiry(activeCard.card_number).then(function(tcc_card) {
+                    tcc_card.ownerId = ownerId;
+                    GiftCard.create(tcc_card).done(function(err,client) {
+                        card.status = "consumed";
+                        card.save(function (err, savedTccCard) {
+                            if (err) {
+                                return res.send(500, {error : err.message});
+                            } else {
+                                return res.json(client);
+                            }
+                        });
+                    });
+                });
+
             });
         });
     },
