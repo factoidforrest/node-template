@@ -24,14 +24,14 @@ module.exports.adapters = {
     module: 'sails-disk'
   },
 
-    mongo: {
-        module   : 'sails-mongo',
-        host     : 'localhost',
-        port     : 27017,
-        user     : '',
-        password : '',
-        database : 'mobile-gift-card'
-    },
+  mongo: {
+      module   : 'sails-mongo',
+      host     : 'localhost',
+      port     : 27017,
+      user     : '',
+      password : '',
+      database : 'mobile-gift-card'
+  },
 
 
     // MySQL is the world's most popular relational database.

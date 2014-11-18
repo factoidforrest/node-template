@@ -16,7 +16,8 @@
     "request": "^2.40.0",
     "sails": "0.9.16",
     "sails-disk": "~0.9.0",
-    "sails-mongo": "^0.9.8"
+    "sails-mongo": "^0.9.8",
+    "jade": "~1.7.0"
   },
   "scripts": {
     "start": "node app.js",
