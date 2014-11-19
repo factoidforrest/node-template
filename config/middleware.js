@@ -79,7 +79,7 @@ module.exports = {
 //                },
 //                verifyHandler
 //            ));
-
+            //is it a good idea to have these vars in source or should they be in env vars?
             passport.use(new GoogleStrategy({
                     clientID: '200927102479-37l48tk8uamrushob22ff8rg9dv9kl4n.apps.googleusercontent.com',
                     clientSecret: 'lhpefdZAZQry95cokNDHj7DR',
@@ -91,6 +91,7 @@ module.exports = {
 
             app.use(passport.initialize());
             app.use(passport.session());
+
         }
     }
 
