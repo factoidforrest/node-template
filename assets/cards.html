@@ -1,0 +1,129 @@
+<div ng-controller="CardsCtrl">
+    <div class="box bordered-box card-table">
+        <div class="box-header">
+            <div class="title"></div>
+        </div>
+        <div class="box-content box-no-padding">
+            <div class="responsive-table">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th colspan="5">You currently have {{giftCards.length}} Gift cards</th>
+                        </tr>
+                        <tr>
+                            <th>Card Number</th>
+                            <th>Card Value</th>
+                            <th>Initial Value</th>
+                            <th colspan="2">Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="item in giftCards">
+                            <td ng-hide="item.giftStatus==='giftaccepted'">{{item.card_number}}</td>
+                            <td ng-hide="item.giftStatus==='giftaccepted'">{{item.balance| currency}}</td>
+                            <td ng-hide="item.giftStatus==='giftaccepted'">{{item.previousBalance | currency}}</td>
+                            <td ng-hide="item.giftStatus==='giftaccepted'" class="status">{{item.status}}</td>
+                            <td colspan="4" ng-show="item.giftStatus==='giftaccepted'">{{item.balance| currency}} Gifted To {{item.giftRecipientEmail}}</td>
+                            <td ng-hide="item.giftStatus"><button class="card-import-button btn btn-xs" ng-click="didTapGiftThisCard(item)">
+                                <i class="icon-gift"></i>
+                                 Gift This Card
+                            </button></td>
+                            <td ng-show="item.giftStatus==='gifted'"><button class="card-import-button btn btn-xs" ng-click="didTapUnGiftThisCard(item)">
+                                <i class="icon-gift"></i>
+                                Ungift This Card
+                            </button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+
+        <div class="text-center box">
+          <a href="#/buy-card">
+            <button class="card-import-button btn btn-inverse btn-lg" >
+              <i class="icon-plus"></i>
+              Buy Card
+            </button>
+          </a>
+          <button class="card-import-button btn btn-inverse btn-lg" ng-click="didTapImportCard()">
+                <i class="icon-plus"></i>
+                Import Card
+            </button>
+        </div>
+
+
+        <div ng-show="AcceptGiftCards.length > 0">
+            <div class="box-header orange-background">
+                <div class="title">{{AcceptGiftCards.length}} Gift cards to Accept</div>
+            </div>
+
+            <div class="box-content box-no-padding">
+                <div class="responsive-table">
+                    <table class="card-table table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Sender</th>
+                            <th>Card Value</th>
+                            <th>Gift Message</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="acceptitem in AcceptGiftCards">
+                            <td>{{acceptitem.giftRecipientEmail}}</td>
+                            <td>{{acceptitem.cardRemainingValue| currency}}</td>
+                            <td>{{acceptitem.giftMessage}}</td>
+                            <th>{{acceptitem.giftStatus}}</th>
+                            <td ng-show="acceptitem.giftStatus==='gifted'"><button class="card-import-button btn btn-primary btn-xs" ng-click="didTapAcceptThisCard(acceptitem)">
+                                <i class="icon-gift"></i>
+                                Accept This Card
+                            </button></td>
+                            <td ng-show="acceptitem.giftStatus==='gifted'"><button class="card-import-button btn btn-primary btn-xs" ng-click="didTapRejectGiftCard(acceptitem)">
+                                <i class="icon-gift"></i>
+                                Reject This Card
+                            </button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="add-card.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Add Gift Card</h3>
+    </div>
+    <form class="form form-horizontal validate-form" novalidate="novalidate">
+    <div class="modal-body">
+        <div class="form-group">
+            <input type="text"  name="validation_card_number" id="validation_card_number" ng-model="giftCard.card_number" placeholder="Gift Card Number" data-rule-required="true" data-rule-minlength="2" class="form-control">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+    </form>
+</script>
+<script type="text/ng-template" id="gift-this-card.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Gift This Card</h3>
+    </div>
+    <form class="form form-horizontal validate-form" novalidate="novalidate">
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="email" id="email">Email</label>
+                <input type="text" id="email" name="email" ng-model="gift.email" placeholder="Email Address to Gift Card to" data-rule-required="true" data-rule-minlength="2" class="form-control">
+                <label for="message" id="message">Message</label>
+                <textarea id="message" ng-model="gift.message" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </form>
+</script>
+
