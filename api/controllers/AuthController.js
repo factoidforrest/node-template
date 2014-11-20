@@ -36,6 +36,7 @@ module.exports = {
 
                     var conf = sails.config;
 
+                    //should we really be redirecting an angular app?
 
 //                    res.redirect('//app.mobilegiftcard.com/#/cards');
                     res.redirect(conf.apiRoot + '#/cards');
@@ -45,6 +46,7 @@ module.exports = {
     },
 
     profile : function(req, res) {
+        console.log('the request is ', req)
         User.findOne({id : req.user.id}).done(function(err, user) {
             if (err) {
                 res.send(501);
