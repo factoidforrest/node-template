@@ -19,7 +19,8 @@
     "sails-mongo": "^0.9.8",
     "jade": "~1.7.0",
     "coffee-script": "~1.8.0",
-    "grunt-contrib-sass": "~0.8.1"
+    "grunt-contrib-sass": "~0.8.1",
+    "passport-facebook": "~1.0.3"
   },
   "scripts": {
     "start": "node app.js",

@@ -12,7 +12,6 @@ angular.module('mobileGiftCardWebApp')
         $scope.apiRoot = ENV.apiRoot;
 
         userService.getProfile().then(function(profile) {
-            console.log(profile);
             $scope.profile = profile;
         });
 

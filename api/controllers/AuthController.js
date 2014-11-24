@@ -16,8 +16,10 @@
  */
 
 var passport = require('passport');
+var FacebookStrategy = require('passport-facebook').Strategy;
 
 module.exports = {
+    
 
     google : function (req, res) {
         var options = { failureRedirect: '/login',
@@ -34,10 +36,8 @@ module.exports = {
                         return;
                     }
 
+
                     var conf = sails.config;
-
-                    //should we really be redirecting an angular app?
-
 //                    res.redirect('//app.mobilegiftcard.com/#/cards');
                     res.redirect(conf.apiRoot + '#/cards');
                     return;
@@ -69,7 +69,7 @@ module.exports = {
     logout : function(req, res) {
         req.logout();
 //        res.redirect('//app.mobilegiftcard.com/');
-        res.redirect(conf.apiRoot);
+        res.redirect(sails.config.apiRoot);
     },
 
 

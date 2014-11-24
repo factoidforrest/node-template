@@ -13,6 +13,7 @@ app.factory('UserService', ['$http', '$q', 'ENV', function ($http, $q, ENV) {
         if (me === undefined) {
             console.log('calling getprofile')
             $http.get(ENV.apiRoot + 'auth/profile/').success(function (data) {
+                console.log('user retrieved')
                 console.log(data);
                 me = data;
                 deferred.resolve(me);
