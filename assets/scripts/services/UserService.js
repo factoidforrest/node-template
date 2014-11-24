@@ -11,6 +11,7 @@ app.factory('UserService', ['$http', '$q', 'ENV', function ($http, $q, ENV) {
     service.getProfile = function () {
         var deferred = $q.defer();
         if (me === undefined) {
+            console.log('calling getprofile')
             $http.get(ENV.apiRoot + 'auth/profile/').success(function (data) {
                 console.log(data);
                 me = data;
