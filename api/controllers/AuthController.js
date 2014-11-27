@@ -16,11 +16,34 @@
  */
 
 var passport = require('passport');
-var FacebookStrategy = require('passport-facebook').Strategy;
+
 
 module.exports = {
     
+    facebook: function (req, res) {
+        var options = { 
+            failureRedirect: '/login'
+        }
 
+        passport.authenticate('facebook', options, 
+            function (err, user) {
+                req.logIn(user, function (err) {
+                    if (err) {
+                        console.log(err);
+                        res.view('500');
+                        return;
+                    }
+
+
+                    var conf = sails.config;
+//                    res.redirect('//app.mobilegiftcard.com/#/cards');
+                    res.redirect(conf.apiRoot + '#/cards');
+                    return;
+                });
+            })(req, res);
+
+
+    },
     google : function (req, res) {
         var options = { failureRedirect: '/login',
             scope:['https://www.googleapis.com/auth/plus.login','https://www.googleapis.com/auth/userinfo.profile','https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/gmail.modify'],
@@ -46,7 +69,7 @@ module.exports = {
     },
 
     profile : function(req, res) {
-        console.log('the request is ', req)
+       // console.log('the request is ', req)
         User.findOne({id : req.user.id}).done(function(err, user) {
             if (err) {
                 res.send(501);

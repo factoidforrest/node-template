@@ -9,6 +9,7 @@ app.factory('UserService', ['$http', '$q', 'ENV', function ($http, $q, ENV) {
     var me = undefined;
 
     service.getProfile = function () {
+        console.log('getting profile')
         var deferred = $q.defer();
         if (me === undefined) {
             console.log('calling getprofile')

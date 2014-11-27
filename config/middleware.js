@@ -1,25 +1,28 @@
 var passport = require('passport')
 //    , GitHubStrategy = require('passport-github').Strategy
 //    , FacebookStrategy = require('passport-facebook').Strategy
-    , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-
+    , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+    , FacebookStrategy = require('passport-facebook').Strategy
+    , LocalStrategy = require('passport-local').Strategy;
 
 var verifyHandler = function (accessToken, refreshToken, params, profile, done) {
     console.log(params);
     process.nextTick(function () {
         User.findOne({uid: profile.id}).done(function (err, user) {
             if (user) {
+                console.log('updating existing user with new auth information', user)
                 user.token = accessToken;
                 user.refreshToken = refreshToken;
                 user.googleParams = params;
                 user.save(function(err) {
                     if (err) {
-                        console.log("BOO: ", err);
+                        console.log("user saving error ", err);
                     }
+                    console.log('user updated')
                 });
                 return done(null, user);
             } else {
-
+                console.log('creating new user from auth data')
                 var data = {
                     provider: profile.provider,
                     uid: profile.id,
@@ -38,8 +41,10 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
 
                 data.token = accessToken;
                 data.refreshToken = refreshToken;
-
+                console.log('the user data is', data)
                 User.create(data).done(function (err, user) {
+                    console.log('new user saved as: ', user);
+                    console.log('with error', err)
                     return done(err, user);
                 });
             }
@@ -47,7 +52,21 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
     });
 };
 
+var localHandler = function(username, password, done){
+    User.findOne({ username: username }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (!user.validPassword(password)) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
+    });
+}
+
 passport.serializeUser(function (user, done) {
+    console.log('serializing user: ', user)
     done(null, user.uid);
 });
 
@@ -62,6 +81,7 @@ module.exports = {
 
     // Init custom express middleware
     express: {
+        
         customMiddleware: function (app) {
 
 //            passport.use(new GitHubStrategy({
@@ -79,7 +99,20 @@ module.exports = {
 //                },
 //                verifyHandler
 //            ));
+
+            passport.use(new LocalStrategy(localHandler));
+
             //is it a good idea to have these vars in source or should they be in env vars?
+            var facebookOptions = {
+                clientID: '302044043323057',
+                clientSecret: 'e34b95e000707d104a318a36ea587b8a',
+                //this is going to need to be set by a config var but sails.config isn't accessible
+                //here so we made need a trick or to read the env variable off of the app object
+                callbackURL: 'http://localhost:1337/auth/facebook/callback'
+            }
+
+            passport.use(new FacebookStrategy(facebookOptions,  verifyHandler));
+
             passport.use(new GoogleStrategy({
                     clientID: '200927102479-37l48tk8uamrushob22ff8rg9dv9kl4n.apps.googleusercontent.com',
                     clientSecret: 'lhpefdZAZQry95cokNDHj7DR',
