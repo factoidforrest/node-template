@@ -11,11 +11,11 @@ module.exports = {
     tokenSecret: 'string',
     password: 'string'
     
-  },
-
-  beforeCreate: function (attrs, next) {
+  }
+  /*
+  , beforeCreate: function (attrs, next) {
   	console.log('user before create called')
-  	/*
+  	
 	  bcrypt = require("bcrypt")
 	  bcrypt.genSalt 10, (err, salt) ->
 	    return next(err) if err
@@ -23,8 +23,8 @@ module.exports = {
 	      return next(err) if err
 	      attrs.password = hash
 	      next()
-	   */
+	   
 	 }
-
+	 */
 
 }
