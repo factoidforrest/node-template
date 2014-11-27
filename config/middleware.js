@@ -18,7 +18,7 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
                     if (err) {
                         console.log("user saving error ", err);
                     }
-                    console.log('user updated')
+                    console.log('user updated to db')
                 });
                 return done(null, user);
             } else {
