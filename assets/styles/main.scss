@@ -2,6 +2,7 @@
 /*// bower:scss*/
 // endbower*/
 @import 'login';
+//@import './bower_components/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap';
 
 .browsehappy {
   margin: 0.2em 0;
@@ -68,7 +69,7 @@ body {
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
   .container {
-    max-width: 730px;
+    //max-width: 730px;
   }
 
   /* Remove the padding we set earlier */
@@ -92,7 +93,7 @@ body {
   }
 }
 
-#content {
+#content-old {
   margin: 0 auto ;
   width: 85%;
 }

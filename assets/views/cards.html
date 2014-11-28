@@ -1,9 +1,9 @@
 <div ng-controller="CardsCtrl">
-    <div class="box bordered-box card-table">
-        <div class="box-header">
+    <div class="panel panel-default card-table">
+        <div class="bpanel-heading">
             <div class="title"></div>
         </div>
-        <div class="box-content box-no-padding">
+        <div class="panel-body">
             <div class="responsive-table">
                     <table class="table table-hover">
                         <thead>
@@ -38,14 +38,14 @@
                 </div>
         </div>
 
-        <div class="text-center box">
+        <div class="text-center form-group">
           <a href="#/buy-card">
-            <button class="card-import-button btn btn-inverse btn-lg" >
+            <button class="btn btn-default" >
               <i class="icon-plus"></i>
               Buy Card
             </button>
           </a>
-          <button class="card-import-button btn btn-inverse btn-lg" ng-click="didTapImportCard()">
+          <button class="btn btn-default" ng-click="didTapImportCard()">
                 <i class="icon-plus"></i>
                 Import Card
             </button>
