@@ -19,7 +19,9 @@ module.exports = {
 	  //bcrypt = require("bcrypt")
 	  if (attrs.strategy === 'local'){
 		  bcrypt.genSalt(10, function (err, salt) {
-		    return next(err) if err
+		    if (err) {
+		    	return next(err) 
+		    }
 		    bcrypt.hash(attrs.password, salt, function (err, hash) {
 		      return next(err) if err
 		      attrs.password = hash
