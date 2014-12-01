@@ -54,10 +54,13 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
 
 var localHandler = function(username, password, done){
     User.findOne({ username: username }, function(err, user) {
+        console.log('localhandler found one user', user)
+        console.log('and an err of:', err)
       if (err) { return done(err); }
       if (!user) {
         return done(null, false, { message: 'Incorrect username.' });
       }
+      
       if (!user.validPassword(password)) {
         return done(null, false, { message: 'Incorrect password.' });
       }

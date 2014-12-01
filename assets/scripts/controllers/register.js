@@ -21,13 +21,17 @@ angular.module('mobileGiftCardWebApp')
 
           if (!data.success) {
           	// if not successful, bind errors to error variables
-              $scope.errorUsernmae = data.errors.username;
-              $scope.errorPassord = data.errors.password;
-              $scope.errorConfirm = data.errors.confirm;
+              $scope.errorUsername = data.errors.username;
+              $scope.errorPassword = data.errors.password;
+              $scope.errorConfirm = data.errors.passwordConfirmation;
+              $scope.error = data.error
           } else {
           	// if successful, bind success message to message
             $scope.message = data.message;
           }
+        }).error(function(data){
+        	console.log("server error: ", data);
+        	$scope.error = 'Server Error'
         });
 
 		  };
