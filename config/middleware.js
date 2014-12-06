@@ -53,6 +53,7 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
 };
 
 var localHandler = function(username, password, done){
+    console.log('finding local user to authenticate: ', username)
     User.findOne({ username: username }, function(err, user) {
         console.log('localhandler found one user', user)
         console.log('and an err of:', err)
@@ -128,6 +129,12 @@ module.exports = {
             app.use(passport.initialize());
             app.use(passport.session());
 
+            /*
+            app.post('/auth/local', function(req, res){
+              console.log("body parsing", req.body);
+              //should be something like: {username: YOURUSERNAME, password: YOURPASSWORD}
+            });
+            */
         }
     }
 

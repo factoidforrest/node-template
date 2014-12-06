@@ -50,13 +50,13 @@
                                     <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisl est, vulputate at porttitor non, interdum a mauris. Phasellus imperdiet gravida pulvinar.</small>
                                 </div>
                                 <div class="col-sm-7 col-sm-offset-1">
-                                    <div class="form-group">
+                                    <div class="form-group" ng-show="profile.username">
                                         <label>Username</label>
                                         <input type="text" placeholder="Username" id="username" class="form-control">
                                     </div>
                                     <div class="form-group">
                                         <label>E-mail</label>
-                                        <input type="text" placeholder="E-mail" id="email" class="form-control">
+                                        <input type="text" placeholder="E-mail" id="email" class="form-control" ng-model="profile.email">
                                     </div>
                                     <hr class="hr-normal">
                                     <div class="form-group">
@@ -93,11 +93,11 @@
                                 <div class="col-sm-7 col-sm-offset-1">
                                     <div class="form-group">
                                         <label>First name</label>
-                                        <input type="text" placeholder="First name" id="firstname" class="form-control">
+                                        <input ng-model="profile.first_name" type="text" placeholder="First name" id="firstname" class="form-control">
                                     </div>
                                     <div class="form-group">
                                         <label>Last name</label>
-                                        <input type="text" placeholder="Last name" id="lastname" class="form-control">
+                                        <input ng-model="profile.last_name" type="text" placeholder="Last name" id="lastname" class="form-control">
                                     </div>
                                     <hr class="hr-normal">
                                     <div class="form-group">

@@ -7,12 +7,13 @@
  * Controller of the mobileGiftCardWebApp
  */
 angular.module('mobileGiftCardWebApp')
-    .controller('UserProfileCtrl',function ($scope) {
-        'use strict';
+    .controller('UserProfileCtrl',["$scope", "UserService", "ENV", function ($scope, userService, ENV) {
 
-        $scope.awesomeThings = [
-            'HTML5 Boilerplate'
-        ];
+        $scope.apiRoot = ENV.apiRoot;
 
+        userService.getProfile().then(function(profile) {
+            $scope.profile = profile;
+            console.log('the user profile is', profile)
+        });
 
-    });
+    }]);

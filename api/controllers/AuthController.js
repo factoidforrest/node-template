@@ -22,7 +22,11 @@ module.exports = {
 	
 	facebook: function (req, res) {
 		var options = { 
-			failureRedirect: '/login'
+			failureRedirect: '/login',
+			//scope = permissions
+			scope: [
+				'email'
+			]
 		}
 
 		passport.authenticate('facebook', options, 
@@ -68,28 +72,44 @@ module.exports = {
 			})(req, res);
 	}
 
-	,local: passport.authenticate('local', { successRedirect: '#/cards', failureRedirect: '/' })
+	,local: function(req, res){
+		console.log('auth isnt working! this is where the request goes but the params seem blank.  Here is the request:', req);
+	}
+
+	//passport.authenticate('local', { successRedirect: '#/cards', failureRedirect: '/authfailure' })
 
 
 	,profile : function(req, res) {
 	   // console.log('the request is ', req)
-		User.findOne({id : req.user.id}).done(function(err, user) {
-			if (err) {
-				res.send(501);
-			} else {
-				res.json({
-					created_at: user.createdAt,
-					email: user.email,
-					fist_name: user.firstname,
-					id: user.id,
-					last_name: user.lastname,
-					full_name: user.name,
-					provider: user.provider,
-					uid: user.uid,
-					updated_at: user.updatedAt
-				});
-			}
-		});
+	  //seems to get requested even when the user isn't logged in so send a blank user if so
+	  if (typeof(req.user) === 'undefined'){
+	  	console.log('profile requested but no user found from session, sending blank response')
+	  	res.json({});
+	  } else {
+			User.findOne({id : req.user.id}).done(function(err, user) {
+				
+				if (err) {
+					res.send(501);
+				} else {
+					console.log('the user is:', user)
+					userJSON = {
+						created_at: user.createdAt,
+						email: user.email,
+						id: user.id,
+						last_name: user.lastname,
+						full_name: user.name,
+						provider: user.provider,
+						uid: user.uid,
+						updated_at: user.updatedAt,
+						//no idea why this is saving as fistname, not firstname
+						first_name: user.fistname,
+						username: user.username
+					}
+					console.log('responding with user json:', userJSON)
+					res.json(userJSON);
+				}
+			});
+		}
 	}
 
 	,register: function(req, res) {
