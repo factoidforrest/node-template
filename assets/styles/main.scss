@@ -111,15 +111,21 @@ body {
   width: 70%;
   margin: 0 auto;
 }
+
+//this shouldnt be styled this way, bootstrap has built in support with a class called "navbar-inverse"
+/*
 .navbar-default {
   background-color: #3c3c3c !important;
 }
+*/
 .box .box-header .title {
   font-size: 12px;
 }
+/*
 header .navbar > .nav > li.dark > a {
   background: none repeat scroll 0 0 #3c3c3c !important;
 }
+*/
 .status {
   color: #49bf67;
 }

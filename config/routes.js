@@ -25,24 +25,38 @@
  * For convenience, you can also connect routes directly to views or external URLs.
  *
  */
+routes = {};
+//if mode is undefined server both static and api
+mode = process.env.SERVER_MODE;
 
-module.exports.routes = {
 
-    // By default, your root route (aka home page) points to a view
-    // located at `views/home/index.ejs`
-    //
-    // (This would also work if you had a file at: `/views/home.ejs`)
-    'get /TCCTestCard/:id/activate/:amount': 'TCCTestCardController.activate',
-    'get /TCCTestCard/:id': 'TCCTestCardController.findOne',
-    'get /TCCTestCard/:id/redeem/:amount': 'TCCTestCardController.redeem',
-    'post /echoMessage': 'EchoController.echoMessage',
-    'get /GiftCard/waiting': 'GiftCardController.GiftCardsToAccept',
-    'post /GiftCard/:id/acceptgift': 'GiftCardController.acceptgift',
-    'post /GiftCard/:id/rejectgift': 'GiftCardController.rejectgift',
-    'post /GiftCard/:id/gift': 'GiftCardController.gift',
-    'post /GiftCard/:id/ungift': 'GiftCardController.ungift',
-    'post /GiftCard/buy' : 'GiftCardController.buy'
 
+if(mode==='assets'){
+    console.log('Static Asset mode : API routes empty')
+} else if (mode==='api' || typeof(mode) === undefined){
+    console.log('API mode : routes enabled')
+    //turn off static assets
+    routes = {
+
+        // By default, your root route (aka home page) points to a view
+        // located at `views/home/index.ejs`
+        //
+        // (This would also work if you had a file at: `/views/home.ejs`)
+        'get /TCCTestCard/:id/activate/:amount': 'TCCTestCardController.activate',
+        'get /TCCTestCard/:id': 'TCCTestCardController.findOne',
+        'get /TCCTestCard/:id/redeem/:amount': 'TCCTestCardController.redeem',
+        'post /echoMessage': 'EchoController.echoMessage',
+        'get /GiftCard/waiting': 'GiftCardController.GiftCardsToAccept',
+        'post /GiftCard/:id/acceptgift': 'GiftCardController.acceptgift',
+        'post /GiftCard/:id/rejectgift': 'GiftCardController.rejectgift',
+        'post /GiftCard/:id/gift': 'GiftCardController.gift',
+        'post /GiftCard/:id/ungift': 'GiftCardController.ungift',
+        'post /GiftCard/buy' : 'GiftCardController.buy'
+    }
+}
+
+
+module.exports.routes = routes;
     
      // But what if you want your home page to display
      // a signup form located at `views/user/signup.ejs`?
@@ -97,7 +111,7 @@ module.exports.routes = {
      'get /*(^.*)': 'UserController.profile'
 
      */
-};
+
 
 
 /**

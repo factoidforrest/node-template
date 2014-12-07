@@ -16,12 +16,12 @@ module.exports.adapters = {
 
   // If you leave the adapter config unspecified 
   // in a model definition, 'default' will be used.
-  'default': 'mongo',
+  'default': 'mongodev',
 
   // Persistent adapter for DEVELOPMENT ONLY
   // (data is preserved when the server shuts down)
 
-  mongo: {
+  mongodev: {
       module   : 'sails-mongo',
       host     : 'localhost',
       port     : 27017,

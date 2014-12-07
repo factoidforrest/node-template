@@ -54,6 +54,6 @@ module.exports = {
 
   environment: process.env.NODE_ENV || 'development',
 //  apiRoot : "http://app.mobilegiftcard.com/"
-    apiRoot : "http://localhost:1337/"
+  apiRoot : "http://localhost:1337/"
 
 };
