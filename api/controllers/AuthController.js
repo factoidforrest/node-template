@@ -72,11 +72,7 @@ module.exports = {
 			})(req, res);
 	}
 
-	,local: function(req, res){
-		console.log('auth isnt working! this is where the request goes but the params seem blank.  Here is the request:', req);
-	}
-
-	//passport.authenticate('local', { successRedirect: '#/cards', failureRedirect: '/authfailure' })
+	,local: passport.authenticate('local', { successRedirect: '#/cards', failureRedirect: '/authfailure' })
 
 
 	,profile : function(req, res) {
@@ -103,7 +99,7 @@ module.exports = {
 						updated_at: user.updatedAt,
 						//no idea why this is saving as fistname, not firstname
 						first_name: user.fistname,
-						username: user.username
+						email: user.email
 					}
 					console.log('responding with user json:', userJSON)
 					res.json(userJSON);
@@ -117,17 +113,19 @@ module.exports = {
 		params = req.body;
 		//verify passwords match and are long enough 
 		if (passwordValid(params, res)){
-			User.findByUsername(req.body.username).done(function(err, usr){
+			User.findByEmail(req.body.email).done(function(err, usr){
 				if (err) {
 					res.send(500, { error: "DB Error" });
 				} else if (usr.length > 0) {
 					res.send(200, {
 							success: false
-							, errors: { username: "Username already taken" }
+							//We should maybe just let them register normally and then confirm the email to join the accounts
+							, errors: { email: "A user already exists with this email.  If you previously signed in with Google, Facebook, or Twitter, you can sign in with that and add a password in the settings" }
 						});
 				} else {
 					params.strategy = 'local';
 					//store the password so we can put it back in the req when bcrypt overwrites it in the user beforecreate
+					//not sure why bcrypt overwrites the params in place
 					var password = req.body.password;
 					var user = User.create(params).done(function(error, user){
 						if (error) {
@@ -184,7 +182,7 @@ function passwordValid(params, res) {
 			}})
 		return false;
 		//check password length
-	} else if (params.password.length < 6) {
+	} else if (typeof(params.password) === 'undefined' || params.password.length < 6) {
 		console.log('password too short')
 		res.send(200, {
 			success: false

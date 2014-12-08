@@ -26,7 +26,7 @@ if(mode==='assets'){
     shortcuts: false
   }
 } else if (mode==='api' || mode === '' || typeof(mode) === undefined){
-  console.log('API mode : automatic routing on')
+  console.log('API or development mode : automatic routing on')
   blueprints = {
     actions: true,
     rest: true,

@@ -5,10 +5,12 @@ var passport = require('passport')
     , FacebookStrategy = require('passport-facebook').Strategy
     , LocalStrategy = require('passport-local').Strategy;
 
+//this handler is used for third party authentications like google
 var verifyHandler = function (accessToken, refreshToken, params, profile, done) {
     console.log(params);
     process.nextTick(function () {
-        User.findOne({uid: profile.id}).done(function (err, user) {
+        Authentication.findOne({uid: profile.id}).done(function (err, user) {
+            //note that user refers to the authentication object, not the user object itself
             if (user) {
                 console.log('updating existing user with new auth information', user)
                 user.token = accessToken;
@@ -29,6 +31,7 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
                     name: profile.displayName
                 };
 
+                //may need to make 100% sure they have an email for this to work right
                 if(profile.emails && profile.emails[0] && profile.emails[0].value) {
                     data.email = profile.emails[0].value;
                 }
@@ -52,14 +55,14 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
     });
 };
 
-var localHandler = function(username, password, done){
-    console.log('finding local user to authenticate: ', username)
-    User.findOne({ username: username }, function(err, user) {
+var localHandler = function(email, password, done){
+    console.log('finding local user to authenticate: ', email)
+    User.findOne({ email: email }, function(err, user) {
         console.log('localhandler found one user', user)
         console.log('and an err of:', err)
       if (err) { return done(err); }
       if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
+        return done(null, false, { message: 'Incorrect email.' });
       }
       
       if (!user.validPassword(password)) {
@@ -71,11 +74,11 @@ var localHandler = function(username, password, done){
 
 passport.serializeUser(function (user, done) {
     console.log('serializing user: ', user)
-    done(null, user.uid);
+    done(null, user.id);
 });
 
-passport.deserializeUser(function (uid, done) {
-    User.findOne({uid: uid}).done(function (err, user) {
+passport.deserializeUser(function (id, done) {
+    User.findOne({id: id}).done(function (err, user) {
         done(err, user)
     });
 });
@@ -104,8 +107,14 @@ module.exports = {
 //                verifyHandler
 //            ));
 
-            passport.use(new LocalStrategy(localHandler));
-
+            passport.use(new LocalStrategy(
+                { 
+                    usernameField : 'email', 
+                    passwordField : 'password'
+                    //,passReqToCallback : true
+                },
+                localHandler));
+   
             //is it a good idea to have these vars in source or should they be in env vars?
             var facebookOptions = {
                 clientID: '302044043323057',
