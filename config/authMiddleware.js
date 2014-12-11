@@ -9,22 +9,22 @@ var passport = require('passport')
 var verifyHandler = function (accessToken, refreshToken, params, profile, done) {
     console.log(params);
     process.nextTick(function () {
-        Authentication.findOne({uid: profile.id}).done(function (err, user) {
-            //note that user refers to the authentication object, not the user object itself
-            if (user) {
-                console.log('updating existing user with new auth information', user)
-                user.token = accessToken;
-                user.refreshToken = refreshToken;
-                user.googleParams = params;
-                user.save(function(err) {
+        Authentication.findOne({uid: profile.id}).done(function (err, authentication) {
+            //note that authentication refers to the authentication object, not the authentication object itself
+            if (authentication) {
+                console.log('updating existing authentication with new auth information', authentication)
+                authentication.token = accessToken;
+                authentication.refreshToken = refreshToken;
+                authentication.googleParams = params;
+                authentication.save(function(err) {
                     if (err) {
-                        console.log("user saving error ", err);
+                        console.log("authentication saving error ", err);
                     }
-                    console.log('user updated to db')
+                    console.log('authentication updated to db')
                 });
-                return done(null, user);
+                return done(null, authentication);
             } else {
-                console.log('creating new user from auth data')
+                console.log('creating new authentication from auth data')
                 var data = {
                     provider: profile.provider,
                     uid: profile.id,
@@ -44,11 +44,11 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
 
                 data.token = accessToken;
                 data.refreshToken = refreshToken;
-                console.log('the user data is', data)
-                User.create(data).done(function (err, user) {
-                    console.log('new user saved as: ', user);
+                console.log('the authentication data is', data)
+                Authentication.create(data).done(function (err, authentication) {
+                    console.log('new authentication saved as: ', authentication);
                     console.log('with error', err)
-                    return done(err, user);
+                    return done(err, authentication);
                 });
             }
         });

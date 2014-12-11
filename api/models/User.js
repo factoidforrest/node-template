@@ -10,7 +10,10 @@ module.exports = {
   	token: 'string',
     tokenSecret: 'string',
     password: 'string',
-    email: 'string',
+    email: {
+      type: 'email', // Email type will get validated by the ORM
+      index: true
+    }
 
     validPassword: function(password) {
       console.log('checking password')
