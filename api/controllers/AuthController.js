@@ -117,13 +117,36 @@ module.exports = {
 				if (err) {
 					res.send(500, { error: "DB Error" });
 				} else if (usr.length > 0) {
-					res.send(200, {
+					usr = usr[0];
+					if (typeof(usr.password) === 'undefined') {
+						console.log('setting new password on old user:', usr)
+						//TODO: need to confirm the email before this login method becomes active
+						usr.setPassword(params.password, function(){
+							usr.save(function(err, usr){
+								console.log(err)
+								if (err) return res.send(500, {error: "DB Error"});
+								console.log('set password on previously passwordless user:', user)
+
+								passport.authenticate('local')(req, res, function () {
+							  	console.log('authenticated new user')
+	                res.json({
+										success: true,
+										errors: {}
+									});
+	            	});
+							});
+						});
+
+					} else {
+						res.send(200, {
 							success: false
 							//We should maybe just let them register normally and then confirm the email to join the accounts
-							, errors: { email: "A user already exists with this email.  If you previously signed in with Google, Facebook, or Twitter, you can sign in with that and add a password in the settings" }
+							, errors: { email: "A user already exists with this email and they already have a password." }
 						});
+					}
+					
 				} else {
-					params.strategy = 'local';
+					//params.strategy = 'local';
 					//store the password so we can put it back in the req when bcrypt overwrites it in the user beforecreate
 					//not sure why bcrypt overwrites the params in place
 					var password = req.body.password;

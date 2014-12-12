@@ -10,12 +10,12 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
     console.log(params);
     process.nextTick(function () {
         Authentication.findOne({uid: profile.id}).done(function (err, authentication) {
-            //note that authentication refers to the authentication object, not the authentication object itself
             if (authentication) {
                 console.log('updating this existing authentication with new auth information', authentication)
                 authentication.token = accessToken;
                 authentication.refreshToken = refreshToken;
                 authentication.googleParams = params;
+
                 authentication.save(function(err) {
                     if (err) {
                         console.log("authentication saving error ", err);
@@ -88,6 +88,7 @@ passport.serializeUser(function (authentication, done) {
 
 passport.deserializeUser(function (id, done) {
     User.findOne({id: id}).done(function (err, user) {
+        console.log('found user using session key: ', user)
         done(err, user)
     });
 });

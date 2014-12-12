@@ -12,11 +12,14 @@ module.exports = {
     uid: {
     	type:'string',
     	index:true
-    },
-    user_id: 'integer'
+    }
+    //,user_id: 'string'
 
   }
-  
+  , beforeUpdate: function(attrs, next) {
+  	console.log('authentication before update with attrs ', attrs);
+  	next();
+  }
   , beforeCreate: function (attrs, next) {
   	console.log('creating authentication model instance with attrs:', attrs);
   	User.findOne({email: attrs.email}).done(function(err, user){

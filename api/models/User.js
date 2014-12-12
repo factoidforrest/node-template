@@ -25,9 +25,9 @@ module.exports = {
     },
     setPassword: function(password, next){
       var self = this;
-      bcrypt.hash(self.attrs.password, null, null, function (err, hash) {
+      bcrypt.hash(password, null, null, function (err, hash) {
         if (err) return next(err);
-        self.attrs.password = hash;
+        self.password = hash;
         next();
       });
     }
@@ -43,10 +43,11 @@ module.exports = {
     //  console.log('found users matching email: ', user)
     //});
     if (typeof(attrs.password) !== 'undefined'){//(attrs.strategy === 'local'){
-      console.log("converting password to hash")
+      console.log("converting password to hash");
       bcrypt.hash(attrs.password, null, null, function (err, hash) {
         if (err) return next(err);
         attrs.password = hash;
+        delete(attrs.passwordConfirmation);
         next();
       });
 
