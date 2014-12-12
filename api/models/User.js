@@ -13,7 +13,7 @@ module.exports = {
     email: {
       type: 'email', // Email type will get validated by the ORM
       index: true
-    }
+    },
 
     validPassword: function(password) {
       console.log('checking password')
@@ -36,7 +36,7 @@ module.exports = {
   
   , beforeCreate: function (attrs, next) {
 
-    console.log('auth before create called and the attributes are')
+    console.log('user before create called and the attributes are')
     console.log(attrs)
     //bcrypt = require("bcrypt")
     //User.findByEmail(attrs.email).done(function(err, user){

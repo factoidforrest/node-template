@@ -12,7 +12,7 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
         Authentication.findOne({uid: profile.id}).done(function (err, authentication) {
             //note that authentication refers to the authentication object, not the authentication object itself
             if (authentication) {
-                console.log('updating existing authentication with new auth information', authentication)
+                console.log('updating this existing authentication with new auth information', authentication)
                 authentication.token = accessToken;
                 authentication.refreshToken = refreshToken;
                 authentication.googleParams = params;
@@ -36,7 +36,7 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
                     data.email = profile.emails[0].value;
                 }
                 if(profile.name && profile.name.givenName) {
-                    data.fistname = profile.name.givenName;
+                    data.firstname = profile.name.givenName;
                 }
                 if(profile.name && profile.name.familyName) {
                     data.lastname = profile.name.familyName;
@@ -72,9 +72,18 @@ var localHandler = function(email, password, done){
     });
 }
 
-passport.serializeUser(function (user, done) {
-    console.log('serializing user: ', user)
-    done(null, user.id);
+passport.serializeUser(function (authentication, done) {
+    console.log('serializing authentication: ', authentication)
+    console.log('with user: ', authentication.user_id)
+    if (authentication.provider) {
+        //we have an authentication model(facebook, twitter, etc)
+        id = authentication.user_id;
+    }  else {
+        //we have the user model which means we are authenticating using a password
+        id = authentication.id;
+    }
+
+    done(null, id);
 });
 
 passport.deserializeUser(function (id, done) {

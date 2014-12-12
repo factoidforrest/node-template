@@ -12,41 +12,37 @@ module.exports = {
     uid: {
     	type:'string',
     	index:true
-    }
+    },
+    user_id: 'integer'
+
   }
   
   , beforeCreate: function (attrs, next) {
-  	console.log('creating authentication model instant with attrs:', attrs);
+  	console.log('creating authentication model instance with attrs:', attrs);
   	User.findOne({email: attrs.email}).done(function(err, user){
   		if (err) return next(err);
+  		console.log('found matching user: ', user)
   		if (user){
   			//user already exists
   			console.log('found existing user for auth method ', user)
-  			attrs.user_id = user._id
+  			attrs.user_id = user.id
   			return next()
   		} else {
   			var data = {
-            name: attrs.displayName
+            name: attrs.name,
+            email: attrs.email,
+            firstName: attrs.firstname,
+            lastName: attrs.lastname
         };
-
-        data.email = attrs.emails[0].value;
-        
-        if(attrs.name && attrs.name.givenName) {
-            data.fistname = attrs.name.givenName;
-        }
-        if(attrs.name && attrs.name.familyName) {
-            data.lastname = attrs.name.familyName;
-        }
-
         User.create(data).done(function (err, user) {
-        		attrs.user_id = user._id
+        		attrs.user_id = user.id
             console.log('new user saved as: ', user);
             console.log('with error', err)
+            console.log('and the auth attributes before save are: ', attrs)
             next(err)
         });
   		}
   	});
-		next();
 	}
 	,afterCreate: function(attrs, next){
 		//console.log('aftercreate callback called with attrs: ', attrs)
