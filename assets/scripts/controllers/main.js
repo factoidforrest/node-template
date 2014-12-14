@@ -26,12 +26,13 @@ angular.module('mobileGiftCardWebApp')
 
         if (!data.success) {
         	// if not successful, bind errors to error variables
-            $scope.errorEmail = data.errors.email;
-            $scope.errorPassword = data.errors.password;
+
             $scope.error = data.error
         } else {
         	// if successful, bind success message to message
-          $location.hash = "#/cards"
+        	console.log('auth success')
+        	//should be using angular hash ($location.hash(cards)) for this but it's acting funny
+          window.location.hash = "#/cards"
         }
       }).error(function(data){
       	console.log("server error: ", data);

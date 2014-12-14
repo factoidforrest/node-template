@@ -20,7 +20,6 @@ module.exports = {
       //would be more efficient to do this async, can figure that out once load becomes a problem
       valid = bcrypt.compareSync(password, this.password)
       console.log('correct password? : ', valid)
-      console.log('the password is', password)
       return valid;
     },
     setPassword: function(password, next){

@@ -70,8 +70,37 @@ module.exports = {
 			})(req, res);
 	}
 
-	,local: passport.authenticate('local', { successRedirect: '#/cards', failureRedirect: '/authfailure' })
+	,local: function(req, res) {
+		console.log("about to authenticate local user with request params: ", req.body)
+		/*
+		passport.authenticate('local', { successRedirect: '#/cards', failureRedirect: '/authfailure' }, function(err, user) {
+			console.log('passport local got callback with err: ', err, " and user: ", user);
+		});
+		*/
+		//let's just take passport out of the loop since it has tons of silent errors and stuff I don't like.
+		console.log('finding local user to authenticate: ', email)
+		var email = req.body.email;
+		var password = req.body.password;
+    User.findOne({ email: email }, function(err, user) {
+      console.log('localhandler found one user', user)
+      console.log('and an err of:', err)
+      if (err) { return done(err); }
+      if (!user) {
+        return res.json({ error: 'Incorrect email.' });
+      }
+      
+      if (!user.validPassword(password)) {
+        return res.json({ error: 'Incorrect password.' });
+      }
 
+      req.logIn(user, function (err) {
+      	if (err) return res.json({error: err});
+      	return res.json({success: true});
+    	});
+    });
+
+
+	}
 
 	,profile : function(req, res) {
 	   // console.log('the request is ', req)
