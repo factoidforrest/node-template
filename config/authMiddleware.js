@@ -89,10 +89,21 @@ passport.serializeUser(function (authentication, done) {
 
 passport.deserializeUser(function (id, done) {
     User.findOne({id: id}).done(function (err, user) {
-        console.log('found user using session key: ', user)
+        console.log('found user from session: ', user)
         done(err, user)
     });
 });
+
+if (process.env.NODE_ENV === 'production') {
+    env = 'production';
+    keyPath = 'ssl/dev.key';
+    certPath = 'ssl/dev.key';
+
+} else {
+    env = 'development';
+    keyPath = 'ssl/dev.key';
+    certPath = 'ssl/dev.key';
+}
 
 
 module.exports = {
@@ -138,15 +149,15 @@ module.exports = {
                 clientSecret: 'e34b95e000707d104a318a36ea587b8a',
                 //this is going to need to be set by a config var but sails.config isn't accessible
                 //here so we made need a trick or to read the env variable off of the app object
-                callbackURL: 'http://localhost:1337/auth/facebook/callback'
+                callbackURL: 'https://localhost:1337/auth/facebook/callback'
             }
 
             passport.use(new FacebookStrategy(facebookOptions,  verifyHandler));
 
             passport.use(new GoogleStrategy({
-                    clientID: '200927102479-37l48tk8uamrushob22ff8rg9dv9kl4n.apps.googleusercontent.com',
-                    clientSecret: 'lhpefdZAZQry95cokNDHj7DR',
-                    callbackURL: 'http://localhost:1337/auth/google/callback',
+                    clientID: '525376363568-p6rb6mji0mpj4f6otog4b81pgeni631i.apps.googleusercontent.com',
+                    clientSecret: '0IsST81_2uT2okOcgTxpzgcE',
+                    callbackURL: 'https://localhost:1337/auth/google/callback',
 //                    callbackURL: 'http://api.mobilegiftcard.com/auth/google/callback'
                 },
                 verifyHandler

@@ -40,7 +40,6 @@ module.exports = {
 
 
 					var conf = sails.config;
-//                    res.redirect('//app.mobilegiftcard.com/#/cards');
 					res.redirect(conf.apiRoot + '#/cards');
 					return;
 				});
@@ -65,7 +64,6 @@ module.exports = {
 
 
 					var conf = sails.config;
-//                    res.redirect('//app.mobilegiftcard.com/#/cards');
 					res.redirect(conf.apiRoot + '#/cards');
 					return;
 				});
