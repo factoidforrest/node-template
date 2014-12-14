@@ -3,7 +3,8 @@ var passport = require('passport')
 //    , FacebookStrategy = require('passport-facebook').Strategy
     , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
     , FacebookStrategy = require('passport-facebook').Strategy
-    , LocalStrategy = require('passport-local').Strategy;
+    , LocalStrategy = require('passport-local').Strategy
+    , fs = require('fs');
 
 //this handler is used for third party authentications like google
 var verifyHandler = function (accessToken, refreshToken, params, profile, done) {
@@ -98,7 +99,13 @@ module.exports = {
 
     // Init custom express middleware
     express: {
-        
+
+        //ssl stuff
+        serverOptions : {
+            key: fs.readFileSync('ssl/dev.key'),
+            cert: fs.readFileSync('ssl/dev.cert')
+        },
+
         customMiddleware: function (app) {
 
 //            passport.use(new GitHubStrategy({
