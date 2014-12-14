@@ -22,7 +22,7 @@ module.exports = {
 	
 	facebook: function (req, res) {
 		var options = { 
-			failureRedirect: '/login',
+			failureRedirect: '/',
 			//scope = permissions
 			scope: [
 				'email'
