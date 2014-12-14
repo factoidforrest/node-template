@@ -56,6 +56,8 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
     });
 };
 
+
+//DEPRECATED, auth just runs directly in the handler in the auth controller now since passport wasn't playing nicely.  
 var localHandler = function(email, password, done){
     console.log('finding local user to authenticate: ', email)
     User.findOne({ email: email }, function(err, user) {
@@ -89,7 +91,6 @@ passport.serializeUser(function (authentication, done) {
 
 passport.deserializeUser(function (id, done) {
     User.findOne({id: id}).done(function (err, user) {
-        console.log('found user from session: ', user)
         done(err, user)
     });
 });
@@ -135,6 +136,7 @@ module.exports = {
 //                verifyHandler
 //            ));
 
+            //DEPRECATED, local auth just runs directly in controller now
             passport.use(new LocalStrategy(
                 { 
                     usernameField : 'email', 

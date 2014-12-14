@@ -7,11 +7,10 @@
  * Controller of the mobileGiftCardWebApp
  */
 angular.module('mobileGiftCardWebApp')
-  .controller('MainCtrl',["$location", "$http", "$scope", "$rootScope", "UserService", "ENV", function ($location, $http, $scope, $rootScope, userService, ENV) {
+  .controller('MainCtrl',["$location", "$http", "$scope", "$rootScope", "$route", "UserService", "ENV", function ( $location, $http, $scope, $rootScope, $route, userService, ENV) {
         'use strict';
     $scope.apiRoot = ENV.apiRoot;
     $scope.formData = {};
-
     $scope.login = function () {
     	console.log('submit called with formdata')
     	console.log($scope.formData)
@@ -30,9 +29,13 @@ angular.module('mobileGiftCardWebApp')
             $scope.error = data.error
         } else {
         	// if successful, bind success message to message
-        	console.log('auth success')
+        	console.log('auth success, server responded: ', data)
         	//should be using angular hash ($location.hash(cards)) for this but it's acting funny
+        	userService.profile = data.user;
+        	$route.reload();
           window.location.hash = "#/cards"
+      	
+        
         }
       }).error(function(data){
       	console.log("server error: ", data);

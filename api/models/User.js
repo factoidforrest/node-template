@@ -29,6 +29,20 @@ module.exports = {
         self.password = hash;
         next();
       });
+    },
+    toJSON: function() {
+      return {
+            created_at: this.createdAt,
+            email: this.email,
+            id: this.id,
+            last_name: this.lastname,
+            full_name: this.name,
+            provider: this.provider,
+            uid: this.uid,
+            updated_at: this.updatedAt,
+            first_name: this.firstname,
+            email: this.email
+        }
     }
     
   }

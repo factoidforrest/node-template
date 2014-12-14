@@ -84,7 +84,7 @@ module.exports = {
     User.findOne({ email: email }, function(err, user) {
       console.log('localhandler found one user', user)
       console.log('and an err of:', err)
-      if (err) { return done(err); }
+      if (err) return res.json({error: err}); 
       if (!user) {
         return res.json({ error: 'Incorrect email.' });
       }
@@ -95,7 +95,10 @@ module.exports = {
 
       req.logIn(user, function (err) {
       	if (err) return res.json({error: err});
-      	return res.json({success: true});
+      	return res.json({
+      		success: true,
+      		user: user
+      	});
     	});
     });
 
@@ -115,21 +118,8 @@ module.exports = {
 					res.send(501);
 				} else {
 					console.log('the user is:', user)
-					userJSON = {
-						created_at: user.createdAt,
-						email: user.email,
-						id: user.id,
-						last_name: user.lastname,
-						full_name: user.name,
-						provider: user.provider,
-						uid: user.uid,
-						updated_at: user.updatedAt,
-						//no idea why this is saving as fistname, not firstname
-						first_name: user.fistname,
-						email: user.email
-					}
-					console.log('responding with user json:', userJSON)
-					res.json(userJSON);
+					console.log('responding with user json:', JSON.stringify(user));
+					res.json(user);
 				}
 			});
 		}

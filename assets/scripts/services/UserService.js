@@ -6,21 +6,20 @@ var app = angular.module('mobileGiftCardWebApp');
 app.factory('UserService', ['$http', '$q', 'ENV', function ($http, $q, ENV) {
     'use strict';
     var service = {};
-    var me = undefined;
-
+    service.profile = undefined;
     service.getProfile = function () {
         console.log('getting profile')
         var deferred = $q.defer();
-        if (me === undefined) {
+        if (service.profile === undefined) {
             console.log('calling getprofile')
             $http.get(ENV.apiRoot + 'auth/profile/').success(function (data) {
                 console.log('user retrieved')
                 console.log(data);
-                me = data;
-                deferred.resolve(me);
+                service.profile = data;
+                deferred.resolve(data);
             });
         } else {
-            deferred.resolve(me);
+            deferred.resolve(service.profile);
         }
         return deferred.promise;
     };
