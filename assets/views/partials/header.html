@@ -37,15 +37,11 @@
                     <li class="divider"></li>
                     <li>
                         <!--<a href="//api.mobilegiftcard.com/auth/logout" ng-show="profile">-->
-                        <a href="{{apiRoot}}auth/logout" ng-show="profile">
+                        <a ng-click="logout()" href="#" ng-show="profile">
                             <i class="icon-signout"></i>
                             Sign out
                         </a>
                             <!--<a href="//api.mobilegiftcard.com/auth/google">-->
-                            <a href="{{apiRoot}}auth/google">
-                            <i class="icon-signout"></i>
-                            Sign in
-                        </a>
 
                     </li>
                 </ul>

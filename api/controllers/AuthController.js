@@ -195,7 +195,7 @@ module.exports = {
 	,logout : function(req, res) {
 		req.logout();
 //        res.redirect('//app.mobilegiftcard.com/');
-		res.redirect(sails.config.apiRoot);
+		res.json({success:true});
 	},
 
 
