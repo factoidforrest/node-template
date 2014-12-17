@@ -14,6 +14,7 @@ module.exports = {
       type: 'email', // Email type will get validated by the ORM
       index: true
     },
+    token: 'string',
 
     validPassword: function(password) {
       console.log('checking password')
@@ -61,7 +62,11 @@ module.exports = {
         if (err) return next(err);
         attrs.password = hash;
         delete(attrs.passwordConfirmation);
-        next();
+        require('crypto').randomBytes(48, function(ex, buf) {
+          attrs.token = buf.toString('hex');
+          Mail.sendConfirmation(attrs, next);
+        });
+        
       });
 
     } else {
@@ -74,3 +79,4 @@ module.exports = {
 	 
 
 }
+

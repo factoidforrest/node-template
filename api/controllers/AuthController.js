@@ -191,6 +191,13 @@ module.exports = {
 		}
 	}
 
+	,confirm: function(req, res){
+		var token = req.body.token;
+		User.confirmEmail(token, function(success){
+			res.redirect(sails.config.asset_url)
+		});
+	}
+
 
 	,logout : function(req, res) {
 		req.logout();

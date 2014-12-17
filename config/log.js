@@ -8,9 +8,19 @@
  * For more information on the Sails logger, check out:
  * http://sailsjs.org/#documentation
  */
+var winston = require('winston');
+require('winston-mongodb').MongoDB;
+
+var customLogger = new winston.Logger({
+       
+});
+
+mongoOptions = {
+  db: 'mobile-gift-card'
+}
+customLogger.add(winston.transports.MongoDB, mongoOptions);
 
 module.exports = {
-
   // Valid `level` configs:
   // i.e. the minimum log level to capture with sails.log.*()
   //
@@ -20,8 +30,17 @@ module.exports = {
   // 'info'	: Display calls from `.error()`, `.warn()`, `.debug()` to `.info()`
   // 'verbose': Display calls from `.error()`, `.warn()`, `.debug()`, `.info()` to `.verbose()`
   //
+
+  notify:function() {
+    
+    console.log('logging enabled')
+    Sails.log('info', 'logging enabled')
+  },
   log: {
-    level: 'info'
+    level: 'info',
+    filePath: 'application.log'
+
+    ,custom: customLogger
   }
 
 };
