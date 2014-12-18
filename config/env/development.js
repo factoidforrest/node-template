@@ -1,7 +1,10 @@
 console.log('loaded development config file ')
 module.exports = {
   //I guess you can set sails config stuff here like sails.config.whatever = whatever
-  sails.config.api_url = sails.config.asset_url = 'https://localhost:1337/';
+  configure: function(){
+  	sails.config.api_url = sails.config.asset_url = 'https://localhost:1337/';  	
+  }
+
 
 };
 
