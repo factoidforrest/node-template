@@ -34,7 +34,7 @@ module.exports = {
   notify:function() {
     
     console.log('logging enabled')
-    Sails.log('info', 'logging enabled')
+    sails.log('info', 'logging enabled')
   },
   log: {
     level: 'info',

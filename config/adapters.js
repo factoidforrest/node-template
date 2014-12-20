@@ -28,7 +28,16 @@ module.exports.adapters = {
       user     : '',
       password : '',
       database : 'mobile-gift-card'
-  },
+  }, 
+  mongoprod: {
+    //not sure yet, leaving the same as dev for now but changing db name, actual db should have username and password and read env vars to get them
+      module   : 'sails-mongo',
+      host     : 'localhost',
+      port     : 27017,
+      user     : '',
+      password : '',
+      database : 'mobile-gift-card-prod'
+  }
 
 
 
