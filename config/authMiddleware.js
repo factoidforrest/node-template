@@ -95,15 +95,14 @@ passport.deserializeUser(function (id, done) {
     });
 });
 
+//not using these vars for now
 if (process.env.NODE_ENV === 'production') {
     env = 'production';
-    keyPath = 'ssl/dev.key';
-    certPath = 'ssl/dev.key';
+
 
 } else {
     env = 'development';
-    keyPath = 'ssl/dev.key';
-    certPath = 'ssl/dev.key';
+
 }
 
 
@@ -113,10 +112,6 @@ module.exports = {
     express: {
 
         //ssl stuff
-        serverOptions : {
-            key: fs.readFileSync('ssl/dev.key'),
-            cert: fs.readFileSync('ssl/dev.cert')
-        },
 
         customMiddleware: function (app) {
 
