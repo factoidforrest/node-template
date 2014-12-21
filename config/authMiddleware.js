@@ -4,11 +4,13 @@ var passport = require('passport')
     , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
     , FacebookStrategy = require('passport-facebook').Strategy
     , LocalStrategy = require('passport-local').Strategy
+    , TwitterStrategy = require('passport-twitter').Strategy
     , fs = require('fs');
 
 //this handler is used for third party authentications like google
 var verifyHandler = function (accessToken, refreshToken, params, profile, done) {
     console.log(params);
+    console.log('the user profile is: ', profile)
     process.nextTick(function () {
         Authentication.findOne({uid: profile.id}).done(function (err, authentication) {
             if (authentication) {
@@ -46,6 +48,7 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
                 data.token = accessToken;
                 data.refreshToken = refreshToken;
                 console.log('the authentication data is', data)
+                //creating an authentication will automatically create a user if none exists with that email, see auth model
                 Authentication.create(data).done(function (err, authentication) {
                     console.log('new authentication saved as: ', authentication);
                     console.log('with error', err)
@@ -152,6 +155,14 @@ module.exports = {
             }
 
             passport.use(new FacebookStrategy(facebookOptions,  verifyHandler));
+
+            passport.use(new TwitterStrategy({
+                consumerKey: 'Bs8rkqXa7lFTpngp6mtrYQHtN',
+                consumerSecret: 'XUTGiBfCsvk6PF4H0P0tYgyopE3DLDnO2WREl1uLBVeiYMXNoL',
+                callbackURL: 'https://localhost:1337/auth/twitter/callback'
+              },
+              verifyHandler
+            ));
 
             passport.use(new GoogleStrategy({
                     clientID: '525376363568-p6rb6mji0mpj4f6otog4b81pgeni631i.apps.googleusercontent.com',
