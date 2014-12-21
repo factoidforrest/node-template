@@ -19,7 +19,30 @@ var passport = require('passport');
 
 
 module.exports = {
-	
+	twitter: function (req, res) {
+		var options = { 
+			failureRedirect: '/'
+		}
+
+		passport.authenticate('twitter', options, 
+			function (err, user) {
+				console.log('authenticated via twitter with err', err, 'and user ', user)
+				req.logIn(user, function (err) {
+					if (err) {
+						console.log(err);
+						res.view('500');
+						return;
+					}
+
+
+					var conf = sails.config;
+					res.redirect(conf.apiRoot + '#/cards');
+					return;
+				});
+			})(req, res);
+
+
+	},
 	facebook: function (req, res) {
 		var options = { 
 			failureRedirect: '/',
@@ -192,9 +215,12 @@ module.exports = {
 	}
 
 	,confirm: function(req, res){
-		var token = req.body.token;
-		User.confirmEmail(token, function(success){
-			res.redirect(sails.config.asset_url)
+		var token = req.query.token;
+		console.log('got confirm request with token: ', token);
+		User.confirmEmail(token, function(err){
+			if (err) return res.redirect(sails.config.assetRoot + '#/?message=confirmfail');
+			console.log('confirmed user email by token')
+			res.redirect(sails.config.assetRoot + '#/?message=confirmsuccess')
 		});
 	}
 

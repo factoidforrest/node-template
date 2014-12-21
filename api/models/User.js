@@ -46,6 +46,19 @@ module.exports = {
         }
     }
     
+  }, 
+  confirmEmail: function(token, next){
+    User.findOne({token:token}).done(function(err, user){
+      if (err) return next(err);
+      if (user === null || typeof(user) === 'undefined') return next('Invalid token');
+      console.log('found user to confirm by token: ', user)
+      user.token = null;
+      user.save(function(error){
+        if (error) return next(error);
+        console.log('updated user to rmeove token: ', user);
+        next();
+      });
+    });
   }
   
   , beforeCreate: function (attrs, next) {
@@ -62,6 +75,7 @@ module.exports = {
         if (err) return next(err);
         attrs.password = hash;
         delete(attrs.passwordConfirmation);
+        //should check the key is unique but it's probably ok not to since the chances of two being the same are insanely small
         require('crypto').randomBytes(48, function(ex, buf) {
           attrs.token = buf.toString('hex');
           Mail.sendConfirmation(attrs, next);

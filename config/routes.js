@@ -25,7 +25,7 @@
  * For convenience, you can also connect routes directly to views or external URLs.
  *
  */
-routes = {};
+var routes = {};
 //if mode is undefined server both static and api
 mode = process.env.SERVER_MODE;
 
@@ -33,7 +33,7 @@ mode = process.env.SERVER_MODE;
 
 if(mode==='assets'){
     console.log('Static Asset mode : API routes empty')
-} else if (mode==='api' || typeof(mode) === undefined){
+} else {
     console.log('API mode : routes enabled')
     //turn off static assets
     routes = {

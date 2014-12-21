@@ -4,6 +4,8 @@ var exports;
 
 if (process.env.NODE_ENV === 'production') {
 	exports = {
+		apiRoot : "SETME.USING.ENV",
+		assetRoot : "SETMEUSINGENV",
 		ssl: {
 			key: fs.readFileSync('ssl/prod.key')
     	, cert: fs.readFileSync('ssl/prod.cert')
@@ -14,6 +16,8 @@ if (process.env.NODE_ENV === 'production') {
 	}
 } else {
 	exports = {
+		apiRoot : "https://localhost:1337/",
+		assetRoot : "https://localhost:1337/",
 		ssl: {
 			key: fs.readFileSync('ssl/dev.key')
     	, cert: fs.readFileSync('ssl/dev.cert')

@@ -11,6 +11,18 @@ angular.module('mobileGiftCardWebApp')
         'use strict';
     $scope.apiRoot = ENV.apiRoot;
     $scope.formData = {};
+    console.log('the message is ,', $location.search().message)
+    var messages = {
+      confirmsuccess: 'You successfully confirmed your email.  You can now login.',
+      confirmfail: 'Failed to confirm your email.  Maybe the link was incorrect or the token was expired or your email is already confirmed.'
+    }
+
+    var messageKey =  $location.search().message;
+    if (messageKey) {
+      $scope.message = messages[messageKey];
+    }
+    console.log('the scope message is ', $scope.message)
+
     $scope.login = function () {
     	console.log('submit called with formdata')
     	console.log($scope.formData)
