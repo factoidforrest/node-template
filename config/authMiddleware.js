@@ -79,7 +79,7 @@ var localHandler = function(email, password, done){
 }
 
 passport.serializeUser(function (authentication, done) {
-    console.log('serializing authentication: ', authentication)
+    console.log('serializing user: ', authentication)
     console.log('with user: ', authentication.user_id)
     if (authentication.provider) {
         //we have an authentication model(facebook, twitter, etc)

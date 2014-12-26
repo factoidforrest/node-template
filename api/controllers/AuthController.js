@@ -112,8 +112,17 @@ module.exports = {
         return res.json({ error: 'Incorrect email.' });
       }
       
+      if (typeof(user.password) === 'undefined'){
+      	return res.json({ error: 'You have previously logged in with this email through a social network, but not using a password.  You can register this email with a password by clicking register below and the accounts will merge, or log in with a social network.' })
+      }
+
       if (!user.validPassword(password)) {
         return res.json({ error: 'Incorrect password.' });
+      }
+
+      if (user.token !== null){
+      	//should offer a link to resend confirmation I guess. 
+      	return res.json({ error: 'You must confirm your email.  Please check your inbox.' });
       }
 
       req.logIn(user, function (err) {
@@ -166,22 +175,17 @@ module.exports = {
 								console.log(err)
 								if (err) return res.send(500, {error: "DB Error"});
 								console.log('set password on previously passwordless user:', user)
-
-								passport.authenticate('local')(req, res, function () {
-							  	console.log('authenticated new user')
-	                res.json({
-										success: true,
-										errors: {}
-									});
-	            	});
+                res.json({
+									success: true,
+									errors: {}
+								});
 							});
 						});
 
 					} else {
 						res.send(200, {
 							success: false
-							//We should maybe just let them register normally and then confirm the email to join the accounts
-							, errors: { email: "A user already exists with this email and they already have a password." }
+							, errors: { email: "A user already exists with this email and they already have a password.  To change your password, login and do so through the settings menu" }
 						});
 					}
 					
@@ -196,14 +200,11 @@ module.exports = {
 						} else {
 						  console.log('the user was saved as', user);
 						  req.body.password = password;
-							
-						  passport.authenticate('local')(req, res, function () {
-						  	console.log('authenticated new user')
-                res.json({
-									success: true,
-									errors: {}
-								});
-            	});
+              res.json({
+								success: true,
+								errors: {}
+							});
+            	
 
 
 						}
@@ -231,6 +232,18 @@ module.exports = {
 		res.json({success:true});
 	},
 
+	resendConfirmation: function(req, res) {
+		var email = req.query.email;
+		User.findOne({email:email}).done(function(err,user){
+			if (err) return res.status(404).json({message:"Server Error looking up user"});
+			console.log("found user for resending confirmation:", user)
+			Mail.sendConfirmation(user, function(er){
+				if (er) return res.status(500).json({message:"Server Error sending email"});
+				res.status(200).json({message:"Confirmation Sent"})
+			});
+		});
+	},
+
 
 
 
@@ -244,7 +257,7 @@ module.exports = {
 };
 
 
-
+//checks if the password is acceptable during registration
 function passwordValid(params, res) {
 	if (params.password !== params.passwordConfirmation) {
 		console.log('passwords didnt match')

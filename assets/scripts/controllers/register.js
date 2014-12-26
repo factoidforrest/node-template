@@ -29,7 +29,7 @@ angular.module('mobileGiftCardWebApp')
           	// if successful, bind success message to message
 
             $scope.message = data.message;
-            window.location.hash = "#/cards"
+            window.location.hash = "#/?message=pleaseconfirm"
           }
         }).error(function(data){
         	console.log("server error: ", data);

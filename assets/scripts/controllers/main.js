@@ -13,6 +13,7 @@ angular.module('mobileGiftCardWebApp')
     $scope.formData = {};
     console.log('the message is ,', $location.search().message)
     var messages = {
+      pleaseconfirm: 'A confirmation email has been sent to your address.  Please click the link to continue.',
       confirmsuccess: 'You successfully confirmed your email.  You can now login.',
       confirmfail: 'Failed to confirm your email.  Maybe the link was incorrect or the token was expired or your email is already confirmed.'
     }
