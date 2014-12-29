@@ -94,7 +94,9 @@ module.exports = {
                 card.save(function(err, saved){
                     // Error handling
                     if (err) {
-                        return console.log(err);
+                        console.log(err);
+                        return res.send(500, {error : 'Internal Server Error saving Gift'});
+                        
                     } else {
                         return res.json(saved);
                     }

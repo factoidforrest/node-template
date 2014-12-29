@@ -16,7 +16,7 @@
  */
 
 var passport = require('passport');
-
+var moment = require('moment');
 
 module.exports = {
 	twitter: function (req, res) {
@@ -235,12 +235,63 @@ module.exports = {
 	resendConfirmation: function(req, res) {
 		var email = req.query.email;
 		User.findOne({email:email}).done(function(err,user){
+			if (user.token === null) return res.send(405, {message: "User already confirmed email"})
 			if (err) return res.status(404).json({message:"Server Error looking up user"});
 			console.log("found user for resending confirmation:", user)
 			Mail.sendConfirmation(user, function(er){
 				if (er) return res.status(500).json({message:"Server Error sending email"});
 				res.status(200).json({message:"Confirmation Sent"})
 			});
+		});
+	},
+
+	sendResetEmail: function(req, res){
+		console.log('send reset password called with params: ', req.body)
+		var email = req.body.email;
+		User.findOne({email: email}, function(err, user){
+			console.log('found user with matching email:', user)
+			if (err) return res.send(404, {error: 'No matching email found'});
+			Token.create({user_id: user.id}, function(err, token){
+				console.log('created token: ', token)
+				if (err) {
+					console.log(err)
+					return res.send(500, {error: 'Error creating token'});
+				}
+				Mail.sendPasswordReset(user, token, function(err){
+
+					if (err){
+						console.log(err)
+						return res.send(500, {error: 'Error sending email'});
+					}
+					res.send(200, {message:'Email Sent'})
+				})
+			})
+		})
+	},
+
+	resetPassword: function(req, res) {
+		console.log('reset password called with params: ', req.body)
+		var key = req.body.token;
+		var password = req.body.password;
+		Token.findOne({key:key}, function(err, token){
+			if (err) return res.send(500, {error: 'Internal Server Error'});
+			
+			//if the token is over an hour old, consider it invalid.  moment() is now
+			if (moment().subtract(1, 'hour').isAfter(token.createdAt)){
+				return res.send(400, {error: 'Token Expired'});
+			} else {
+				User.findOne({id: token.user_id}, function(err, user){
+					if (err) return res.send(500, {error: 'Internal Server Error'});
+					user.setPassword(password, function(){
+						user.save(function(err, user){
+							//maybe log the user in here.  Maybe make them enter their password again(as below) since that way they might remember
+							if (err) return res.send(500, {error: 'Internal Server Error'});
+							return res.send(200, {message: 'Password Reset'});
+
+						})
+					})
+				});
+			}
 		});
 	},
 

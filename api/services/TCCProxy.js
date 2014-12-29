@@ -112,6 +112,8 @@ var redeemBodyForCard = function(card, amount) {
 
 module.exports = {
 
+    //TODO make these one method which takes a callback, get that url out of the code and into a sails config var
+
     getTCCInquiry : function(card_number) {
         var deferred = q.defer();
 
@@ -143,6 +145,7 @@ module.exports = {
         var deferred = q.defer();
 
         var body = activateBodyForCard(card_number, amount);
+        //shouldnt be hardcoded
         var url = 'http://64.73.249.146/Partner/ProcessJson';
         var options = {
             method: 'post',
