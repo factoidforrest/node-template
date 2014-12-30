@@ -16,7 +16,9 @@ module.exports.policies = {
 
   // Default policy for all controllers and actions
   // (`true` allows public access) 
+  //by default, require user to be logged in for everything
   '*': 'isAuthenticated',
+  //except
     'auth': {
         '*' : true
     },
