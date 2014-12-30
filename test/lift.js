@@ -1,6 +1,5 @@
 
 
-module.exports = function(){
   before(function(done) {
     // Lift Sails and store the app reference
     require('sails').lift({
@@ -41,4 +40,3 @@ module.exports = function(){
   after(function(done) {
     sails.lower(done);
   });
-}

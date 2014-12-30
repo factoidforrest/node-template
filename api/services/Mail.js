@@ -73,6 +73,28 @@ module.exports.sendPasswordReset = function(user, token, next){
   });
 }
 
-function confirmHTML(token){
-  return '<html><head><title>Confirmation</title></head><body>Click this link to confirm your email: <a href="' + token + '"></a> </body></html>'
+module.exports.invite = function(email, next){
+  sails.log('info','sending an invitation');
+
+  fs.readFile('views/invite-email.jade', 'utf8', function (err, file) {
+    if (err) return next(err);
+    console.log('read jade template file data: ', file);
+    var template = jade.compile(file);
+    var link = sails.config.assetRoot;
+    var html = template({
+      link: link
+    });
+    mail = {
+      to: email,
+      //consider using the inviters email since that will help get around spam filters I think
+      from: 'no-reply@dinersgroup.com',
+      text: 'Diners Group Invitation.  You have HTML disabled in your email client.  Paste this link into your browser to accept your invitation: ' + link,
+      attachment:  {data:html, alternative:true},//confirmHTML(userAttrs.token),
+      subject: "Diner's Group Invite"
+    }
+
+    send(mail, next)
+  });
 }
+
+

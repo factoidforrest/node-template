@@ -18,8 +18,20 @@
 module.exports = {
     
   
+	//untested
+	create: function(req, res){
+		var invited = req.body.email;
+		var sender = req.user; 
+		Invitation.invite(invited, sender, function(err){
+			if (err) {
+				sails.error(err)
+				return res.send(500,{error:'Error Creating Invitation'})
+			} else {
+				res.send(200)
+			}
+		})
 
-
+	},
   /**
    * Overrides for the settings in `config/controllers.js`
    * (specific to InvitationController)

@@ -18,11 +18,32 @@ module.exports = {
     	type: 'integer',
     	index:true,
     	required: true
+    },
+    notify: function(done){
+      Mail.invite(this.email, function(err){
+        done(err);
+      })
     }
-  	/* e.g.
-  	nickname: 'string'
-  	*/
+
     
+  },
+
+  invite: function(invited, sender, callback) {
+  	User.findOne({email: invited}, function(err, existing){
+      console.log('the type is', typeof(existing) !== 'undefined')
+  		if (typeof(existing) !== 'undefined'){
+  			return callback('User already exists');
+  		}
+      Invitation.create({email: invited, sender_id: sender.id}, function(err, invitation){
+        if (err) return callback(err);
+        invitation.notify(function(err){
+          callback(err);
+        });
+        
+      });
+  		
+		});
+
   }
 
 };

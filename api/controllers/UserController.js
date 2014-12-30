@@ -15,6 +15,9 @@
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
 
+
+//USER MUST BE LOGGED IN TO USE THIS API, SEE CONFIG/POLICIES
+
 module.exports = {
     
   
