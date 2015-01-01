@@ -15,7 +15,7 @@ module.exports = {
       required: true
     },
     sender_id: {
-    	type: 'integer',
+    	type: 'string',
     	index:true,
     	required: true
     },
@@ -37,7 +37,7 @@ module.exports = {
       Invitation.create({email: invited, sender_id: sender.id}, function(err, invitation){
         if (err) return callback(err);
         invitation.notify(function(err){
-          callback(err);
+          callback(err, invitation);
         });
         
       });

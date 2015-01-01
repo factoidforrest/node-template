@@ -115,6 +115,7 @@ module.exports = {
     //TODO make these one method which takes a callback, get that url out of the code and into a sails config var
 
     getTCCInquiry : function(card_number) {
+        console.log('card number requesting from tcc is ', card_number)
         var deferred = q.defer();
 
         var url = 'http://64.73.249.146/Partner/ProcessJson';
@@ -125,7 +126,7 @@ module.exports = {
             url: url
         };
         request(options, function (err, httpResponse, body) {
-
+            console.log('res body is', body)
             if (err || body.txs.length === 0) {
                 deferred.reject(err);
             }

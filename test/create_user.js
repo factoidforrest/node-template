@@ -1,5 +1,6 @@
 beforeEach(function(done){
   User.create({
+    //if you change this be sure to change in the login.js file as well.  
     email: 'light24bulbs@gmail.com',
     last_name: 'testLast',
     full_name: 'testFirst testLast',

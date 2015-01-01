@@ -16,10 +16,16 @@ describe('invitations', function(){
 		})
 	})
 	it('should create', function(done){
+		this.timeout(10000);
 		getUser(function(err, sender){
-			Invitation.invite('light24bulbs+invitation@gmail.com', sender, function(err){
+			Invitation.invite('light24bulbs+invitation@gmail.com', sender, function(err, invitation){
 				console.log('err is', err)
+				console.log('invite is ', invitation)
 				expect(err).to.equal(undefined)
+				User.findOne({id: invitation.sender_id}, function(err, senderInDB){
+					console.log('sender is ', senderInDB)
+					expect(JSON.stringify(senderInDB)).to.equal(JSON.stringify(sender));
+				})
 				done();
 			}) 
 		})

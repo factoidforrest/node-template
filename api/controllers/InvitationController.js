@@ -22,7 +22,7 @@ module.exports = {
 	create: function(req, res){
 		var invited = req.body.email;
 		var sender = req.user; 
-		Invitation.invite(invited, sender, function(err){
+		Invitation.invite(invited, sender, function(err, invitation){
 			if (err) {
 				sails.error(err)
 				return res.send(500,{error:'Error Creating Invitation'})

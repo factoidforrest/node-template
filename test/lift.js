@@ -30,7 +30,6 @@
          sails.localAppURL = localAppURL = ( sails.usingSSL ? 'https' : 'http' ) + '://' + sails.config.host + ':' + sails.config.port + '';
          // save reference for teardown function
          console.log('lifted sails for testing')
-         console.log('done is: ', done)
          done(err);
        });
 

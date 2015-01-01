@@ -19,7 +19,7 @@ module.exports = {
     create : function(req, res) {
         var cardNumber = req.body.card_number;
         var ownerId = req.user.id;
-
+        console.log('got card number from client ', cardNumber)
         TCCProxy.getTCCInquiry(cardNumber).then(function(tcc_card) {
             tcc_card.ownerId = ownerId;
             GiftCard.create(tcc_card).done(function(err,client) {
@@ -32,6 +32,7 @@ module.exports = {
         });
     },
     buy : function(req, res) {
+        sails.info('buying a gift card:', req.body)
         var amount = req.body.amount;
         var ownerId = req.user.id;
 
@@ -80,6 +81,8 @@ module.exports = {
             }
         });
     },
+
+    //this API checks if the user being gifted exists, if not it returns a warning unless the request specifies 'invite: true'
     gift : function(req, res) {
         GiftCard.findOne({
             ownerId: req.user.id,
@@ -89,8 +92,34 @@ module.exports = {
             if(card.giftStatus === 'gifted') {
                 return res.send(409, {error : 'Card Already Gifted'});
             }
+            User.findOne({email:req.body.email}, function(err, user){
+                if (err) {
+                    sails.error(err)
+                    return res.send(500, {error : 'Internal Server Error'});
+                }
+                if (typeof user === undefined && req.body.invite !== true) {
+                    return res.json({status:'noemail', message:"The user doesn't exist but we can still send the gift card to them and an invitation to join diner's group."})
+                } else {
+                    GiftCardGift.create({giftRecipientEmail : req.body.email, giftMessage : req.body.message, giftStatus : 'gifted', giftCardId : card.id, cardRemainingValue : card.balance}).done(function(){
+                        card.giftStatus = "gifted";
+
+                        card.save(function(err, saved){
+                            // Error handling
+                            if (err) {
+                                console.log(err);
+                                return res.send(500, {error : 'Internal Server Error saving Gift'});
+                                
+                            } else {
+                                saved.status = "good"
+                                return res.json(saved);
+                            }
+                        });
+                    })
+                }
+            })
             GiftCardGift.create({giftRecipientEmail : req.body.email, giftMessage : req.body.message, giftStatus : 'gifted', giftCardId : card.id, cardRemainingValue : card.balance}).done(function(){
                 card.giftStatus = "gifted";
+
                 card.save(function(err, saved){
                     // Error handling
                     if (err) {
