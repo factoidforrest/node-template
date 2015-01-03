@@ -7,7 +7,6 @@ module.exports = {
   attributes: {
   	
 
-  	token: 'string',
     tokenSecret: 'string',
     password: 'string',
     email: {

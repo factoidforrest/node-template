@@ -30,6 +30,9 @@ module.exports.policies = {
     },
     'GiftCardGift' : {
         '*' : true
+    },
+    'Admin': {
+      '*' : 'isAdmin'
     }
 
 

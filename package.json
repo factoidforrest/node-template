@@ -34,7 +34,8 @@
     "mocha": "~2.1.0",
     "chai": "~1.10.0",
     "supertest": "~0.15.0",
-    "superagent": "~0.21.0"
+    "superagent": "~0.21.0",
+    "object-assign": "~2.0.0"
   },
   "scripts": {
     "start": "node app.js",

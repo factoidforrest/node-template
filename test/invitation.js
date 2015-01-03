@@ -3,6 +3,8 @@
 var expect = require('chai').expect
 
 require('./lift')
+require('./create_user').createUser({})
+
 var getUser = require('./create_user').getUser
 
 describe('invitations', function(){

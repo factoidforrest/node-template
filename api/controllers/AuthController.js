@@ -171,15 +171,22 @@ module.exports = {
 						console.log('setting new password on old user:', usr)
 						//TODO: need to confirm the email before this login method becomes active
 						usr.setPassword(params.password, function(){
-							usr.save(function(err, usr){
-								console.log(err)
-								if (err) return res.send(500, {error: "DB Error"});
-								console.log('set password on previously passwordless user:', user)
-                res.json({
-									success: true,
-									errors: {}
+							require('crypto').randomBytes(48, function(ex, buf) {
+			          usr.token = buf.toString('hex');
+			          usr.save(function(err, usr){
+									console.log(err)
+									if (err) return res.send(500, {error: "DB Error"});
+
+									Mail.sendConfirmation(usr, function(){});
+
+									console.log('set password on previously passwordless user:', usr)
+	                res.json({
+										success: true,
+										errors: {}
+									});
 								});
-							});
+			        });
+							
 						});
 
 					} else {

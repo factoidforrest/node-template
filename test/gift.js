@@ -4,6 +4,7 @@ require('./lift')
 
 var expect = require('chai').expect
 var request = require('supertest')
+require('./create_user').createUser({})
 
 var getUser = require('./create_user').getUser
 var login = require('./login')
@@ -20,7 +21,7 @@ describe('gift cards gifting', function(){
 		    .expect(200)
 		    .end(function(err, res){
 		    	//console.log('got api logged in test response of:', res)
-		    	done();
+		    	done(err);
 		    });
 
 		

@@ -50,9 +50,12 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
                 console.log('the authentication data is', data)
                 //creating an authentication will automatically create a user if none exists with that email, see auth model
                 Authentication.create(data).done(function (err, authentication) {
-                    console.log('new authentication saved as: ', authentication);
-                    console.log('with error', err)
-                    return done(err, authentication);
+                	User.findOne({id : authentication.user_id}, function(err, user){
+	                    console.log('new authentication saved as: ', authentication);
+	                    console.log('with user:', user);
+	                    console.log('with error', err);
+	                    return done(err, user);
+	                });
                 });
             }
         });
@@ -78,16 +81,12 @@ var localHandler = function(email, password, done){
     });
 }
 
-passport.serializeUser(function (authentication, done) {
-    console.log('serializing user: ', authentication)
-    console.log('with user: ', authentication.user_id)
-    if (authentication.provider) {
-        //we have an authentication model(facebook, twitter, etc)
-        id = authentication.user_id;
-    }  else {
-        //we have the user model which means we are authenticating using a password
-        id = authentication.id;
-    }
+passport.serializeUser(function (user, done) {
+    console.log('serializing user: ', user)
+
+    //we have the user model which means we are authenticating using a password
+    id = user.id;
+
 
     done(null, id);
 });

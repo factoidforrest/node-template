@@ -1,33 +1,62 @@
-beforeEach(function(done){
-  User.create({
-    //if you change this be sure to change in the login.js file as well.  
-    email: 'light24bulbs@gmail.com',
-    last_name: 'testLast',
-    full_name: 'testFirst testLast',
-    provider: 'local',
-    first_name: 'testFirst'
-  }).done(function(err, user){
-    
-    user.token = null;
-    //need to do this in it's own step so it doesn't trigger password confirmation via email
-    user.setPassword('secretpassword',function(){
-      user.save(function(err,user){
-        console.log('created user for testing:', user)
-        if (err) return done(err);
-        done();
-      });
-    });
-    
-  });
-});
+var objectAssign = require('object-assign');
 
-afterEach(function(done){
-  User.destroy({}, function() {
-    console.log('destroyed all users')
-    done();
-  })
-})
+var registeredDestroyHook = false;
+
+module.exports.createUser = function(params){
+
+  var userProperties = {
+      //if you change this be sure to change in the login.js file as well.  
+      email: 'light24bulbs@gmail.com',
+      last_name: 'testLast',
+      full_name: 'testFirst testLast',
+      provider: 'local',
+      first_name: 'testFirst'
+    }
+  objectAssign(userProperties, params);
+
+  beforeEach(function(done){
+    User.create(userProperties).done(function(err, user){
+      
+      user.token = null;
+      //need to do this in it's own step so it doesn't trigger password confirmation via email
+      user.setPassword('secretpassword',function(){
+        user.save(function(err,user){
+          //console.log('created user for testing:', user)
+          if (err) return done(err);
+          done();
+        });
+      });
+      
+    });
+  });
+
+  if (!registeredDestroyHook){
+    registeredDestroyHook = true;
+    afterEach(function(done){
+      User.destroy({}, function() {
+        console.log('destroyed all users')
+        done();
+      })
+    })
+  }
+}
+
 
 module.exports.getUser = function getUser(cb){
   User.findOne({first_name: 'testFirst'}).exec(cb);
 }
+
+/*
+module.exports.getUser = function getUser(params, cb){
+
+  User.findOne({first_name: 'testFirst'}).exec(function(err, user){
+    if(JSON.stringify(params) !== JSON.stringify({})) {
+      return cb(err, user)
+    } else {
+      //modify the user using the params, save the user, and return it
+    }
+
+  });
+}
+
+*/
