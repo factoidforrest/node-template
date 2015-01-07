@@ -83,7 +83,7 @@ module.exports = {
 				return res.json(gift);
 			}
 
-		}
+		});
 	},
 	GiftCardsToAccept : function(req, res) {
 		GiftCardGift.find({
