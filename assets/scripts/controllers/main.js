@@ -16,6 +16,7 @@ angular.module('mobileGiftCardWebApp')
       pleaseconfirm: 'A confirmation email has been sent to your address.  Please click the link to continue.',
       confirmsuccess: 'You successfully confirmed your email.  You can now login.',
       confirmfail: 'Failed to confirm your email.  Maybe the link was incorrect or the token was expired or your email is already confirmed.'
+      , deactivated: 'Your account has been deactivated by an administrator.'
     }
 
     var messageKey =  $location.search().message;
