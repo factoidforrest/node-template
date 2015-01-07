@@ -23,7 +23,7 @@ This is a dual mode application which can serve either the API(backend), the ass
 Be sure to leave this variable unset(not just blank) when you want to serve both.
 SERVER_MODE=(assets, api, unset)
 
-DATABASE_URL= the mongo URL you wish to connect to in production.  
+DATABASE_URI= the mongo URI you wish to connect to in production.  
 If unset, it will default to the development configuration on localhost.
 
 WARN_EMAIL= The email which errors be sent to.  Leave unset to disable this feature.  
