@@ -20,12 +20,16 @@ var verifyHandler = function (accessToken, refreshToken, params, profile, done) 
                 authentication.googleParams = params;
 
                 authentication.save(function(err) {
-                    if (err) {
-                        console.log("authentication saving error ", err);
-                    }
-                    console.log('authentication updated to db')
+                	User.findOne({id : authentication.user_id}, function(err, user){
+	                    if (err) {
+	                        console.log("authentication saving error ", err);
+	                        return done(err);
+	                    }
+	                    console.log('authentication updated to db')
+	                    return done(null, user);
+	                });
                 });
-                return done(null, authentication);
+                
             } else {
                 console.log('creating new authentication from auth data')
                 var data = {

@@ -17,9 +17,10 @@
 
 module.exports = {
     deactivateuser : function(req, res){
-    	var email = req.params.email;
+    	var email = req.body.email;
     	User.findOne({email: email}, function(err, user){
-    		sails.info('found user to deactivate:', user)
+    		console.log('searching for user to deactivate with email ', req.body)
+    		console.log('info','found user to deactivate:', user)
     		if (typeof user === 'undefined') return res.send(500, {error:'No user with that email'});
     		user.deactivated = true;
     		user.save(function(err, user){

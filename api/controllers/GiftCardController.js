@@ -68,6 +68,23 @@ module.exports = {
 			}
 		});
 	},
+	findGift : function(req, res){
+		GiftCardGift.findOne({
+			giftRecipientEmail: req.user.email,
+			id: req.body.id
+		}).done(function(err, gift) {
+			if (typeof gift === 'undefined'){
+				return res.send(404, {error: 'Gift not found.'})
+			}
+			if (err) {
+				sails.error('Database error in findGift while looking up giftcardgift', {error: err})
+				return res.send(500, {error: 'Database Error'})
+			} else {
+				return res.json(gift);
+			}
+
+		}
+	},
 	GiftCardsToAccept : function(req, res) {
 		GiftCardGift.find({
 			giftRecipientEmail: req.user.email
@@ -172,6 +189,10 @@ module.exports = {
 			if (gift.giftStatus === 'giftaccepted') {
 				return res.send(409, {error: 'Card Already been Accepted'});
 			}
+			if (req.user.email !== gift.giftRecipientEmail){
+				sails.log.error('Hacking attempt detected on accept gift', {users_ip: getIP(req), request: req})
+				return res.send(401, {error: 'Unauthorized to reject gift, gift card was gifted to another user.  This action has been reported and your IP has been logged.'})
+			}
 			gift.giftStatus = "giftaccepted";
 			gift.save(function(err, gift) {
 				GiftCard.findOne({
@@ -192,31 +213,35 @@ module.exports = {
 		})
      },
      rejectgift : function(req, res) {
-		GiftCard.findOne({
-			id : req.param("id")
-		}).done(function(err, card) {
+			GiftCard.findOne({
+				id : req.param("id")
+			}).done(function(err, card) {
 
-		if(card.giftStatus === 'rejected') {
-			return res.send(409, {error : 'Card Already rejected'});
-		}
-		GiftCardGift.findOne({giftCardId : card.id, giftStatus : 'gifted'}).done(function(err, gift){
-			//delete card.giftStatus;
-			card.giftStatus = undefined;
-
-			card.save(function(err, saved){
-				// Error handling
-				if (err) {
-					return res.send(409, {error : err.message});
+				if(card.giftStatus === 'rejected') {
+					return res.send(409, {error : 'Card Already rejected'});
 				}
-				gift.giftStatus = "rejected";
-				gift.save(function() {
-					return res.json(saved);
-				});
-			});
+				GiftCardGift.findOne({giftCardId : card.id, giftStatus : 'gifted'}).done(function(err, gift){
+					//delete card.giftStatus;
+					if (req.user.email !== gift.giftRecipientEmail){
+						sails.log.error('Hacking attempt detected on reject gift', {users_ip: getIP(req), request: req})
+						return res.send(401, {error: 'Unauthorized to reject gift, gift card was gifted to another user.  This action has been reported and your IP has been logged.'})
+					}
+					card.giftStatus = undefined;
 
-		})
-	});
-},
+					card.save(function(err, saved){
+						// Error handling
+						if (err) {
+							return res.send(409, {error : err.message});
+						}
+						gift.giftStatus = "rejected";
+						gift.save(function() {
+							return res.json(saved);
+						});
+					});
+
+				})
+		});
+	},
 
 
 
@@ -228,3 +253,11 @@ module.exports = {
 
     
 };
+
+function getIP(req){
+	var ip = req.headers['x-forwarded-for'] || 
+     req.connection.remoteAddress || 
+     req.socket.remoteAddress ||
+     req.connection.socket.remoteAddress;
+  return ip;
+}

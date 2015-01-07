@@ -26,18 +26,20 @@ module.exports = {
 
 		passport.authenticate('twitter', options, 
 			function (err, user) {
-				console.log('authenticated via twitter with err', err, 'and user ', user)
-				req.logIn(user, function (err) {
-					if (err) {
-						console.log(err);
-						res.view('500');
+				redirectIfDeactivated(user, res, function(){
+					console.log('authenticated via twitter with err', err, 'and user ', user)
+					req.logIn(user, function (err) {
+						if (err) {
+							console.log(err);
+							res.view('500');
+							return;
+						}
+
+
+						var conf = sails.config;
+						res.redirect(conf.apiRoot + '#/cards');
 						return;
-					}
-
-
-					var conf = sails.config;
-					res.redirect(conf.apiRoot + '#/cards');
-					return;
+					});
 				});
 			})(req, res);
 
@@ -54,17 +56,19 @@ module.exports = {
 
 		passport.authenticate('facebook', options, 
 			function (err, user) {
-				req.logIn(user, function (err) {
-					if (err) {
-						console.log(err);
-						res.view('500');
+				redirectIfDeactivated(user, res, function(){
+					req.logIn(user, function (err) {
+						if (err) {
+							console.log(err);
+							res.view('500');
+							return;
+						}
+
+
+						var conf = sails.config;
+						res.redirect(conf.apiRoot + '#/cards');
 						return;
-					}
-
-
-					var conf = sails.config;
-					res.redirect(conf.apiRoot + '#/cards');
-					return;
+					});
 				});
 			})(req, res);
 
@@ -78,17 +82,19 @@ module.exports = {
 		};
 		passport.authenticate('google',options,
 			function (err, user) {
-				req.logIn(user, function (err) {
-					if (err) {
-						console.log(err);
-						res.view('500');
+				redirectIfDeactivated(user, res, function(){
+					req.logIn(user, function (err) {
+						if (err) {
+							console.log(err);
+							res.view('500');
+							return;
+						}
+
+
+						var conf = sails.config;
+						res.redirect(conf.apiRoot + '#/cards');
 						return;
-					}
-
-
-					var conf = sails.config;
-					res.redirect(conf.apiRoot + '#/cards');
-					return;
+					});
 				});
 			})(req, res);
 	}
@@ -124,14 +130,20 @@ module.exports = {
       	//should offer a link to resend confirmation I guess. 
       	return res.json({ error: 'You must confirm your email.  Please check your inbox.' });
       }
-
-      req.logIn(user, function (err) {
-      	if (err) return res.json({error: err});
-      	return res.json({
-      		success: true,
-      		user: user
+      if (accountActive(user)){
+	      req.logIn(user, function (err) {
+	      	if (err) return res.json({error: err});
+	      	return res.json({
+	      		success: true,
+	      		user: user
+	      	});
+	    	});
+	    } else {
+	    	return res.json({
+      		success: false,
+      		error: "Account disabled."
       	});
-    	});
+	    }
     });
 
 
@@ -336,5 +348,21 @@ function passwordValid(params, res) {
 		return false;
 	} else {
 		return true;
+	}
+}
+
+function accountActive(user){
+	if (user.deactivated === true){
+		return false;
+	} else {
+		return true;
+	}
+}
+
+function redirectIfDeactivated(user, res, success){
+	if (!accountActive(user)){
+		return res.redirect(sails.config.assetRoot + '#/?message=deactivated')
+	} else {
+		success();
 	}
 }

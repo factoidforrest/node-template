@@ -13,7 +13,7 @@ start the app with 'nodemon' when your terminal is in the root app directory wit
 #### Deployment
 ##### Env Variables
 
-This application depends on a number of ENV variables to being set properply in order to deploy.
+This application depends on a number of ENV variables to being set properly in order to deploy.
 All values are lower case, all keys are upper case. 
 
 NODE_ENV=production

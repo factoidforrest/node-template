@@ -1,6 +1,7 @@
 
 
   before(function(done) {
+    this.timeout(7000)
     // Lift Sails and store the app reference
     require('sails').lift({
 

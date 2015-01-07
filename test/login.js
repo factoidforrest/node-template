@@ -3,7 +3,7 @@ var request = require('supertest');
 
 var savedSession;
 
-module.exports = function(callback){
+module.exports = function(params, callback){
 	if (!savedSession){
 		var session = request.agent(sails.express.app);
 		session

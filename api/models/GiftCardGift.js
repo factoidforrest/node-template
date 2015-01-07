@@ -12,5 +12,13 @@ module.exports = {
       giftRecipientEmail: 'string',
       giftMessage: 'string',
       giftStatus: 'string'
+  },
+  //untested since the prereqs are complex.  Should manually test.
+  toJSON: function() {
+  	var json = this;
+  	GiftCard.findOne({id: this.giftCardId}, function(err, card){
+  		json.card = JSON.stringify(card);
+  		return json;
+  	})
   }
 };
