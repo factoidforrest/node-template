@@ -14,7 +14,7 @@ var login = require('./login')
 describe('gift cards gifting', function(){
 	
 		it('should buy a gift card to get things set up', function(done){
-			login(function(session){
+			login({},function(session){
 				session
 				.post('/giftcard/buy')
 		    .send({amount: '1'})

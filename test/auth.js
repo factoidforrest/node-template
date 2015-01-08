@@ -24,7 +24,7 @@ describe('local auth', function(){
 
 	})
 	it('should log in', function(done){
-		login(function(session){
+		login({},function(session){
 			session
 			.post('/giftcard/find')
 //            .send({token: token.key, password: 'newsecretpassword' })

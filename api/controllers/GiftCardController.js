@@ -32,7 +32,7 @@ module.exports = {
 		});
 	},
 	buy : function(req, res) {
-		sails.info('buying a gift card:', req.body)
+		sails.log.info('buying a gift card:', req.body)
 		var amount = req.body.amount;
 		var ownerId = req.user.id;
 

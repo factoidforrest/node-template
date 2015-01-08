@@ -8,6 +8,7 @@ var request = require('supertest')
 var moment = require('moment')
 
 require('./lift')
+require('./create_user').createUser({})
 var getUser = require('./create_user').getUser
 
 
