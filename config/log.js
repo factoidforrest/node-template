@@ -8,6 +8,8 @@
  * For more information on the Sails logger, check out:
  * http://sailsjs.org/#documentation
  */
+
+ 
 var winston = require('winston');
 require('winston-mongodb').MongoDB;
 
@@ -31,16 +33,13 @@ module.exports = {
   // 'verbose': Display calls from `.error()`, `.warn()`, `.debug()`, `.info()` to `.verbose()`
   //
 
-  notify:function() {
-    
-    console.log('logging enabled')
-    sails.log('info', 'logging enabled')
-  },
+
   log: {
     level: 'info',
-    filePath: 'application.log'
+    filePath: './logs/application.log'
 
-    ,custom: customLogger
+    //,custom: customLogger
   }
 
 };
+
