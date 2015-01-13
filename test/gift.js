@@ -1,13 +1,13 @@
 
 
-require('./lift')
+require('./libs/lift')
 
 var expect = require('chai').expect
 var request = require('supertest')
-require('./create_user').createUser({})
-require('./create_user').createUser({email:'light24bulbs+giftme@gmail.com'})
-var getUser = require('./create_user').getUser
-var login = require('./login')
+require('./libs/create_user').createUser({})
+require('./libs/create_user').createUser({email:'light24bulbs+giftme@gmail.com'})
+var getUser = require('./libs/create_user').getUser
+var login = require('./libs/login')
 
 
 

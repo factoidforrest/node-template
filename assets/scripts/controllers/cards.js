@@ -18,7 +18,8 @@ app.controller('CardsCtrl', ['$scope', '$modal', 'GiftCardService', function ($s
     var reloadData = function() {
         giftCardService.getList().then(function(data) {
             $scope.pluralized_cards = data.length > 1 || data.length < 1 ? "cards" : "card";
-            $scope.giftCards = data;
+            $scope.giftCards = data.cards;
+            console.log('card data is: ',data)
         });
         giftCardService.getAcceptList().then(function(data) {
             $scope.pluralized_cards_to_accept = data.length > 1 || data.length < 1 ? "cards" : "card";

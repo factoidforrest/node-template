@@ -1,11 +1,11 @@
 var expect = require('chai').expect
 
-require('./lift')
-var login = require('./login')
-require('./create_user').createUser({admin: true});
-require('./create_user').createUser({email: 'light24bulbs+deactivate@gmail.com'});
+require('./libs/lift')
+var login = require('./libs/login')
+require('./libs/create_user').createUser({admin: true});
+require('./libs/create_user').createUser({email: 'light24bulbs+deactivate@gmail.com'});
 
-var getUser = require('./create_user').getUser
+var getUser = require('./libs/create_user').getUser
 var request = require('supertest');
 
 

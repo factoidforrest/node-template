@@ -1,4 +1,4 @@
-require('./lift')
+require('./libs/lift')
 
 describe('logs', function(){
 	it('should log', function(){

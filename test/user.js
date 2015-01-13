@@ -7,9 +7,9 @@ var should = require('chai').should()
 var request = require('supertest')
 var moment = require('moment')
 
-require('./lift')
-require('./create_user').createUser({})
-var getUser = require('./create_user').getUser
+require('./libs/lift')
+require('./libs/create_user').createUser({})
+var getUser = require('./libs/create_user').getUser
 
 
 describe('account management', function(){

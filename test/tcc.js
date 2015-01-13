@@ -1,5 +1,5 @@
 
-require('./lift')
+require('./libs/lift')
 var should = require('chai').should()
 
 describe('TCC API', function(){

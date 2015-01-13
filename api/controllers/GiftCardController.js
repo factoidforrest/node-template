@@ -14,7 +14,7 @@
  *
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
-
+var async = require('async');
 module.exports = {
 	create : function(req, res) {
 		var cardNumber = req.body.card_number;
@@ -56,17 +56,33 @@ module.exports = {
 		});
 	},
 	find : function(req, res) {
-		GiftCard.find({
-			ownerId: req.user.id
-		}).done(function(err, cards) {
+		//hopefully the double database call doesn't slow this down much or at all.  It does add to database load though
+		async.parallel([
+			function(cb){
+				GiftCard.find({
+					ownerId: req.user.id
+				}).done(cb);
+			},
+			function(cb){
+				GiftCardGift.find({
+					"card.ownerId" : req.user.id,
+					giftStatus: 'accepted'
+				}).done(cb);
+			}],
+			function(err, results){
+				if (err) {
+					console.log(err);
+					return res.send(500, {error: 'Internal Server Error'});
+				} else {
+					var response = {cards: results[0], gifted: results[1]};
+					return res.json(response);
+				}
+		
+			});
+		
 
 			// Error handling
-			if (err) {
-				return console.log(err);
-			} else {
-				return res.json(cards);
-			}
-		});
+			
 	},
 	findGift : function(req, res){
 		GiftCardGift.findOne({
@@ -142,19 +158,15 @@ module.exports = {
 						card.giftStatus = "gifted";
 
 
-						//my goodness. unnecessary save here, double database call for no reason
 						card.save(function(err, saved){
 							// Error handling
 							if (err) {
 								console.log(err);
 								return res.send(500, {error : 'Internal Server Error saving Gift'});
-								
 							} else {
 								saved.status = "good"
 								if (req.body.invite === true  && !alreadyInvited){
-									Invitation.invite(req.body.email, req.user, function(err, invitation){
-
-									})
+									Invitation.invite(req.body.email, req.user, function(err, invitation){})
 								}
 								return res.json(saved);
 							}
@@ -195,20 +207,20 @@ module.exports = {
 		GiftCardGift.findOne({
 			id : req.param("id")
 		}).done(function(err, gift) {
-			if (gift.giftStatus === 'giftaccepted') {
+			if (gift.giftStatus === 'accepted') {
 				return res.send(409, {error: 'Card Already been Accepted'});
 			}
 			if (req.user.email !== gift.giftRecipientEmail){
 				sails.log.error('Hacking attempt detected on accept gift', {users_ip: getIP(req), request: req})
-				return res.send(401, {error: 'Unauthorized to reject gift, gift card was gifted to another user.  This action has been reported and your IP has been logged.'})
+				return res.send(401, {error: 'Unauthorized to reject gift, gift card was gifted to another user, not you.  This action has been reported and your IP has been logged.'})
 			}
-			gift.giftStatus = "giftaccepted";
+			gift.giftStatus = "accepted";
 			gift.save(function(err, gift) {
 				GiftCard.findOne({
 					id: gift.giftCardId
 				}).done(function(err, card){
-					card.giftStatus = "giftaccepted";
-					card.save(function(err, card) {
+					card.giftStatus = "accepted";
+					card.destroy(function(err) {
 						delete card.giftStatus;
 						delete card.id;
 

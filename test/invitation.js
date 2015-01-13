@@ -2,10 +2,10 @@
 
 var expect = require('chai').expect
 
-require('./lift')
-require('./create_user').createUser({})
+require('./libs/lift')
+require('./libs/create_user').createUser({})
 
-var getUser = require('./create_user').getUser
+var getUser = require('./libs/create_user').getUser
 
 describe('invitations', function(){
 	it('shouldnt create for email which is already a user or invitation',function(done){

@@ -1,10 +1,10 @@
 var expect = require('chai').expect
 
-require('./lift')
-var login = require('./login')
-require('./create_user').createUser({})
+require('./libs/lift')
+var login = require('./libs/login')
+require('./libs/create_user').createUser({})
 
-var getUser = require('./create_user').getUser
+var getUser = require('./libs/create_user').getUser
 var request = require('supertest');
 
 

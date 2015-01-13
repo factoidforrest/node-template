@@ -15,6 +15,9 @@ app.factory('UserService', ['$http', '$q', 'ENV', function ($http, $q, ENV) {
             $http.get(ENV.apiRoot + 'auth/profile/').success(function (data) {
                 console.log('user retrieved')
                 console.log(data);
+                if(!data.hasOwnProperty('full_name')){
+                   data.full_name = data.email;
+                }
                 service.profile = data;
                 deferred.resolve(data);
             });
