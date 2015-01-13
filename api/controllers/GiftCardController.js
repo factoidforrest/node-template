@@ -131,9 +131,18 @@ module.exports = {
 
 					})
 				} else {
-					GiftCardGift.create({giftRecipientEmail : req.body.email, giftMessage : req.body.message, giftStatus : 'gifted', giftCardId : card.id, cardRemainingValue : card.balance}).done(function(){
+					GiftCardGift.create({
+						card: card
+						, giftRecipientEmail : req.body.email
+						, giftMessage : req.body.message
+						, giftStatus : 'gifted'
+						, giftCardId : card.id
+						, cardRemainingValue : card.balance
+					}).done(function(){
 						card.giftStatus = "gifted";
 
+
+						//my goodness. unnecessary save here, double database call for no reason
 						card.save(function(err, saved){
 							// Error handling
 							if (err) {
