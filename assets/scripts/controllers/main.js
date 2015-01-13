@@ -10,6 +10,11 @@ angular.module('mobileGiftCardWebApp')
   .controller('MainCtrl',["$location", "$http", "$scope", "$rootScope", "$route", "UserService", "ENV", function ( $location, $http, $scope, $rootScope, $route, userService, ENV) {
         'use strict';
     $scope.apiRoot = ENV.apiRoot;
+    userService.getProfile().then(function(profile) {
+            if(typeof profile.email !== "undefined") {
+                $location.path('/cards');
+            }
+    });
     $scope.formData = {};
     console.log('the message is ,', $location.search().message)
     var messages = {

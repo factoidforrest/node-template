@@ -8,7 +8,7 @@
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th colspan="5">You currently have {{giftCards.length}} Gift cards</th>
+                            <th colspan="5">You currently have {{giftCards.length}} Gift {{pluralized_cards}}</th>
                         </tr>
                         <tr>
                             <th>Card Number</th>
@@ -54,7 +54,7 @@
 
         <div ng-show="AcceptGiftCards.length > 0">
             <div class="box-header orange-background">
-                <div class="title">{{AcceptGiftCards.length}} Gift cards to Accept</div>
+                <div class="title">{{AcceptGiftCards.length}} Gift {{pluralized_cards_to_accept}} to Accept</div>
             </div>
 
             <div class="box-content box-no-padding">
