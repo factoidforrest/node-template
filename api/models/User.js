@@ -42,7 +42,8 @@ module.exports = {
             uid: this.uid,
             updated_at: this.updatedAt,
             first_name: this.firstname,
-            email: this.email
+            email: this.email,
+            admin: this.admin
         }
     }
     
