@@ -39,9 +39,8 @@ module.exports.adapters = {
   }, 
 
   mongoprod: {
-    //not sure yet, leaving the same as dev for now but changing db name, actual db should have username and password and read env vars to get them
       module   : 'sails-mongo',
-      url: process.env.DATABASE_URI
+      url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
   }
 
 
