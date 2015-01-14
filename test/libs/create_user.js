@@ -14,7 +14,7 @@ module.exports.createUser = function(params){
     }
   objectAssign(userProperties, params);
 
-  beforeEach(function(done){
+  before(function(done){
     User.create(userProperties).done(function(err, user){
       
       user.token = null;
@@ -32,7 +32,7 @@ module.exports.createUser = function(params){
 
   if (!registeredDestroyHook){
     registeredDestroyHook = true;
-    afterEach(function(done){
+    after(function(done){
       User.destroy({}, function() {
         console.log('destroyed all users')
         done();

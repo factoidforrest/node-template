@@ -4,9 +4,10 @@ require('./libs/lift')
 
 var expect = require('chai').expect
 var request = require('supertest')
-require('./libs/create_user').createUser({})
-require('./libs/create_user').createUser({email:'light24bulbs+giftme@gmail.com'})
-var getUser = require('./libs/create_user').getUser
+var userUtil = require('./libs/create_user')
+userUtil.createUser({})
+userUtil.createUser({email:'light24bulbs+giftme@gmail.com'})
+var getUser = userUtil.getUser
 var login = require('./libs/login')
 
 
@@ -35,6 +36,7 @@ describe('gift cards gifting', function(){
 			GiftCard.find({ownerId: user.id}, function(err, cards){
 				console.log('err:', err)
 				expect(cards.length).to.equal(1);
+				done(err)
 			})
 		})
 	})
@@ -52,9 +54,10 @@ describe('gift cards gifting', function(){
 			    .expect(200)
 			    .end(function(err, res){
 
-			   		console.log("got response for gifting a card: ", res)
-			    	var gifted = GiftCardGift.findOne({giftRecipientEmail:'light24bulbs+giftme@gmail.com'}, function(err, gift){
-			    		expect(gifted.giftRecipientEmail).to.exist;
+			   		console.log("got response for gifting a card: ", res.body)
+			    	GiftCardGift.findOne({giftRecipientEmail:'light24bulbs+giftme@gmail.com'}, function(err, gift){
+			    		console.log('gift card gift is:', gift)
+			    		expect(gift).to.exist;
 			    		done(err)
 			    	})
 			    	//console.log('got api logged in test response of:', res)

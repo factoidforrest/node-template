@@ -139,10 +139,10 @@ module.exports = {
 						} 
 						if (invitation){
 							alreadyInvited = true;
-							return res.json({status:'alreadyinvited', message:"This user has been invited but not yet joined.  Would you still like to gift them the card?  They can claim it when they make an account."})
+							return res.json({status:'alreadyInvited', message:"This user has been invited but not yet joined.  Would you still like to gift them the card?  They can claim it when they make an account."})
 						} else {
 							alreadyInvited = false;
-							return res.json({status:'noemail', message:"The user doesn't exist but we can still send the gift card to them and an invitation to join diner's group. They can claim the card when they make an account. "})
+							return res.json({status:'noUser', message:"The user doesn't exist but we can still send the gift card to them and an invitation to join diner's group. They can claim the card when they make an account. "})
 						}
 
 					})
