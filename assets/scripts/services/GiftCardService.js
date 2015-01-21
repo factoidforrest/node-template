@@ -27,6 +27,7 @@ giftCardService
         };
 
         service.add = function(card) {
+            console.log('adding card:', card)
             var deferred = $q.defer();
             $http.post(ENV.apiRoot + 'GiftCard', card).success(function(data) {
                 deferred.resolve(data);

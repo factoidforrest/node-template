@@ -15,6 +15,8 @@
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
 
+
+//NOT SURE WHY THIS WASN'T USED, ALL LOGIC IS IN GIFTCARDCONTROLLER FOR NOW
 module.exports = {
     
 
