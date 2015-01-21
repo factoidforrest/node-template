@@ -29,6 +29,11 @@ module.exports = {
 					return res.json(client);
 				}
 			});
+		}).fail(function(results){
+			var err = results[0]
+			var body = results[1]
+			console.log('tcc inquiry failed with err ', err, 'and body', body);
+			return res.send(500, {error : body.hrd.msg});
 		});
 	},
 	buy : function(req, res) {

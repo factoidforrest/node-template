@@ -129,7 +129,7 @@ module.exports = {
         request(options, function (err, httpResponse, body) {
             console.log('res body is', body)
             if (err || body.txs.length === 0) {
-                deferred.reject(err);
+                return deferred.reject([err,body]);
             }
 
             var txn = body.txs[0];
