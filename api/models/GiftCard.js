@@ -9,7 +9,10 @@
 module.exports = {
 
   attributes: {
-  	cardNumber: 'string',
+  	cardNumber: {
+  		type:'string',
+  		unique: true
+  	},
     cardInitialValue: 'float',
     cardRemainingValue: 'float',
     giftStatus: 'string'
