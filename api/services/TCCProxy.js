@@ -27,7 +27,7 @@ var inquiryBodyForCard = function(card) {
             'ver':'1.0.0',
             'uid':'14d4fd5a-488e-4544-ba4a-c73cd978c5bb',
             'cliUid':'59344556-3C62-42B0-81A1-284EACCFF949',
-            'cliId':93,
+            'cliId':sails.config.clientID,
             'locId':1,
             'rcId':0,
             'term':'1',
@@ -57,7 +57,7 @@ var activateBodyForCard = function(card, amount) {
             'ver':'1.0.0',
             'uid':'14d4fd5a-488e-4544-ba4a-c73cd978c5bb',
             'cliUid':'59344556-3C62-42B0-81A1-284EACCFF949',
-            'cliId':93,
+            'cliId':sails.config.clientID,
             'locId':1,
             'rcId':0,
             'term':'1',
@@ -87,7 +87,7 @@ var redeemBodyForCard = function(card, amount) {
             'ver':'1.0.0',
             'uid':'14d4fd5a-488e-4544-ba4a-c73cd978c5bb',
             'cliUid':'59344556-3C62-42B0-81A1-284EACCFF949',
-            'cliId':93,
+            'cliId':sails.config.clientID,
             'locId':1,
             'rcId':0,
             'term':'1',
@@ -110,6 +110,7 @@ var redeemBodyForCard = function(card, amount) {
 }
 
 
+
 module.exports = {
 
     //TODO make these one method which takes a callback, get that url out of the code and into a sails config var
@@ -118,7 +119,7 @@ module.exports = {
         
         var deferred = q.defer();
 
-        var url = 'http://64.73.249.146/Partner/ProcessJson';
+        var url = sails.config.TCC;
         var options = {
             method: 'post',
             body: inquiryBodyForCard(card_number),
@@ -148,7 +149,7 @@ module.exports = {
 
         var body = activateBodyForCard(card_number, amount);
         //shouldnt be hardcoded
-        var url = 'http://64.73.249.146/Partner/ProcessJson';
+        var url = sails.config.TCC;
         var options = {
             method: 'post',
             body: activateBodyForCard(card_number, amount),
@@ -176,7 +177,7 @@ module.exports = {
     redeemTCCCard : function(card_number, amount) {
         var deferred = q.defer();
 
-        var url = 'http://64.73.249.146/Partner/ProcessJson';
+        var url = sails.config.TCC;
         var options = {
             method: 'post',
             body: redeemBodyForCard(card_number, amount),

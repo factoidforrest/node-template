@@ -1,5 +1,5 @@
 /**
- * GiftCard
+ * Configuration
  *
  * @module      :: Model
  * @description :: A short summary of how this model works and what it represents.
@@ -9,19 +9,16 @@
 module.exports = {
 
   attributes: {
-  	card_number: {
-  		type:'string',
-  		unique: true
-  	},
-    cardInitialValue: 'float',
-    cardRemainingValue: 'float',
-    balance: 'float',
-    previousBalance: 'float',
-    giftStatus: 'string'
+  	
   	/* e.g.
   	nickname: 'string'
   	*/
-    
+    variables: function(){
+    	delete this.createdAt;
+    	delete this.updatedAt;
+    	delete this.id;
+    	return this;
+    }
   }
 
 };

@@ -7,21 +7,14 @@
  * For more information on bootstrapping your app, check out:
  * http://sailsjs.org/#documentation
  */
+var config = require('./libs/config')
 
 module.exports.bootstrap = function (cb) {
-	//setupConfig();
+	config.configure(cb);
 	
   // It's very important to trigger this callack method when you are finished 
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-  cb();
+  //cb();
 };
 
 
-function setupConfig(){
-	var defaults = sails.config.configurationvariables;
-	Configuration.findOne({},function(err, conf){
-		if (conf === null){
-			Configuration.create
-		}
-	})
-}

@@ -16,24 +16,41 @@
  */
 var async = require('async');
 module.exports = {
+
+	//create means import.  should fix this at some point
 	create : function(req, res) {
 		var cardNumber = req.body.card_number;
 		var ownerId = req.user.id;
 		console.log('got card number from client ', cardNumber)
 		TCCProxy.getTCCInquiry(cardNumber).then(function(tcc_card) {
 			tcc_card.ownerId = ownerId;
-			GiftCard.create(tcc_card).done(function(err,client) {
+			GiftCard.create(tcc_card).done(function(err,card) {
 				if (err) {
-					return res.send(500, {error : err.message});
+					console.log('DB error importing card:', err)
+					var errMsg;
+					//the error code for an illegal duplicate value. see gift card model.  Card number is enforced unique.  Avoids extra db round trips to enforce this way
+					if (err.code === 11000){
+						errMsg = 'This card already has been added by someone.  Is the card in your inventory?';
+					} else {
+						errMsg = 'Internal server error adding card';
+					}
+					return res.send(500, {error : errMsg});
 				} else {
-					return res.json(client);
+					console.log('returning card:', card)
+					return res.json(card);
 				}
 			});
 		}).fail(function(results){
 			var err = results[0]
 			var body = results[1]
 			console.log('tcc inquiry failed with err ', err, 'and body', body);
-			return res.send(500, {error : body.hrd.msg});
+			var errMsg;
+			if (!err && body && body.hdr.msg === 'Error: Unable to process request.'){
+				errMsg = 'Card number not found.  Did you type it correctly?'
+			} else {
+				errMsg = 'Internal server error adding card'
+			}
+			res.send(500, {error : errMsg});
 		});
 	},
 	buy : function(req, res) {
