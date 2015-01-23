@@ -27,3 +27,8 @@ DATABASE_URI= the mongo URI you wish to connect to in production.
 If unset, it will default to the development configuration on localhost.
 
 WARN_EMAIL= The email which errors be sent to.  Leave unset to disable this feature.  
+
+######TCC API configuration variables
+
+TCC: process.env.TCC ||  'http://64.73.249.146/Partner/ProcessJson',
+clientID: process.env.CLIENTID || 73,
