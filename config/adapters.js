@@ -43,7 +43,7 @@ module.exports.adapters = {
 
   mongoprod: {
       module   : 'sails-mongo',
-      url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
+      url: 'mongodb://heroku_app33233436:ktp26bb70gq7pfniv7i70veh4d@ds031641.mongolab.com:31641/heroku_app33233436'// || process.env.DATABASE_URI || process.env.MONGOLAB_URI
   }
 
 

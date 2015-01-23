@@ -1,4 +1,3 @@
-console.log('loaded development config file ')
 var fs = require('fs');
 var exports;
 
