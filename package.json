@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.1",
   "description": "MobileGiftCard API Platform",
+  "engines": {
+    "node": "0.10.x"
+  },
   "dependencies": {
     "ejs": "0.8.4",
     "googleapis": "^0.7.0",
