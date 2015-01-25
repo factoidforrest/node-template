@@ -28,8 +28,12 @@ module.exports.policies = {
     'echoMessage' : {
         '*' : true
     },
+    //not sure why this is here, controller is empty
     'GiftCardGift' : {
         '*' : true
+    },
+    'Meal': {
+      '*' : 'hasPosKey'
     },
     'Admin': {
       '*' : 'isAdmin'
