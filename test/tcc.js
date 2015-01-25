@@ -19,7 +19,7 @@ describe('TCC API', function(){
 
 	this.timeout(15000)
 	it('should query card data from tcc', function(done){
-		var cardNumber = '2093555002667630'
+		var cardNumber = '2073183100123127'
 		TCCProxy.getTCCInquiry(cardNumber).then(function(tcc_card) {
 			console.log('got card: ', tcc_card)
 			done();
@@ -31,7 +31,7 @@ describe('TCC API', function(){
 
 	it('should import a card through the MGC api', function(done){
 		this.timeout(15000);
-		var validNumber = '2093555002667630'
+		var validNumber = '2073183100123127'
 		login({}, function(session){
 			session
 			.post('/giftcard/create')
@@ -48,7 +48,7 @@ describe('TCC API', function(){
 
 	it('shouldnt add duplicate card', function(done){
 		this.timeout(15000);
-		var validNumber = '2093555002667630'
+		var validNumber = '2073183100123127'
 		login({}, function(session){
 			session
 			.post('/giftcard/create')

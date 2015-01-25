@@ -18,7 +18,7 @@
 var request = require("request"),
     q = require("q");
 
-var inquiryBodyForCard = function(card) {
+var inquiryBody = function(card) {
     return {
         'hdr':
         {
@@ -48,7 +48,7 @@ var inquiryBodyForCard = function(card) {
     }
 };
 
-var activateBodyForCard = function(card, amount) {
+var activateBody = function(card, amount) {
     return {
         'hdr':
         {
@@ -70,6 +70,7 @@ var activateBodyForCard = function(card, amount) {
         'txs':
             [
                 {
+                    //type is svSale
                     'typ':4,
                     'crd':card,
                     'amt':amount
@@ -78,7 +79,7 @@ var activateBodyForCard = function(card, amount) {
     }
 };
 
-var redeemBodyForCard = function(card, amount) {
+var redeemBody = function(card, amount) {
     return {
         'hdr':
         {
@@ -100,6 +101,7 @@ var redeemBodyForCard = function(card, amount) {
         'txs':
         [
             {
+                //type is svRed(eem)
                 'typ':5,
                 'crd':card,
                 'amt':amount
@@ -122,7 +124,7 @@ module.exports = {
         var url = sails.config.TCC;
         var options = {
             method: 'post',
-            body: inquiryBodyForCard(card_number),
+            body: inquiryBody(card_number),
             json: true,
             url: url
         };
@@ -130,9 +132,10 @@ module.exports = {
         request(options, function (err, httpResponse, body) {
             console.log('res body is', body)
             if (err || body.txs.length === 0) {
+                console.log('rejecting promise with args ', [err,body])
                 return deferred.reject([err,body]);
             }
-
+            console.log('resolving promise')
             var txn = body.txs[0];
             deferred.resolve({
                 card_number : txn.crd,
@@ -147,12 +150,11 @@ module.exports = {
     activateTCCCard : function(card_number, amount) {
         var deferred = q.defer();
 
-        var body = activateBodyForCard(card_number, amount);
-        //shouldnt be hardcoded
+        var body = activateBody(card_number, amount);
         var url = sails.config.TCC;
         var options = {
             method: 'post',
-            body: activateBodyForCard(card_number, amount),
+            body: body,
             json: true,
             url: url
         };
@@ -180,7 +182,7 @@ module.exports = {
         var url = sails.config.TCC;
         var options = {
             method: 'post',
-            body: redeemBodyForCard(card_number, amount),
+            body: redeemBody(card_number, amount),
             json: true,
             url: url
         };

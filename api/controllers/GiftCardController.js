@@ -27,7 +27,7 @@ module.exports = {
 			GiftCard.create(tcc_card).done(function(err,card) {
 				if (err) {
 					console.log('DB error importing card:', err)
-					var errMsg;
+					var errMsg = 'error'
 					//the error code for an illegal duplicate value. see gift card model.  Card number is enforced unique.  Avoids extra db round trips to enforce this way
 					if (err.code === 11000){
 						errMsg = 'This card already has been added by someone.  Is the card in your inventory?';
@@ -40,11 +40,12 @@ module.exports = {
 					return res.json(card);
 				}
 			});
-		}).fail(function(results){
+		}).catch(function(results){
+			console.log('promise failed')
 			var err = results[0]
 			var body = results[1]
 			console.log('tcc inquiry failed with err ', err, 'and body', body);
-			var errMsg;
+			var errMsg = 'error'
 			if (!err && body && body.hdr.msg === 'Error: Unable to process request.'){
 				errMsg = 'Card number not found.  Did you type it correctly?'
 			} else {
