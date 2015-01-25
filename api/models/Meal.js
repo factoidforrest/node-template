@@ -16,7 +16,7 @@ module.exports = {
     
   }
   , beforeCreate: function (attrs, next) {
-  	 require('crypto').randomBytes(8, function(ex, buf) {
+  	 require('crypto').randomBytes(4, function(ex, buf) {
       attrs.key = buf.toString('hex');
       next();
     });
