@@ -1,14 +1,14 @@
 var fs = require('fs');
 var exports;
-
+console.log('loading environment configuration based on role: ', process.env.SERVER_ROLE)
 switch(process.env.SERVER_ROLE){
     case 'production': exports = {
     		apiRoot : process.env.APIROOT || "https://localhost:1337/",
     		assetRoot : process.env.ASSETROOT || "https://localhost:1337/",
     		TCC: process.env.TCC ||  'http://64.73.249.146/Partner/ProcessJson',
-    		clientID: process.env.CLIENTID || 73,
+    		clientID: process.env.CLIENTID || 73
     		/*
-    		ssl: {
+    		,ssl: {
     			key: fs.readFileSync('ssl/mobilegiftcard.key')
         	, cert: fs.readFileSync('ssl/mgc_ssl_wildcard.crt')
     		}
@@ -22,9 +22,9 @@ switch(process.env.SERVER_ROLE){
     		apiRoot : process.env.APIROOT || "https://localhost:1337/",
     		assetRoot : process.env.ASSETROOT || "https://localhost:1337/",
     		TCC: process.env.TCC ||  'http://64.73.249.146/Partner/ProcessJson',
-    		clientID: process.env.CLIENTID || 73,
+    		clientID: process.env.CLIENTID || 73
     		/*
-    		ssl: {
+    		,ssl: {
     			key: fs.readFileSync('ssl/mobilegiftcard.key')
         	, cert: fs.readFileSync('ssl/mgc_ssl_wildcard.crt')
     		}
@@ -38,9 +38,9 @@ switch(process.env.SERVER_ROLE){
     		apiRoot : process.env.APIROOT || "https://localhost:1337/",
     		assetRoot : process.env.ASSETROOT || "https://localhost:1337/",
     		TCC: process.env.TCC ||  'http://64.73.249.146/Partner/ProcessJson',
-    		clientID: process.env.CLIENTID || 73,
+    		clientID: process.env.CLIENTID || 73
     		/*
-    		ssl: {
+    		,ssl: {
     			key: fs.readFileSync('ssl/mobilegiftcard.key')
         	, cert: fs.readFileSync('ssl/mgc_ssl_wildcard.crt')
     		}

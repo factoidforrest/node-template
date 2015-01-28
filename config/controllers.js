@@ -16,6 +16,9 @@
  * For more information on configuring controllers and blueprints, check out:
  * http://sailsjs.org/#documentation
  */
+
+ var blueprints;
+
 mode = process.env.SERVER_MODE;
 console.log("the server mode is: ", mode);
 if(mode==='assets'){
@@ -27,7 +30,7 @@ if(mode==='assets'){
   }
 } else if (mode==='api' || mode === '' || typeof(mode) === 'undefined'){
   console.log('API or development mode : automatic routing on')
-  blueprints = {
+  blueprints =  {
     actions: true,
     rest: true,
     shortcuts: true,
