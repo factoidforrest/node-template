@@ -1,7 +1,7 @@
 var fs = require('fs');
 var exports;
 
-switch(process.env.NODE_ENV){
+switch(process.env.SERVER_ROLE){
     case 'production': exports = {
     		apiRoot : process.env.APIROOT || "https://localhost:1337/",
     		assetRoot : process.env.ASSETROOT || "https://localhost:1337/",

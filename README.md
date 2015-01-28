@@ -23,6 +23,10 @@ This is a dual mode application which can serve either the API(backend), the ass
 Be sure to leave this variable unset(not just blank) when you want to serve both.
 SERVER_MODE=(assets, api, unset)
 
+This application has multiple roles it is expected to serve such as daily, staging, and production(and of course development, which does not need to be set).  To configure this set:
+
+SERVER_ROLE=(production,staging,daily)
+
 DATABASE_URI= the mongo URI you wish to connect to in production.  
 If unset, it will default to the development configuration on localhost.
 
