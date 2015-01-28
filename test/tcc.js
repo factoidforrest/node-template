@@ -18,6 +18,15 @@ describe('TCC API', function(){
   })
 
 	this.timeout(15000)
+	it('should create a new card using svAlloc', function(done){
+		TCCProxy.createCard(10,'149').then(function(card){
+			console.log('new card created:', card)
+			done();
+		}).fail(function(err){
+			console.log('card creation failed with error:', err)
+			done(err)
+		})
+	})
 	it('should query card data from tcc', function(done){
 		var cardNumber = '2073183100123127'
 		TCCProxy.getTCCInquiry(cardNumber).then(function(tcc_card) {
@@ -25,7 +34,7 @@ describe('TCC API', function(){
 			done();
 		})
 		.fail(function(err){
-			throw err;
+			done(err)
 		});
 	})
 

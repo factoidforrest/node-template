@@ -170,6 +170,7 @@ module.exports = {
 
 					})
 				} else {
+					//doesn't mirror data in TCC at all
 					GiftCardGift.create({
 						card: card
 						, giftRecipientEmail : req.body.email

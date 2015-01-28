@@ -24,7 +24,7 @@ module.exports = {
 			console.log('created meal: ', meal)
 			var response = {key:meal.key};
 			res.send(response);
-		})
+		});
 	}
 
   /**
