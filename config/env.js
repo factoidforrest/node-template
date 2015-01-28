@@ -7,10 +7,12 @@ switch(process.env.SERVER_ROLE){
     		assetRoot : process.env.ASSETROOT || "https://localhost:1337/",
     		TCC: process.env.TCC ||  'http://64.73.249.146/Partner/ProcessJson',
     		clientID: process.env.CLIENTID || 73,
+    		/*
     		ssl: {
     			key: fs.readFileSync('ssl/mobilegiftcard.key')
         	, cert: fs.readFileSync('ssl/mgc_ssl_wildcard.crt')
     		}
+    		*/
     		, models: {
     			connection: 'mongoprod'
     		}
@@ -21,10 +23,12 @@ switch(process.env.SERVER_ROLE){
     		assetRoot : process.env.ASSETROOT || "https://localhost:1337/",
     		TCC: process.env.TCC ||  'http://64.73.249.146/Partner/ProcessJson',
     		clientID: process.env.CLIENTID || 73,
+    		/*
     		ssl: {
     			key: fs.readFileSync('ssl/mobilegiftcard.key')
         	, cert: fs.readFileSync('ssl/mgc_ssl_wildcard.crt')
     		}
+    		*/
     		, models: {
     			connection: 'mongostaging'
     		}
@@ -35,10 +39,12 @@ switch(process.env.SERVER_ROLE){
     		assetRoot : process.env.ASSETROOT || "https://localhost:1337/",
     		TCC: process.env.TCC ||  'http://64.73.249.146/Partner/ProcessJson',
     		clientID: process.env.CLIENTID || 73,
+    		/*
     		ssl: {
     			key: fs.readFileSync('ssl/mobilegiftcard.key')
         	, cert: fs.readFileSync('ssl/mgc_ssl_wildcard.crt')
     		}
+    		*/
     		, models: {
     			connection: 'mongodaily'
     		}
