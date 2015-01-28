@@ -32,3 +32,11 @@ WARN_EMAIL= The email which errors be sent to.  Leave unset to disable this feat
 
 TCC: process.env.TCC ||  'http://64.73.249.146/Partner/ProcessJson',
 clientID: process.env.CLIENTID || 73,
+
+######For remote pushing to the server
+First add this guy to your local repo
+git remote add daily ssh://deployer@23.20.9.88/home/deployer/repos/mobile-gift-card-platform.git
+
+Then after you make commits and push to the branch you can then do this:
+git push daily origin/development
+This will push it to the server in the daily environment providing your public cert is installed on the server.
