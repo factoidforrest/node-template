@@ -32,20 +32,16 @@ module.exports.adapters = {
       password : '',
       database : 'mobile-gift-card'
   }, 
-  mongotest: {
+  mongostaging: {
       module   : 'sails-mongo',
-      host     : 'localhost',
-      port     : 27017,
-      user     : '',
-      password : '',
-      database : 'mobile-gift-card-test'
-  }, 
-
+      url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
+  },
+  mongodaily: {
+      module   : 'sails-mongo',
+      url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
+  },
   mongoprod: {
       module   : 'sails-mongo',
       url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
   }
-
-
-
 };
