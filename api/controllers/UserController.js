@@ -19,15 +19,28 @@
 //USER MUST BE LOGGED IN TO USE THIS API, SEE CONFIG/POLICIES
 
 module.exports = {
-    
-  
 
 
-  /**
-   * Overrides for the settings in `config/controllers.js`
-   * (specific to UserController)
-   */
-  _config: {}
+    update : function(req, res) {
+        User.findOne({
+            id : req.user.id
+        }).done(function(err, profile) {
 
+            console.log('hi profile is2', profile);
+            if(!profile) {
+                return res.send(409, {error : 'No User Found'});
+            }
+
+            profile.save(function(err, saved){
+                    // Error handling
+                    if (err) {
+                        return res.send(409, {error : err.message});
+                    }
+                    profile.save(function() {
+                        return res.json(saved);
+                    });
+              });
+        });
+    }
   
 };
