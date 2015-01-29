@@ -25,7 +25,9 @@ module.exports = {
 			var response = {key:meal.key};
 			res.send(response);
 		});
-	}
+	},
+
+	
 
   /**
    * Overrides for the settings in `config/controllers.js`
