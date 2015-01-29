@@ -93,6 +93,21 @@ describe('account management', function(){
         });
       });
     })
+
+    it('should update the names', function(done){
+      login({},function(session){
+        session
+        .post('/auth/update')
+        .send({firstName: 'updatedname', lastName: 'updatedname'})
+        .expect(200)
+        .end(function(err, res){
+          console.log('response when trying to update users names is:', res.body)
+          //console.log('got api logged in test response of:', res)
+          done(err);
+        });
+      });
+
+    })
   })
 })
 
