@@ -6,6 +6,7 @@
 var should = require('chai').should()
 var request = require('supertest')
 var moment = require('moment')
+var login = require('./libs/login')
 
 require('./libs/lift')
 require('./libs/create_user').createUser({})
@@ -13,7 +14,27 @@ var getUser = require('./libs/create_user').getUser
 
 
 describe('account management', function(){
-  
+  describe('should update', function(){
+
+
+  it('the names', function(done){
+      login({},function(session){
+        session
+        .post('/auth/update')
+        .send({firstName: 'updatedname', lastName: 'updatedname'})
+        .expect(200)
+        .end(function(err, res){
+          console.log('response when trying to update users names is:', res.body)
+          //console.log('got api logged in test response of:', res)
+          res.body.first_name.should.equal('updatedname')
+          res.body.last_name.should.equal('updatedname')
+
+          done(err);
+        });
+      });
+
+    })
+  })
 
  
 
@@ -36,6 +57,8 @@ describe('account management', function(){
           .expect(200)
           .end(function(err, res){
             //reload the user.  Waterline sucks
+
+
             if (err) console.log('request err is ', err)
             done(err)
           });
@@ -80,8 +103,10 @@ describe('account management', function(){
                 //reload the user.  Waterline sucks
                 if (err) return done(err)
                 getUser(function(err, user){
-                  user.validPassword('secretpassword').should.equal(true);
+                  console.log('user is:', user)
                   user.validPassword('newsecretpassword').should.equal(false);
+
+                  user.validPassword('secretpassword').should.equal(true);
                   console.log('got response: ', res)
                   done(err);
 
@@ -94,20 +119,7 @@ describe('account management', function(){
       });
     })
 
-    it('should update the names', function(done){
-      login({},function(session){
-        session
-        .post('/auth/update')
-        .send({firstName: 'updatedname', lastName: 'updatedname'})
-        .expect(200)
-        .end(function(err, res){
-          console.log('response when trying to update users names is:', res.body)
-          //console.log('got api logged in test response of:', res)
-          done(err);
-        });
-      });
-
-    })
+    
   })
 })
 

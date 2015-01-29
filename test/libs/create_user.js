@@ -43,7 +43,7 @@ module.exports.createUser = function(params){
 
 
 module.exports.getUser = function getUser(cb){
-  User.findOne({first_name: 'testFirst'}).exec(cb);
+  User.findOne({email: 'light24bulbs@gmail.com'}).exec(cb);
 }
 
 /*

@@ -336,7 +336,9 @@ module.exports = {
 			}
 
 			//update the email
-			if (params.email !== user.email) {
+
+			if (params.hasOwnProperty('email') && params.email !== user.email) {
+				console.log('updating email')
 				//store the email in a new property on the user new_email which gets swapped for email once the email is confirmed
 				user.new_email = params.email;
 				require('crypto').randomBytes(48, function(ex, buf) {
@@ -347,7 +349,8 @@ module.exports = {
 			} 
 
 			//update the password
-			if (params.hasOwnProperty('password') || params.password !== ''){
+			if (params.hasOwnProperty('password') && params.password !== ''){
+				console.log('updating password')
 				if (!user.validPassword(params.currentPassword)) {
 					return res.send(400, {error: 'Current password was incorrect.  '})
 				}
@@ -364,9 +367,9 @@ module.exports = {
 					return;
 				}
 			}
-			user.firstname = params.firstname;
-			user.lastname = params.lastname;
-
+			user.first_name = params.firstName;
+			user.last_name = params.lastName;
+			console.log('the updated user before save is: ', user)
 			user.save(function(err, saved){
 				if (err) {
 					return res.send(500, {error : err.message});
