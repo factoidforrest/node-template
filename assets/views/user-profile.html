@@ -1,6 +1,6 @@
-<div id="content-wrapper" class="row">
+<div id="content-wrapper" class="row" ng-controller="UserProfileCtrl">
     <!-- probably shouldn't be doing this but it is a way to get the styling to just apply to this page -->
-    <link rel="stylesheet" href="styles/mobile-gift-card.css">
+    <!-- <link rel="stylesheet" href="styles/mobile-gift-card.css"> -->
     <div class="col-xs-12">
         <div class="row">
             <div class="col-sm-12">
@@ -95,7 +95,7 @@
                                 <div class="col-sm-7 col-sm-offset-1">
                                     <div class="form-group">
                                         <label>First name</label>
-                                        <input ng-model="profile.first_name" type="text" placeholder="First name" id="firstname" class="form-control">
+                                        <input ng-model="profile.fist_name" type="text" placeholder="First name" id="firstname" class="form-control">
                                     </div>
                                     <div class="form-group">
                                         <label>Last name</label>
@@ -105,10 +105,10 @@
                             </fieldset>
                             <div style="margin-bottom: 0;" class="form-actions form-actions-padding">
                                 <div class="text-right">
-                                    <div class="btn btn-primary btn-lg">
+                                    <button class="btn btn-primary btn-lg" ng-click="UpdateUserProfile()">
                                         <i class="icon-save"></i>
                                         Save
-                                    </div>
+                                    </button>
                                 </div>
                             </div>
                         </form>

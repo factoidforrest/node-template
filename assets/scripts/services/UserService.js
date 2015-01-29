@@ -1,9 +1,9 @@
 
 
 
-var app = angular.module('mobileGiftCardWebApp');
+var UserService = angular.module('mobileGiftCardWebApp');
 
-app.factory('UserService', ['$http', '$q', 'ENV', function ($http, $q, ENV) {
+UserService.factory('UserService', ['$http', '$q', 'ENV', function ($http, $q, ENV) {
     'use strict';
     var service = {};
     service.profile = undefined;
@@ -24,6 +24,16 @@ app.factory('UserService', ['$http', '$q', 'ENV', function ($http, $q, ENV) {
         } else {
             deferred.resolve(service.profile);
         }
+        return deferred.promise;
+    };
+
+    service.updateUserProfile = function(profile) {
+        var deferred = $q.defer();
+        $http.post(ENV.apiRoot + 'user/update').success(function(data) {
+            deferred.resolve(data);
+        }).fail(function(error) {
+            deferred.reject(error);
+        });
         return deferred.promise;
     };
 

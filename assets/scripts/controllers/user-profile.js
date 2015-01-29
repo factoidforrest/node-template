@@ -7,7 +7,7 @@
  * Controller of the mobileGiftCardWebApp
  */
 angular.module('mobileGiftCardWebApp')
-    .controller('UserProfileCtrl',["$scope", "UserService", "ENV", function ($scope, userService, ENV) {
+    .controller('UserProfileCtrl',['$scope', 'UserService', 'ENV', function ($scope, userService, ENV) {
 
         $scope.apiRoot = ENV.apiRoot;
 
@@ -15,5 +15,10 @@ angular.module('mobileGiftCardWebApp')
             $scope.profile = profile;
             console.log('the user profile is', profile)
         });
+
+        $scope.updateProfile = function() {
+            console.log('the user profile is2', $scope.profile);
+            UserService.updateUserProfile($scope.profile);
+        };
 
     }]);
