@@ -25,7 +25,7 @@ module.exports = {
 			var response = {key:meal.key};
 			res.send(response);
 		});
-	},
+	}
 
 	
 

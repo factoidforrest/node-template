@@ -25,7 +25,12 @@ var send = module.exports.send = function(params, next) {
   });
 };
 
-module.exports.sendConfirmation = function(userAttrs, next){
+module.exports.sendConfirmation = function(userAttrs, next, to){
+
+  //bit of a hack to facilitate sending the confirmation to the users new email if they are updating it
+  if (!!to) {
+    userAttrs.email = userAttrs.new_email;
+  }
   console.log('sending a confirmation email using the user attrs:', userAttrs)
   fs.readFile('views/confirmation-email.jade', 'utf8', function (err, file) {
     if (err) return next(err);

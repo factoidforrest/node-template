@@ -25,10 +25,13 @@ module.exports = {
     },
     setPassword: function(password, next){
       var self = this;
+      if (password.length < 6){
+        return next('Password too short')
+      }
       bcrypt.hash(password, null, null, function (err, hash) {
         if (err) return next(err);
         self.password = hash;
-        next();
+        return next();
       });
     },
     toJSON: function() {
@@ -53,6 +56,10 @@ module.exports = {
       if (err) return next(err);
       if (user === null || typeof(user) === 'undefined') return next('Invalid token');
       console.log('found user to confirm by token: ', user)
+      //swap with new email if the user was updating an existing email
+      if (user.hasOwnProperty('new_email')){
+        user.email = user.new_email;
+      }
       user.token = null;
       user.save(function(error){
         if (error) return next(error);

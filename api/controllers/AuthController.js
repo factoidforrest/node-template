@@ -110,52 +110,53 @@ module.exports = {
 		console.log('finding local user to authenticate: ', email)
 		var email = req.body.email;
 		var password = req.body.password;
-    User.findOne({ email: email }, function(err, user) {
-      console.log('localhandler found one user', user)
-      console.log('and an err of:', err)
-      if (err) return res.json({error: err}); 
-      if (!user) {
-        return res.json({ error: 'Incorrect email.' });
-      }
-      
-      if (typeof(user.password) === 'undefined'){
-      	return res.json({ error: 'You have previously logged in with this email through a social network, but not using a password.  You can register this email with a password by clicking register below and the accounts will merge, or log in with a social network.' })
-      }
+		User.findOne({ email: email }, function(err, user) {
+			console.log('localhandler found one user', user)
+			console.log('and an err of:', err)
+			if (err) return res.json({error: err}); 
+			if (!user) {
+				return res.json({ error: 'Incorrect email.' });
+			}
+			
+			if (typeof(user.password) === 'undefined'){
+				return res.json({ error: 'You have previously logged in with this email through a social network, but not using a password.  You can register this email with a password by clicking register below and the accounts will merge, or log in with a social network.' })
+			}
 
-      if (!user.validPassword(password)) {
-        return res.json({ error: 'Incorrect password.' });
-      }
+			if (!user.validPassword(password)) {
+				return res.json({ error: 'Incorrect password.' });
+			}
 
-      if (user.token !== null){
-      	//should offer a link to resend confirmation I guess. 
-      	return res.json({ error: 'You must confirm your email.  Please check your inbox.' });
-      }
-      if (accountActive(user)){
-	      req.logIn(user, function (err) {
-	      	if (err) return res.json({error: err});
-	      	return res.json({
-	      		success: true,
-	      		user: user
-	      	});
-	    	});
-	    } else {
-	    	return res.json({
-      		success: false,
-      		error: "Account disabled."
-      	});
-	    }
-    });
+			//if the user email hasn't been confirmed.  When updating a user there might be a token and the old email is still valid so we check for the new_email property
+			if (user.token !== null || user.hasOwnProperty('new_email')){
+				//should offer a link to resend confirmation I guess. 
+				return res.json({ error: 'You must confirm your email.  Please check your inbox.' });
+			}
+			if (accountActive(user)){
+				req.logIn(user, function (err) {
+					if (err) return res.json({error: err});
+					return res.json({
+						success: true,
+						user: user
+					});
+				});
+			} else {
+				return res.json({
+					success: false,
+					error: "Account disabled."
+				});
+			}
+		});
 
 
 	}
 
 	,profile : function(req, res) {
-	   // console.log('the request is ', req)
-	  //seems to get requested even when the user isn't logged in so send a blank user if so
-	  if (typeof(req.user) === 'undefined'){
-	  	console.log('profile requested but no user found from session, sending blank response')
-	  	res.json({});
-	  } else {
+		 // console.log('the request is ', req)
+		//seems to get requested even when the user isn't logged in so send a blank user if so
+		if (typeof(req.user) === 'undefined'){
+			console.log('profile requested but no user found from session, sending blank response')
+			res.json({});
+		} else {
 			User.findOne({id : req.user.id}).done(function(err, user) {
 				
 				if (err) {
@@ -182,22 +183,25 @@ module.exports = {
 					if (typeof(usr.password) === 'undefined') {
 						console.log('setting new password on old user:', usr)
 						//TODO: need to confirm the email before this login method becomes active
-						usr.setPassword(params.password, function(){
+						usr.setPassword(params.password, function(passwordError){
+							if (passwordError) {
+								return res.send(400, {error: passwordError})
+							}
 							require('crypto').randomBytes(48, function(ex, buf) {
-			          usr.token = buf.toString('hex');
-			          usr.save(function(err, usr){
+								usr.token = buf.toString('hex');
+								usr.save(function(err, usr){
 									console.log(err)
 									if (err) return res.send(500, {error: "DB Error"});
 
 									Mail.sendConfirmation(usr, function(){});
 
 									console.log('set password on previously passwordless user:', usr)
-	                res.json({
+									res.json({
 										success: true,
 										errors: {}
 									});
 								});
-			        });
+							});
 							
 						});
 
@@ -217,13 +221,13 @@ module.exports = {
 						if (error) {
 							res.send(500, {error: "DB Error"});
 						} else {
-						  console.log('the user was saved as', user);
-						  req.body.password = password;
-              res.json({
+							console.log('the user was saved as', user);
+							req.body.password = password;
+							res.json({
 								success: true,
 								errors: {}
 							});
-            	
+							
 
 
 						}
@@ -301,7 +305,10 @@ module.exports = {
 			} else {
 				User.findOne({id: token.user_id}, function(err, user){
 					if (err) return res.send(500, {error: 'Internal Server Error'});
-					user.setPassword(password, function(){
+					user.setPassword(password, function(passwordError){
+						if (passwordError) {
+							return res.send(400, {error: passwordError})
+						}
 						user.save(function(err, user){
 							//maybe log the user in here.  Maybe make them enter their password again(as below) since that way they might remember
 							if (err) return res.send(500, {error: 'Internal Server Error'});
@@ -314,16 +321,71 @@ module.exports = {
 		});
 	},
 
+	update : function(req, res) {
+		params = req.body;
+		User.findOne({
+			id : req.user.id
+		}).done(function(err, user) {
+			if (err){
+				return res.send(500, {error: 'Internal Server Error '+  err.message})
+			}
+			console.log('updating user', user);
+			console.log('with new attributes: ', params)
+			if(!user) {
+				return res.send(404, {error : 'No User Found'});
+			}
+
+			//update the email
+			if (params.email !== user.email) {
+				//store the email in a new property on the user new_email which gets swapped for email once the email is confirmed
+				user.new_email = params.email;
+				require('crypto').randomBytes(48, function(ex, buf) {
+	      	user.token = buf.toString('hex');
+	      	var to = user.new_email;
+	      	Mail.sendConfirmation(attrs, next, to);
+	    	});
+			} 
+
+			//update the password
+			if (params.hasOwnProperty('password') || params.password !== ''){
+				if (!user.validPassword(params.currentPassword)) {
+					return res.send(400, {error: 'Current password was incorrect.  '})
+				}
+				if (params.password !== params.passwordConfirmation){
+					return res.send(400, {error: 'Password and confirmation didnt match '})
+				}
+				user.setPassword(params.password, function(passwordError){
+					if (passwordError) {
+						return res.send(400, {error: passwordError})
+					}
+				});
+			}
+			user.firstname = params.firstname;
+			user.lastname = params.lastname;
+
+			user.save(function(err, saved){
+				if (err) {
+					return res.send(500, {error : err.message});
+				}
+
+				return res.json(saved);
+
+			});
+		});
+	},
+
+
+
 
 
 
 /**
-   * Overrides for the settings in `config/controllers.js`
-   * (specific to AuthController)
-   */
-  _config: {}
+	 * Overrides for the settings in `config/controllers.js`
+	 * (specific to AuthController)
+	 */
+	_config: {}
 
-  
+	
 };
 
 
