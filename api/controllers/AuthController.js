@@ -351,14 +351,18 @@ module.exports = {
 				if (!user.validPassword(params.currentPassword)) {
 					return res.send(400, {error: 'Current password was incorrect.  '})
 				}
-				if (params.password !== params.passwordConfirmation){
-					return res.send(400, {error: 'Password and confirmation didnt match '})
+				//password valid handles sending errors to the response object.  If it fails, just exit
+				if (passwordValid(params, res)){
+
+
+					user.setPassword(params.password, function(passwordError){
+						if (passwordError) {
+							return res.send(400, {error: passwordError})
+						}
+					});
+				} else {
+					return;
 				}
-				user.setPassword(params.password, function(passwordError){
-					if (passwordError) {
-						return res.send(400, {error: passwordError})
-					}
-				});
 			}
 			user.firstname = params.firstname;
 			user.lastname = params.lastname;
