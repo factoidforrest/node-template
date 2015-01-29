@@ -43,5 +43,15 @@ module.exports.adapters = {
   mongoprod: {
       module   : 'sails-mongo',
       url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
+  },
+  
+  mongotest: {
+      module   : 'sails-mongo',
+      host     : 'localhost',
+      port     : 27017,
+      user     : '',
+      password : '',
+      database : 'mobile-gift-card-test'
   }
+
 };
