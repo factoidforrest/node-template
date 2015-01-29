@@ -44,4 +44,3 @@ git remote add daily ssh://deployer@23.20.9.88/home/deployer/repos/mobile-gift-c
 Then after you make commits and push to the branch you can then do this:
 git push daily origin/development
 This will push it to the server in the daily environment providing your public cert is installed on the server.
-
