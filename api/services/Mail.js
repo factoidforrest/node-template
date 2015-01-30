@@ -28,9 +28,6 @@ var send = module.exports.send = function(params, next) {
 module.exports.sendConfirmation = function(userAttrs, next, to){
 
   //bit of a hack to facilitate sending the confirmation to the users new email if they are updating it
-  if (!!to) {
-    userAttrs.email = userAttrs.new_email;
-  }
   console.log('sending a confirmation email using the user attrs:', userAttrs)
   fs.readFile('views/confirmation-email.jade', 'utf8', function (err, file) {
     if (err) return next(err);
@@ -42,7 +39,7 @@ module.exports.sendConfirmation = function(userAttrs, next, to){
       link: link
     });
     mail = {
-      to: userAttrs.email,
+      to: to || userAttrs.email,
       from: 'no-reply@dinersgroup.com',
       text: 'You have HTML disabled in your email client.  Paste this link into your browser to confirm your email: ' + link,
       attachment:  {data:html, alternative:true},//confirmHTML(userAttrs.token),

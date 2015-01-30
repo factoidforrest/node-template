@@ -17,24 +17,41 @@ describe('account management', function(){
   describe('should update', function(){
 
 
-  it('the names', function(done){
+    it('the names', function(done){
+        login({},function(session){
+          session
+          .post('/auth/update')
+          .send({firstName: 'updatedname', lastName: 'updatedname'})
+          .expect(200)
+          .end(function(err, res){
+            console.log('response when trying to update users names is:', res.body)
+            //console.log('got api logged in test response of:', res)
+            res.body.first_name.should.equal('updatedname')
+            res.body.last_name.should.equal('updatedname')
+
+            done(err);
+          });
+        });
+
+      })
+    
+
+    it('the email', function(done){
       login({},function(session){
         session
         .post('/auth/update')
-        .send({firstName: 'updatedname', lastName: 'updatedname'})
+        .send({email:'light24bulbs+updated@gmail.com'})
         .expect(200)
         .end(function(err, res){
           console.log('response when trying to update users names is:', res.body)
           //console.log('got api logged in test response of:', res)
-          res.body.first_name.should.equal('updatedname')
-          res.body.last_name.should.equal('updatedname')
+          res.body.new_email.should.equal('light24bulbs+updated@gmail.com')
 
           done(err);
         });
       });
-
     })
-  })
+  });
 
  
 

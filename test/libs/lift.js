@@ -15,6 +15,10 @@
       adapters: {
         default: 'mongotest'
       }
+      //clear things out
+      ,migrate: 'drop'
+
+
       /*
        models: {
         connection: 'mongotest'

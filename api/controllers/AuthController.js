@@ -344,7 +344,7 @@ module.exports = {
 				require('crypto').randomBytes(48, function(ex, buf) {
 	      	user.token = buf.toString('hex');
 	      	var to = user.new_email;
-	      	Mail.sendConfirmation(attrs, next, to);
+	      	Mail.sendConfirmation(user, function(){}, to);
 	    	});
 			} 
 

@@ -52,18 +52,23 @@ module.exports = {
     
   }, 
   confirmEmail: function(token, next){
+    console.log('searching for user with token:', token)
     User.findOne({token:token}).done(function(err, user){
       if (err) return next(err);
       if (user === null || typeof(user) === 'undefined') return next('Invalid token');
       console.log('found user to confirm by token: ', user)
+      if (user.token === null) {
+        return next('This user is already confirmed, please log in.')
+      }
       //swap with new email if the user was updating an existing email
       if (user.hasOwnProperty('new_email')){
         user.email = user.new_email;
       }
+
       user.token = null;
       user.save(function(error){
         if (error) return next(error);
-        console.log('updated user to rmeove token: ', user);
+        console.log('updated user to remove token: ', user);
         next();
       });
     });
