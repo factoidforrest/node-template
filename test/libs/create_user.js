@@ -4,30 +4,9 @@ var registeredDestroyHook = false;
 
 module.exports.createUser = function(params){
 
-  var userProperties = {
-      //if you change this be sure to change in the login.js file as well.  
-      email: 'light24bulbs@gmail.com',
-      last_name: 'testLast',
-      full_name: 'testFirst testLast',
-      provider: 'local',
-      first_name: 'testFirst'
-    }
-  objectAssign(userProperties, params);
-
+  
   before(function(done){
-    User.create(userProperties).done(function(err, user){
-      
-      user.token = null;
-      //need to do this in it's own step so it doesn't trigger password confirmation via email
-      user.setPassword('secretpassword',function(){
-        user.save(function(err,user){
-          //console.log('created user for testing:', user)
-          if (err) return done(err);
-          done();
-        });
-      });
-      
-    });
+    module.exports.manuallyCreateUser(params, done)
   });
 
   if (!registeredDestroyHook){
@@ -39,6 +18,39 @@ module.exports.createUser = function(params){
       })
     })
   }
+}
+
+module.exports.manuallyCreateUser = function(attrs, done){
+  var userProperties = {
+      //if you change this be sure to change in the login.js file as well.  
+      email: 'light24bulbs@gmail.com',
+      last_name: 'testLast',
+      full_name: 'testFirst testLast',
+      provider: 'local',
+      first_name: 'testFirst'
+    }
+  objectAssign(userProperties, attrs);
+
+  User.create(userProperties).done(function(err, user){
+    
+    user.token = null;
+    //need to do this in it's own step so it doesn't trigger password confirmation via email
+    user.setPassword('secretpassword',function(){
+      user.save(function(err,user){
+        //console.log('created user for testing:', user)
+        if (err) return done(err);
+        done();
+      });
+    });
+    
+  });
+}
+
+module.exports.manuallyDestroyUser = function(done){
+  User.destroy({}, function() {
+    console.log('destroyed all users')
+    done();
+  })
 }
 
 

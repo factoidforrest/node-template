@@ -354,29 +354,24 @@ module.exports = {
 				if (!user.validPassword(params.currentPassword)) {
 					return res.send(400, {error: 'Current password was incorrect.  '})
 				}
-				//password valid handles sending errors to the response object.  If it fails, just exit
 				if (passwordValid(params, res)){
-
-
-					user.setPassword(params.password, function(passwordError){
-						if (passwordError) {
-							return res.send(400, {error: passwordError})
-						}
-					});
+					var bcrypt = require("bcrypt-nodejs")
+					user.password = bcrypt.hashSync(params.password);
 				} else {
+					//password valid handles sending errors to the response object.  If it fails, just exit
 					return;
 				}
 			}
-			user.first_name = params.firstName;
-			user.last_name = params.lastName;
-			console.log('the updated user before save is: ', user)
+
+			if (params.hasOwnProperty('firstName')) user.first_name = params.firstName;
+			if (params.hasOwnProperty('lastName')) user.last_name = params.lastName;
 			user.save(function(err, saved){
+				console.log('the updated user is: ', user)
+
 				if (err) {
 					return res.send(500, {error : err.message});
 				}
-
 				return res.json(saved);
-
 			});
 		});
 	},

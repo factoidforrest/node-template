@@ -10,12 +10,21 @@ var login = require('./libs/login')
 
 require('./libs/lift')
 require('./libs/create_user').createUser({})
+var userLib = require('./libs/create_user')
 var getUser = require('./libs/create_user').getUser
 
 
 describe('account management', function(){
   describe('should update', function(){
 
+    //clean up since we mess up the user attributes
+    after(function(done){
+      userLib.manuallyDestroyUser(function(){
+        userLib.manuallyCreateUser({},function(){
+          done();
+        })
+      })
+    })
 
     it('the names', function(done){
         login({},function(session){
@@ -48,6 +57,25 @@ describe('account management', function(){
           res.body.new_email.should.equal('light24bulbs+updated@gmail.com')
 
           done(err);
+        });
+      });
+    })
+
+    it('the password', function(done){
+      login({},function(session){
+        session
+        .post('/auth/update')
+        .send({currentPassword:'secretpassword',password:'updatedpassword', passwordConfirmation: 'updatedpassword'})
+        .expect(200)
+        .end(function(err, res){
+          console.log('response when trying to update password is:', res.body)
+          //console.log('got api logged in test response of:', res)
+          getUser(function(err, user){
+            user.validPassword('updatedpassword').should.equal(true)
+            done(err);
+          })
+
+          
         });
       });
     })

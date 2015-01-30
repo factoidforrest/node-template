@@ -32,19 +32,29 @@ module.exports.adapters = {
       password : '',
       database : 'mobile-gift-card'
   }, 
+
+  //these duplicates probably shouldnt be here, we should read a single 
   mongostaging: {
       module   : 'sails-mongo',
       url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
   },
+
+  //export DATABASE_URI=mongodb://mobilegiftcard:mgcdaily@localhost:27017/admin
+  //mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]
   mongodaily: {
       module   : 'sails-mongo',
-      url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
+      host: 'localhost',
+      port: 27017,
+      user: 'mobilegiftcard',
+      password: 'mgcdaily',
+      database: 'admin'
+      //url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
   },
   mongoprod: {
       module   : 'sails-mongo',
       url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
   },
-  
+
   mongotest: {
       module   : 'sails-mongo',
       host     : 'localhost',
