@@ -1,0 +1,34 @@
+//note these might break if we do a new bower install because I had to rename the css to scss to get server side includes
+//working which was faster.  sass dev is so hard headed, like 1000 people asked for a solution to this and he said no
+@import "../../public/components/leaflet/dist/leaflet";
+@import "../../public/components/leaflet.locatecontrol/dist/L.Control.Locate.min";
+//@import "map"
+html, body {
+ height: 100%;
+}
+
+body {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 14px;
+	line-height: 1.42857143;
+	color: #333;
+	background-color: #E7E7E5 !important;
+}
+
+
+
+//TODO: put in seperate file
+#map {
+	width: 100%;
+	height: 100%;
+	.leaflet-marker-icon {
+		transition: opacity 1s ease;
+	}
+	//tried to combine with above selector using comma but it didn't work
+	.leaflet-marker-shadow {
+		transition:opacity 1s ease;
+	}
+
+	
+}
+
