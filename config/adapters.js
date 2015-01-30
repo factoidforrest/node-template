@@ -42,15 +42,18 @@ module.exports.adapters = {
   //export DATABASE_URI=mongodb://mobilegiftcard:mgcdaily@localhost:27017/admin
   //mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]
   mongodaily: {
+      
       module   : 'sails-mongo',
       /*
       host: 'localhost',
       port: 27017,
       user: 'mobilegiftcard',
       password: 'mgcdaily',
-      database: 'admin'
+      database: 'admin',
       */
-      url: 'mongodb://heroku_app33233436:ktp26bb70gq7pfniv7i70veh4d@ds031641.mongolab.com:31641/heroku_app33233436'
+      url: process.env.DATABASE_URI || process.env.MONGOLAB_URI
+      
+      //url: 'mongodb://heroku_app33233436:ktp26bb70gq7pfniv7i70veh4d@ds031641.mongolab.com:31641/heroku_app33233436'
   },
   mongoprod: {
       module   : 'sails-mongo',
