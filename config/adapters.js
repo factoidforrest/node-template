@@ -11,7 +11,7 @@
  * For more information on adapter configuration, check out:
  * http://sailsjs.org/#documentation
  */
-var defaultAdapter = process.env.NODE_ENV === 'production' ? 'mongoprod' : 'mongodev'
+//var defaultAdapter = process.env.NODE_ENV === 'production' ? 'mongoprod' : 'mongodev'
 module.exports.adapters = {
 
   // If you leave the adapter config unspecified 
@@ -19,7 +19,7 @@ module.exports.adapters = {
 
   //this is the wrong way to do this but the right way(env.js) isn't working so there
 
-  'default': defaultAdapter,
+  'default': 'mongodaily',
 
   // Persistent adapter for DEVELOPMENT ONLY
   // (data is preserved when the server shuts down)
