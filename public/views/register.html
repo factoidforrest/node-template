@@ -1,0 +1,32 @@
+<div class="container registration" ng-controller="RegisterCtrl">
+	<div class="col-md-6 col-md-offset-3 panel panel-default">
+		<div class="panel-heading" >
+			<h4 class="text-center"> Register </h4>
+		</div>
+		<div class="panel-body">
+			<div class="alert alert-danger alert-dismissible" ng-show="error" role="alert">
+			  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+			  {{error}}
+			</div>
+			<form role="form" ng-submit="submit()">
+			  <div class="form-group">
+			    <label for="email">Email</label>
+			    <input ng-model="formData.email" type="email" class="form-control" id="input-email" placeholder="Email">
+			    <span class="help-block text-danger" ng-show="errorEmail">{{ errorEmail }}</span>
+			  </div>
+			  <div class="form-group">
+			    <label for="exampleInputPassword1">Password</label>
+			    <input ng-model="formData.password" type="password" class="form-control" id="input-passwrd" placeholder="Password">
+			    <span class="help-block text-danger" ng-show="errorPassword">{{ errorPassword }}</span>
+			  </div>
+			  <div class="form-group">
+			  	<input ng-model="formData.passwordConfirmation" type="password" class="form-control" id="input-confirmation" placeholder="Confirm Password">
+			  	<span class="help-block text-danger" ng-show="errorConfirm">{{ errorConfirm }}</span>
+			  </div>
+			  <div class="form-group">
+			  	<button type="submit" class="btn btn-primary btn-block">Register</button>
+			  </div>
+			</form>
+		</div>
+	</div>
+</div>

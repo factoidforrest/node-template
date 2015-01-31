@@ -1,0 +1,13 @@
+
+.login {
+	.btn {
+		border-radius: 6px !important;
+	}
+}
+
+.registration {
+	.text-danger {
+		//needs an override to make the red appear
+		color: #a94442 !important;
+	}
+}

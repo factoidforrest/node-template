@@ -1,0 +1,43 @@
+<div ng-controller="TccCardListController">
+
+    <div class="box bordered-box orange-border">
+
+        <div class="box-header orange-background">
+            <div class="title">{{allCards.length + 1}} TCC cards</div>
+        </div>
+
+        <div class="box-content box-no-padding">
+
+            <div class="responsive-table">
+                <ul class="list-unstyled card-list">
+                    <li>
+                        <div class="box col-sm-3 hidden-xs"><h4>Card Number</h4></div>
+                        <div class="box col-sm-2 hidden-xs"><h4>Status</h4></div>
+                        <div class="box col-sm-2 hidden-xs"><h4>Balance</h4></div>
+                        <div class="box col-sm-3 hidden-xs"><h4>Previous Balance</h4></div>
+                    </li>
+                </ul>
+
+                <ul class="list-striped list-unstyled card-list">
+                    <li class="row" ng-repeat="item in currentCards">
+                        <a href="#/tcc-cards/{{ item.id }}">
+                            <span class="visible-xs">number</span><div class="col-md-3 col-xs-12"><h5 class="text-left">{{item.card_number}}</h5></div>
+                            <span class="visible-xs">Status</span><div class="col-md-2 col-xs-12"><h5 class="text-left">{{item.status || "Unknown"}}</h5></div>
+                            <span class="visible-xs">Balance</span><div class="col-md-2 col-xs-12"><h5 class="text-left">{{item.balance || "N/A" | currency}}</h5></div>
+                            <span class="visible-xs">Previous</span><div class="col-md-3 col-xs-12"><h5 class="text-left">{{item.previousBalance || "N/A" | currency  }}</h5></div>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="pager">
+                    <li>
+                        <a ng-show="pager.previous" ng-click="didClickPrevious()">Previous</a>
+                    </li>
+                    <li>
+                        <a ng-show="pager.next" ng-click="didClickNext()">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

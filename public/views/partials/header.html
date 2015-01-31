@@ -1,0 +1,53 @@
+
+<nav class="navbar navbar-inverse">
+    <a class="navbar-brand" href="../../index.html">
+        <!--<img width="81" height="21" class="logo" alt="Flatty" src="assets/images/logo.svg">-->
+    </a>
+    <div class='container'>
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Diner's Group</a>
+        </div>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown dark user-menu" ng-show="profile.email">
+
+                <a class="dropdown-toggle" href="#">
+                    <!--
+                    <img ng-show="profile.full_name" width="23" height="23" alt="{{ profile.full_name }}" src="assets/images/avatar@2x.jpg">
+                    -->
+                    <span class="user-name">{{ profile.full_name }}</span>
+                    <span class="caret"></span>
+                </a>
+
+                <ul class="dropdown-menu">
+                    <!--
+                    <li ng-show="profile">
+                        <a href="#/user-profile">
+                            <i class="icon-user"></i>
+                            Profile
+                        </a>
+                    </li>
+                    -->
+                    <li ng-show="profile">
+                        <a href="#/user-profile">
+                            <i class="icon-cog"></i>
+                            Settings
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <!--<a href="//api.mobilegiftcard.com/auth/logout" ng-show="profile">-->
+                        <a ng-click="logout()" href="#" ng-show="profile">
+                            <i class="icon-signout"></i>
+                            Sign out
+                        </a>
+                            <!--<a href="//api.mobilegiftcard.com/auth/google">-->
+
+                    </li>
+                </ul>
+
+            </li>
+        </ul>
+    </div>
+</nav>
+
