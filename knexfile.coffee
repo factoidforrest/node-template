@@ -8,23 +8,26 @@ module.exports =
     }
     client: 'postgresql'
     connection:
-      database: 'beerme'
+      database: 'mobilegiftcarddev'
       user:     'root'
       password: ''
     migrations:
       tableName: 'knex_migrations'
+      directory: __dirname + "/server/database/migrations"
 
   test:
     client: 'postgresql'
     connection:
-      database: 'beermetest'
+      database: 'mobilegiftcardtest'
       user:     'root'
       password: ''
     migrations:
       tableName: 'knex_migrations'
+      directory: __dirname + "/server/database/migrations"
+
 
   production:
-    client: 'postgresql'
+    client: 'mobilegiftcardproduction'
     seeds: {
       directory: './server/database/seeds/'
     }
@@ -34,3 +37,4 @@ module.exports =
       max: 10
     migrations:
       tableName: 'knex_migrations'
+      directory: __dirname + "/server/database/migrations"
