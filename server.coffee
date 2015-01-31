@@ -6,11 +6,13 @@ handlers = require('./server/handlers')
 sass = require('node-sass')
 path = require('path')
 favicon = require('serve-favicon')
-db = require('./server/database/database')
+global.db = require('./server/database/database')
 replify = require('replify')
 parser = require 'body-parser'
+global.winston = require('winston')
+expressWinston = require('express-winston');
 
-production = app.get('env') == 'production'
+production = app.get('env') != 'development'
 
 app.use(express.compress())
 app.use(parser.urlencoded({ extended: true }))
@@ -44,17 +46,27 @@ else
 #static assets
 app.use(express.static(__dirname + '/public', { maxAge: cachetime }))
 
+#request logging
+app.use(expressWinston.logger({
+  transports: [
+    new winston.transports.Console({
+      json: true,
+      colorize: true
+    })
+  ]
+}));
+ 
+###
 #root
 app.get('/', handlers.root)
 
 #api
 app.post('/locations', handlers.locations)
+###
 
+require('./server/config/routes')(app)
 
-
-app.set('db', db)
-
-console.log("Node Env: ", app.get('env'))
+winston.info("Node Env: " +  app.get('env'))
 
 app.listen(process.env.PORT || 3000)
 #replify('realtime-101', app)

@@ -28,7 +28,10 @@
     "chai": "~1.9.2",
     "body-parser": "~1.9.2",
     "postgeo": "~0.1.2",
-    "q": "~1.1.1"
+    "q": "~1.1.1",
+    "winston": "~0.8.3",
+    "express-winston": "~0.2.12",
+    "supertest": "~0.15.0"
   },
   "devDependencies": {
     "coffee-script": "~1.7.1"
