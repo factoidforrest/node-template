@@ -2,7 +2,7 @@
 User = db.models.user
 
 module.exports = (app) ->
-	app.post 'auth/register', (req,res) ->
+	app.post '/auth/register', (req,res) ->
 		winston.info "registering user with params: ", req.body
 		params = req.body
 
@@ -46,7 +46,7 @@ module.exports = (app) ->
 				return
 
 
-	app.post 'auth/local',  (req,res) ->
+	app.post '/auth/local',  (req,res) ->
 
 		console.log "finding local user to authenticate: ", email
 		email = req.body.email

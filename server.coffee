@@ -14,8 +14,19 @@ expressWinston = require('express-winston');
 
 production = app.get('env') != 'development'
 
+#logging
+
+logLevel = production ? 'silly' : 'info'
+global.logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.Console)({ level: logLevel }),
+    #new (winston.transports.File)({ filename: 'somefile.log', level: 'error' })
+  ]
+})
+
 app.use(express.compress())
 app.use(parser.urlencoded({ extended: true }))
+app.use(parser.json())
 app.set('views', __dirname + '/views')
 app.use(express.logger())
 app.use(favicon(path.join(__dirname,'public','images','favicon.ico')))
@@ -46,6 +57,7 @@ else
 #static assets
 app.use(express.static(__dirname + '/public', { maxAge: cachetime }))
 
+
 #request logging
 app.use(expressWinston.logger({
   transports: [
@@ -66,7 +78,8 @@ app.post('/locations', handlers.locations)
 
 require('./server/config/routes')(app)
 
-winston.info("Node Env: " +  app.get('env'))
+logger.info("Node Env: " +  app.get('env'))
+logger.log('silly', 'a silly log')
 
 app.listen(process.env.PORT || 3000)
 #replify('realtime-101', app)

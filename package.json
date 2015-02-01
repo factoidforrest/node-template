@@ -26,7 +26,7 @@
     "replify": "~1.2.0",
     "mocha": "~2.0.1",
     "chai": "~1.9.2",
-    "body-parser": "~1.9.2",
+    "body-parser": "~1.9.3",
     "postgeo": "~0.1.2",
     "q": "~1.1.1",
     "winston": "~0.8.3",
