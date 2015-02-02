@@ -9,21 +9,22 @@ module.exports = (app) ->
 		#verify passwords match and are long enough 
 		if acceptablePassword(params, res)
 			User.where({email : params.email}).fetch().then (usr) ->
-				console.log('when registering user, found prexisting user')
 				if not usr
-					user = User.forge({email: params.email}).then (user) ->
-						user.setPassword req.body.password, ()->
-							user.save().then (saved)->
-								console.log "the user was saved as", saved
-								res.json({success: true, errors: {}})
+					user = User.forge({email: params.email})
+					logger.info 'forged user', user
+					user.setPassword req.body.password, ()->
+						user.save().then (saved)->
+							console.log "the user was saved as", saved
+							res.json({success: true, errors: {}})
 				else
+					console.log('when registering user, found prexisting user', usr)
 					if not usr.password
 						console.log "setting new password on old user:", usr
 						
 						#TODO: need to confirm the email before this login method becomes active
 						usr.setPassword params.password, () ->
 							require("crypto").randomBytes 48, (ex, buf) ->
-								usr.set 'token', buf.toString("hex")
+								usr.set 'confirmation_token', buf.toString("hex")
 								usr.save().then() ->
 									console.log err
 									if err
@@ -51,9 +52,9 @@ module.exports = (app) ->
 		console.log "finding local user to authenticate: ", email
 		email = req.body.email
 		password = req.body.password
-		User.findOne
+		User.where(
 			email: email
-		, (err, user) ->
+		).then (user) ->
 			console.log "localhandler found one user", user
 			console.log "and an err of:", err
 			return res.json(error: err)  if err
@@ -62,7 +63,7 @@ module.exports = (app) ->
 			return res.json(error: "Incorrect password.")  unless user.validPassword(password)
 			
 			#if the user email hasn't been confirmed.  When updating a user there might be a token and the old email is still valid so we check for the new_email property
-			return res.json(error: "You must confirm your email.  Please check your inbox.")  if user.token isnt null or user.hasOwnProperty("new_email")
+			return res.json(error: "You must confirm your email.  Please check your inbox.")  if user.get('confirmation_token') isnt null or user.hasOwnProperty("new_email")
 			if accountActive(user)
 				req.logIn user, (err) ->
 					return res.json(error: err)  if err

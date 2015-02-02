@@ -2,7 +2,6 @@
 express = require('express')
 app = express()
 coffeescript = require('connect-coffee-script')
-handlers = require('./server/handlers')
 sass = require('node-sass')
 path = require('path')
 favicon = require('serve-favicon')

@@ -15,6 +15,19 @@ describe 'user', ->
 		}).expect(200).end (err, res) ->
 			
 			#console.log('login response:', res)
+			console.log "created user with response", res.body
+			console.log "login err: ", err
+			done(err)
+
+
+	it 'local sign in', (done) ->
+		session = request.agent(app)
+		session.post("/auth/local").send(
+			email: "light24bulbs@gmail.com"
+			password: "secretpassword"
+		).expect(200).end (err, res) ->
+			
+			#console.log('login response:', res)
 			console.log "logged in to new session with response", res.body
 			console.log "login err: ", err
 			done(err)

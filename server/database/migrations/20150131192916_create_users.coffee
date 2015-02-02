@@ -3,6 +3,7 @@ exports.up = (knex, Promise) ->
 	knex.schema.createTable 'users', (t) ->
 	  t.increments().primary().index()
 	  t.string('email').notNull().unique().index()
+	  t.string('new_email').unique()
 	  t.string('password')
 	  t.string('confirmation_token').index()
 	  t.string('firstname')

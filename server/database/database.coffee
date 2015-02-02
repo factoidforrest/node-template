@@ -1,6 +1,5 @@
 #should probably switch to some appdir var instead of relative pathing
 adapters = require('../../knexfile')
-locationModel = require('./models/location')
 
 env = process.env.NODE_ENV || "development"
 
@@ -18,7 +17,7 @@ class Database
 		@bookshelf = require('bookshelf')(@knex)
 		#console.log(@bookshelf)
 		@models = {
-			location: locationModel(@bookshelf)
+			user: require('./models/user')(@bookshelf)
 		}
 		console.log("Database connected")
 
