@@ -18,7 +18,7 @@ module.exports = (app) ->
 							res.json({success: true, errors: {}})
 				else
 					console.log('when registering user, found prexisting user', usr)
-					if not usr.password
+					if !usr.get('password')
 						console.log "setting new password on old user:", usr
 						
 						#TODO: need to confirm the email before this login method becomes active
@@ -40,8 +40,7 @@ module.exports = (app) ->
 										errors: {}
 
 					else
-						res.send 200,
-							success: false
+						res.send 400,
 							errors:
 								email: "A user already exists with this email and they already have a password.  To change your password, login and do so through the settings menu"
 				return
@@ -54,36 +53,34 @@ module.exports = (app) ->
 		password = req.body.password
 		User.where(
 			email: email
-		).then (user) ->
+		).fetch().then( (user) ->
 			console.log "localhandler found one user", user
-			console.log "and an err of:", err
-			return res.json(error: err)  if err
-			return res.json(error: "Incorrect email.")  unless user
-			return res.json(error: "You have previously logged in with this email through a social network, but not using a password.  You can register this email with a password by clicking register below and the accounts will merge, or log in with a social network.")  if typeof (user.password) is "undefined"
-			return res.json(error: "Incorrect password.")  unless user.validPassword(password)
+			return res.send(400, error: "Incorrect email.")  unless user
+			return res.send(400, error: "You have previously logged in with this email through a social network, but not using a password.  You can register this email with a password by clicking register below and the accounts will merge, or log in with a social network.")  if !user.get('password')
+			return res.send(400, error: "Incorrect password.")  unless user.validPassword(password)
 			
 			#if the user email hasn't been confirmed.  When updating a user there might be a token and the old email is still valid so we check for the new_email property
-			return res.json(error: "You must confirm your email.  Please check your inbox.")  if user.get('confirmation_token') isnt null or user.hasOwnProperty("new_email")
+			return res.json(error: "You must confirm your email.  Please check your inbox.")  if user.get('confirmation_token') isnt null and not user.hasOwnProperty("new_email")
 			if accountActive(user)
 				req.logIn user, (err) ->
-					return res.json(error: err)  if err
-					res.json
-						success: true
-						user: user
+					return res.json(error: 'login error:' + err)  if err
+					res.json {user: user}
 			else
-				res.json
-					success: false
-					error: "Account disabled."
+				res.send(400, error: "Account disabled.")
 
 			return
+		).catch (dbError) ->
+			logger.error('error with database request on local login' + dbError)
+			console.log('err is ', dbError)
+			return res.send(500, error: 'Internal Server Error')
+
 
 
 
 acceptablePassword = (params, res) ->
   if params.password isnt params.passwordConfirmation
     console.log "passwords didnt match"
-    res.send 200,
-      success: false
+    res.send 400,
       errors:
         passwordConfirmation: "Passwords don't match"
 
@@ -92,7 +89,7 @@ acceptablePassword = (params, res) ->
   #check password length
   else if typeof (params.password) is "undefined" or params.password.length < 6
     console.log "password too short"
-    res.send 200,
+    res.send 400,
       success: false
       errors:
         password: "Password must be at least 6 characters"

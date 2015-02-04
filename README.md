@@ -11,6 +11,25 @@ Enter project directory and run
 
 `npm install`
 
+also do sudo npm install -g <package> to the following packages: 
+
+
+knex 
+
+mocha (if you want tests)
+
+something else I forgot.  
+
+#### Database
+
+You'll need to install postgresql (ubuntu package postgres) 
+
+Create a user matching the user in the knexfile.coffee (including password)
+
+Create a database matching the knexfile and insure it has proper permissions from the above user
+
+#### launch
+
 Start the server with 
 
 `coffee server.coffee`
