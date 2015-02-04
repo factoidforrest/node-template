@@ -19,7 +19,7 @@ module.exports = (bookshelf) ->
 			
 			#would be more efficient to do this async, can figure that out once load becomes a problem
 			valid = false
-			valid = bcrypt.compareSync(password, @password)
+			valid = bcrypt.compareSync(password, @get('password'))
 			logger.info "correct password? : ", valid
 			return valid
 
