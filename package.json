@@ -37,7 +37,6 @@
     "coffee-script": "~1.7.1"
   },
   "scripts": {
-    "postinstall": "knex migrate:latest"
   },
   "repository": {
     "type": "git",
