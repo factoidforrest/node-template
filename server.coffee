@@ -74,7 +74,7 @@ app.get('/', handlers.root)
 #api
 app.post('/locations', handlers.locations)
 ###
-
+require('./server/middleware/passport')(app)
 require('./server/config/routes')(app)
 
 logger.info("Node Env: " +  app.get('env'))

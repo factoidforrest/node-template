@@ -9,6 +9,7 @@ exports.up = (knex, Promise) ->
 	  t.string('firstname')
 	  t.string('lastname')
 	  t.boolean('admin')
+	  t.boolean('active').notNull().defaultTo(true)
 	  t.timestamps()
 
 

@@ -2,10 +2,14 @@ passport = require("passport")
 
 #    , GitHubStrategy = require('passport-github').Strategy
 #    , FacebookStrategy = require('passport-facebook').Strategy
+###
 GoogleStrategy = require("passport-google-oauth").OAuth2Strategy
 FacebookStrategy = require("passport-facebook").Strategy
+
 LocalStrategy = require("passport-local").Strategy
+
 TwitterStrategy = require("passport-twitter").Strategy
+###
 fs = require("fs")
 
 #this handler is used for third party authentications like google
@@ -91,16 +95,17 @@ passport.serializeUser (user, done) ->
   console.log "serializing user: ", user
   
   #we have the user model which means we are authenticating using a password
-  id = user.id
+  id = user.get('id')
   done null, id
   return
 
 passport.deserializeUser (id, done) ->
-  User.findOne(id: id).done (err, user) ->
-    done err, user
+  User.where(id: id).fetch().then((user) ->
+    done null, user
     return
-
-  return
+  ).catch (err) ->
+    logger.error('failed to deserialize user with id', id, 'and error' , err)
+    done err, null
 
 # Init custom express middleware
 module.exports = (app) ->
@@ -125,6 +130,7 @@ module.exports = (app) ->
     #            ));
   
   #DEPRECATED, local auth just runs directly in controller now
+  ###
   passport.use new LocalStrategy(
     usernameField: "email"
     passwordField: "password"
@@ -155,6 +161,7 @@ module.exports = (app) ->
   
   #                    callbackURL: 'http://api.mobilegiftcard.com/auth/google/callback'
   , verifyHandler)
+  ###
   app.use passport.initialize()
   app.use passport.session()
   return

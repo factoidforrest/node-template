@@ -74,17 +74,10 @@ module.exports = (bookshelf) ->
 
 
 		
-
+		#TODO make this safe
 		toJSON: ->
-			created_at: @createdAt
-			email: @email
-			id: @id
-			last_name: @lastname
-			full_name: @name
-			updated_at: @updatedAt
-			first_name: @firstname
-			email: @email
-			admin: @admin
+			@attributes
+
 		},{
 			#class methods
 			confirmEmail: (token, next) ->
