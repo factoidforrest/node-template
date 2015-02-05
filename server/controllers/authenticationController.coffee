@@ -66,7 +66,7 @@ module.exports = (app) ->
 			return res.send(400, error: "You must confirm your email.  Please check your inbox.")  if user.get('confirmation_token') isnt null and not user.hasOwnProperty("new_email")
 			if user.get('active')
 				req.logIn user, (err) ->
-					return res.json(error: 'login error:' + err)  if err
+					return res.send(500, error: 'Internal Server Error') if err
 					res.json {user: user}
 			else
 				res.send(400, error: "Account disabled.")
@@ -93,7 +93,6 @@ acceptablePassword = (params, res) ->
   else if typeof (params.password) is "undefined" or params.password.length < 6
     console.log "password too short"
     res.send 400,
-      success: false
       errors:
         password: "Password must be at least 6 characters"
 
