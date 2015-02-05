@@ -83,5 +83,5 @@ logger.log('silly', 'a silly log')
 app.listen(process.env.PORT || 3000)
 #replify('realtime-101', app)
 
-module.exports = app
+global.app = module.exports = app
 

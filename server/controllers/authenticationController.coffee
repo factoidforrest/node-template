@@ -1,6 +1,5 @@
 
 
-
 module.exports = (app) ->
 	app.post '/auth/register', (req,res) ->
 		winston.info "registering user with params: ", req.body
@@ -16,7 +15,12 @@ module.exports = (app) ->
 						user.generateToken () ->
 							user.save().then (saved)->
 								console.log "the user was saved as", saved
-								res.json({success: true, errors: {}})
+								#res.json({success: true, errors: {}})
+								user.sendConfirmationEmail (err) ->
+									return logger.error 'email error' + err if err
+									logger.info 'email send'
+									res.json({success: true, errors: {}})
+
 				else
 					console.log('when registering user, found prexisting user', usr)
 					if !usr.get('password')

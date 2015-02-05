@@ -1,8 +1,14 @@
 db = require('./../database')
-Promise = require("bluebird")
+#Promise = require("bluebird")
+###
 bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
 crypto = Promise.promisifyAll require 'crypto'
 Mail = Promise.promisifyAll require '../../services/mail'
+###
+bcrypt = require('bcrypt-nodejs')
+crypto = require 'crypto'
+Mail = require '../../services/mail'
+
 
 module.exports = (bookshelf) ->
 	global.User = bookshelf.Model.extend({
@@ -40,6 +46,7 @@ module.exports = (bookshelf) ->
 		name: () ->
 			@get('firstname') + ' ' + @get('lastname')
 
+		#promisification on this doesnt seem to work, so its deprecated
 		hashPassword: (password) -> 
 			console.log('hashing password')
 			#promise
@@ -51,7 +58,6 @@ module.exports = (bookshelf) ->
 
 		generateToken: (next) ->
 			console.log('generating token')
-			#promise
 			self = this
 			return crypto.randomBytes(48, (ex, buf) ->
 				console.log('token generated')
@@ -60,9 +66,9 @@ module.exports = (bookshelf) ->
 				next()
 			)
 
-		sendConfirmationEmail: (err, done) ->
+		sendConfirmationEmail: (done) ->
 			#promise
-			return Mail.sendConfirmation @attributes
+			return Mail.sendConfirmation @attributes, null,  done
 
 		setupLocalUser: (password) ->
 			#promise

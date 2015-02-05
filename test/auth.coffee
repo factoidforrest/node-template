@@ -9,6 +9,7 @@ expect = require('chai').expect
 logger.log('silly', 'a silly log')
 describe 'user', ->
 	it 'sign up', (done) ->
+		this.timeout(10000)
 		session = request.agent(app)
 		session.post("/auth/register").send({
 			email: "light24bulbs@gmail.com"
