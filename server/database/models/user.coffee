@@ -1,8 +1,11 @@
-bcrypt = require("bcrypt-nodejs")
 db = require('./../database')
+Promise = require("bluebird")
+bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
+crypto = Promise.promisifyAll require 'crypto'
+Mail = Promise.promisifyAll require '../../services/mail'
 
 module.exports = (bookshelf) ->
-	User = bookshelf.Model.extend({
+	global.User = bookshelf.Model.extend({
 		tableName: 'users'
 		hasTimestamps: true
 
@@ -14,6 +17,7 @@ module.exports = (bookshelf) ->
 		initialize: () ->
 
 
+
 		validPassword: (password) ->
 			logger.info "checking password"
 			
@@ -23,6 +27,7 @@ module.exports = (bookshelf) ->
 			logger.info "correct password? : ", valid
 			return valid
 
+		#deprecated
 		setPassword: (password, next) ->
 			self = this
 			bcrypt.hash password, null, null, (err, hash) ->
@@ -34,6 +39,41 @@ module.exports = (bookshelf) ->
 
 		name: () ->
 			@get('firstname') + ' ' + @get('lastname')
+
+		hashPassword: (password) -> 
+			console.log('hashing password')
+			#promise
+			self = this
+			return bcrypt.hash(password, null, null).then (hash) ->
+				console.log('hash created')
+				self.set('password', hash)
+				return
+
+		generateToken: (next) ->
+			console.log('generating token')
+			#promise
+			self = this
+			return crypto.randomBytes(48, (ex, buf) ->
+				console.log('token generated')
+				key = buf.toString("hex")
+				self.set('confirmation_token', key)
+				next()
+			)
+
+		sendConfirmationEmail: (err, done) ->
+			#promise
+			return Mail.sendConfirmation @attributes
+
+		setupLocalUser: (password) ->
+			#promise
+			@setPassword password, (err) ->
+				@generateToken
+
+			#.then(sendConfirmationEmail) do after
+
+
+
+		
 
 		toJSON: ->
 			created_at: @createdAt
@@ -49,55 +89,21 @@ module.exports = (bookshelf) ->
 			#class methods
 			confirmEmail: (token, next) ->
 				console.log "searching for user with token:", token
-				User.findOne(token: token).done (err, user) ->
-					return next(err)  if err
+				User.where(confirmation_token: token).fetch().then (user) ->
 					return next("Invalid token")  if user is null or typeof (user) is "undefined"
-					console.log "found user to confirm by token: ", user
-					return next("This user is already confirmed, please log in.")  if user.token is null
+					logger.info "found user to confirm by token: ", user
+					return next("This user is already confirmed, please log in.")  if user.get('confirmation_token') is null
 					
 					#swap with new email if the user was updating an existing email
-					user.email = user.new_email  if user.hasOwnProperty("new_email")
-					user.token = null
-					user.save (error) ->
-						return next(error)  if error
-						console.log "updated user to remove token: ", user
+					user.set('email', user.new_email) if user.hasOwnProperty("new_email")
+					user.set('confirmation_token', null)
+					user.save().then (saved) ->
+						logger.info "updated user to remove token: ", saved
 						next()
 						return
 
 					return
 
-				return
-
-			beforeCreate: (attrs, next) ->
-				console.log "user before create called and the attributes are"
-				console.log attrs
-				
-				#bcrypt = require("bcrypt")
-				#User.findByEmail(attrs.email).done(function(err, user){
-				#  console.log('found users matching email: ', user)
-				#});
-				if typeof (attrs.password) isnt "undefined" #(attrs.strategy === 'local'){
-					console.log "converting password to hash"
-					bcrypt.hash attrs.password, null, null, (err, hash) ->
-						return next(err)  if err
-						attrs.password = hash
-						delete (attrs.passwordConfirmation)
-
-						
-						#should check the key is unique but it's probably ok not to since the chances of two being the same are insanely small
-						require("crypto").randomBytes 48, (ex, buf) ->
-							attrs.token = buf.toString("hex")
-							Mail.sendConfirmation attrs, next
-							return
-
-						return
-
-				else
-					next()
-				return
-
-			afterCreate: (attrs, next) ->
-				next()
 				return
 		})
 	return User

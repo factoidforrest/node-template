@@ -1,5 +1,5 @@
 
-User = db.models.user
+
 
 module.exports = (app) ->
 	app.post '/auth/register', (req,res) ->
@@ -12,10 +12,11 @@ module.exports = (app) ->
 				if not usr
 					user = User.forge({email: params.email})
 					logger.info 'forged user', user
-					user.setPassword req.body.password, ()->
-						user.save().then (saved)->
-							console.log "the user was saved as", saved
-							res.json({success: true, errors: {}})
+					user.setPassword params.password, () ->
+						user.generateToken () ->
+							user.save().then (saved)->
+								console.log "the user was saved as", saved
+								res.json({success: true, errors: {}})
 				else
 					console.log('when registering user, found prexisting user', usr)
 					if !usr.get('password')
