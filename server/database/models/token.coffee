@@ -5,7 +5,7 @@ bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
 crypto = Promise.promisifyAll require 'crypto'
 Mail = Promise.promisifyAll require '../../services/mail'
 ###
- crypto = require 'crypto'
+crypto = require 'crypto'
 
 
 module.exports = (bookshelf) ->
@@ -21,11 +21,11 @@ module.exports = (bookshelf) ->
 		initialize: () ->
 			#I'm aware creating a promise manually like this is considered bad, but using promisification doesn't work so..
 			deferred = Promise.pending()
-			@generateToken(null, () ->
+			@generateToken null, () ->
 				logger.info 'token created'
-				deferred.fulfill('token created')
-			)
-    	return deferred.promise
+				deferred.fulfill 'token created'
+			 
+			return deferred.promise
 
 		generateToken: (length, next) ->
 			length or= 48

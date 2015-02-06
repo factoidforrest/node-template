@@ -5,6 +5,6 @@ expect = require('chai').expect
 
 describe 'tokens', ()->
 	it 'should create', (done) ->
-		Token.create().then (token) ->
+		Token.forge().save().then (token) ->
 			console.log('token:', token)
 			done()
