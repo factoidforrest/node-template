@@ -74,6 +74,8 @@ app.get('/', handlers.root)
 #api
 app.post('/locations', handlers.locations)
 ###
+
+app.set('token_expiry', [1, 'days'])
 require('./server/middleware/passport')(app)
 require('./server/config/routes')(app)
 
