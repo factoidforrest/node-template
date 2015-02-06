@@ -10,7 +10,7 @@ unless registered
 
 module.exports.destroyAll = destroyAll = (done) ->
 	console.log('calling async destroy on models')
-	async.map [User], destroy, (err, results) ->
+	async.map [User, Token], destroy, (err, results) ->
 		console.log('destroyed all')
 		done()
 

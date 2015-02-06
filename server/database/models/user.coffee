@@ -22,8 +22,9 @@ module.exports = (bookshelf) ->
 
 		initialize: () ->
 
-
-
+		tokens: () ->
+    	return this.morphMany(Token, 'tokenable')
+  	
 		validPassword: (password) ->
 			logger.info "checking password"
 			

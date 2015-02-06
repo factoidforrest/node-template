@@ -6,27 +6,27 @@ crypto = Promise.promisifyAll require 'crypto'
 Mail = Promise.promisifyAll require '../../services/mail'
 ###
 crypto = require 'crypto'
-
+moment = require 'moment'
 
 module.exports = (bookshelf) ->
 	global.Token = bookshelf.Model.extend({
 		tableName: 'tokens'
 		hasTimestamps: true
 
-		###
-		cards: () ->
-			@hasMany(db.models.card)
-		###
 
 		initialize: () ->
-			#I'm aware creating a promise manually like this is considered bad, but using promisification doesn't work so..
-			deferred = Promise.pending()
-			@generateToken null, () ->
-				logger.info 'token created'
-				deferred.fulfill 'token created'
-			 
-			return deferred.promise
+			this.on 'saving', (model, attrs, options) ->
+				#I'm aware creating a promise manually like this is considered bad, but using promisification doesn't work so..
+				deferred = Promise.pending()
+				model.generateToken null, () ->
+					logger.info 'token created'
+					deferred.fulfill 'token created'
+				
+				return deferred.promise
 
+		tokenable: () ->
+	    return @morphTo('tokenable', User);
+	  
 		generateToken: (length, next) ->
 			length or= 48
 			console.log('generating token')
@@ -38,7 +38,11 @@ module.exports = (bookshelf) ->
 				next()
 			)
 
-		valid: (date) ->
+		expired: (timeLength, timeUnits) ->
+			if moment().subtract(timeLength, timeUnits).isAfter(@get('createdAt'))
+				return true
+			else
+				return false
 
 		
 		#TODO make this safe
