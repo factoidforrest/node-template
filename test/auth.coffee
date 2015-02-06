@@ -2,12 +2,14 @@
 app = require('../server')
 request = require('supertest');
 setup = require('./libs/setup')
-console.log('app routes is', app.routes)
 expect = require('chai').expect
+userLib = require('./libs/user')
 
 
-logger.log('silly', 'a silly log')
 describe 'user', ->
+
+	before userLib.manuallyDestroyUser
+
 	it 'sign up', (done) ->
 		this.timeout(10000)
 		session = request.agent(app)

@@ -1,7 +1,7 @@
 
 
 objectAssign = require('object-assign')
-
+setup = require './setup'
 hooksCreated = false
 
 module.exports.createHooks = (params) ->
@@ -28,7 +28,7 @@ module.exports.createUser = (params, done) ->
 				done()
  
 module.exports.manuallyDestroyUser = (done) ->
-
+	setup.destroy(User, done)
 
 module.exports.getUser = () ->
 	User.where(email: 'light24bulbs@gmail.com').fetch()

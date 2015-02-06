@@ -69,9 +69,10 @@ module.exports = (app) ->
 			#if the user email hasn't been confirmed.  When updating a user there might be a token and the old email is still valid so we check for the new_email property
 			return res.send(400, error: "You must confirm your email.  Please check your inbox.")  if user.get('confirmation_token') isnt null and not user.hasOwnProperty("new_email")
 			if user.get('active')
-				req.logIn user, (err) ->
-					return res.send(500, error: 'Internal Server Error') if err
-					res.json {user: user}
+				user.createToken().then (token) ->
+					req.logIn user, (err) ->
+						return res.send(500, error: 'Internal Server Error') if err
+						res.json {token:token}
 			else
 				res.send(400, error: "Account disabled.")
 
