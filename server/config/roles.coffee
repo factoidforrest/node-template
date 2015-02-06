@@ -3,25 +3,25 @@ ConnectRoles = require('connect-roles');
 
 module.exports = (app) ->
 
-	user = new ConnectRoles(
+	global.roles = new ConnectRoles(
 		failureHandler: (req, res, action) ->
-	  # optional function to customise code that runs when
-	  # user fails authorisation
-	  	res.send(403, 'Access Denied - You don\'t have permission to: ' + action)
+			# optional function to customise code that runs when
+			# user fails authorisation
+			res.send(403, {error: 'Access Denied - You don\'t have permission to: ' + action})
 
-	  #async: true
+			#async: true
 	)
 
-	app.use(user.middleware())
+	app.use(roles.middleware())
 
 
-	user.use 'logged in', (req) -> 
-	  if req.user?
-	    return true
+	roles.use 'logged in', (req) -> 
+		if req.user? and req.user.get('active')
+			return true
 
-	  
-	user.use 'admin', (req) -> 
-	  if req.user.get('admin') == true 
-	    return true
+		
+	roles.use 'admin', (req) -> 
+		if req.user.get('admin') == true 
+			return true
 
-	  
+		

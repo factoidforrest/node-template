@@ -7,15 +7,16 @@ module.exports = (req, res, next) ->
 		return next()
 	else
 		Token.forge(key: key).fetch(withRelated: ['tokenable']).then (token) ->
-			logger.info 'Fetched token: ', token
 			if not token?
+				logger.info('token invalid')
 				return res.send(401, {error: 'Token Invalid', token: 'Invalid'})
 			else if token.expired(app.get('token_expiry')) 
+				logger.info('token expired')
 				return res.send(401, {error: 'Token Expired', token: 'Expired'})
 			else
+				logger.info('token accepted')
 				user = token.related('tokenable')
 				req.user = user
-				logger.info 'added this user to request:', req
 				return next()
 
 
