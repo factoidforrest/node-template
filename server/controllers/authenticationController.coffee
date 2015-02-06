@@ -1,6 +1,7 @@
 
 
 module.exports = (app) ->
+
 	app.post '/auth/register', (req,res) ->
 		winston.info "registering user with params: ", req.body
 		params = req.body
@@ -70,9 +71,7 @@ module.exports = (app) ->
 			return res.send(400, error: "You must confirm your email.  Please check your inbox.")  if user.get('confirmation_token') isnt null and not user.hasOwnProperty("new_email")
 			if user.get('active')
 				user.createToken().then (token) ->
-					req.logIn user, (err) ->
-						return res.send(500, error: 'Internal Server Error') if err
-						res.json {token:token}
+					res.json {token:token}
 			else
 				res.send(400, error: "Account disabled.")
 
