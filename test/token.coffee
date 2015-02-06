@@ -7,6 +7,8 @@ userLib = require './libs/user'
 
 userLib.createHooks()
 
+key = null
+
 describe 'tokens', ()->
 	it 'should create', (done) ->
 		Token.forge().save().then (token) ->
@@ -40,4 +42,26 @@ describe 'tokens', ()->
 			token = user.related('tokens').models[0].attributes
 			console.log('with related token ', token)
 			expect(user.related('tokens').length).to.equal(1)
+			key = user.related('tokens').models[0].get('key')
+			console.log('got key')
 			done()
+
+	it 'should authenticate a request', (done) ->
+		session = request.agent(app)
+		session.post("/user/testtoken").send({
+			token: key
+		}).expect(200).end (err, res) ->
+			
+			#console.log('login response:', res)
+			console.log('authenticated with token and got response:', res.body)
+			done(err)
+
+	it 'request should fail on a bad token', (done) ->
+		session = request.agent(app)
+		session.post("/user/testtoken").send({
+			token: '12345asddoijb'
+		}).expect(401).end (err, res) ->
+			
+			#console.log('login response:', res)
+			console.log('authenticated with bad token and got response:', res.body)
+			done(err)

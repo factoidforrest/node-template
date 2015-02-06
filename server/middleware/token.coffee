@@ -2,7 +2,7 @@
 # This middleware checks if the request contains a token and if so adds the corresponding user to the req object
 
 module.exports = (req, res, next) ->
-	key = req.params.token
+	key = req.body.token
 	if not key?
 		return next()
 	else
@@ -15,6 +15,7 @@ module.exports = (req, res, next) ->
 			else
 				user = token.related('tokenable')
 				req.user = user
+				logger.info 'added this user to request:', req
 				return next()
 
 

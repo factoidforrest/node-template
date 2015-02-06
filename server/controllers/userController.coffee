@@ -11,5 +11,8 @@ module.exports = (app) ->
 			console.log('confirmed user email by token')
 			res.redirect(app.assetRoot + '#/?message=confirmsuccess')
 
-
+	app.post '/user/testtoken', (req, res) ->
+		console.log('called token test')
+		user = req.user
+		res.send(user)
 
