@@ -10,8 +10,20 @@ LocalStrategy = require("passport-local").Strategy
 
 TwitterStrategy = require("passport-twitter").Strategy
 ###
-fs = require("fs")
+GoogleAuthCodeStrategy = require('passport-google-authcode').Strategy
 
+
+
+passport.use new GoogleAuthCodeStrategy({
+  #vars should be out of source and in the environment
+  clientID: "808716966460-mu0tt4jvafitf5vvf2rolj2dpjfvdrba.apps.googleusercontent.com"
+  clientSecret: "NBZ-UcUjZsXrUB3CCod-m-Ww"
+}, (accessToken, refreshToken, profile, done) ->
+  console.log('got profile from google:', profile)
+  Authentication.findOrCreateGoogle accessToken, refreshToken, profile, (err, user) ->
+    done err, user
+)
+###
 #this handler is used for third party authentications like google
 verifyHandler = (accessToken, refreshToken, params, profile, done) ->
   console.log params
@@ -70,26 +82,6 @@ verifyHandler = (accessToken, refreshToken, params, profile, done) ->
   return
 
 
-#DEPRECATED, auth just runs directly in the handler in the auth controller now since passport wasn't playing nicely.  
-localHandler = (email, password, done) ->
-  console.log "finding local user to authenticate: ", email
-  User.findOne
-    email: email
-  , (err, user) ->
-    console.log "localhandler found one user", user
-    console.log "and an err of:", err
-    return done(err)  if err
-    unless user
-      return done(null, false,
-        message: "Incorrect email."
-      )
-    unless user.validPassword(password)
-      return done(null, false,
-        message: "Incorrect password."
-      )
-    done null, user
-
-  return
 
 passport.serializeUser (user, done) ->
   console.log "serializing user: ", user
@@ -106,7 +98,7 @@ passport.deserializeUser (id, done) ->
   ).catch (err) ->
     logger.error('failed to deserialize user with id', id, 'and error' , err)
     done err, null
-
+###
 # Init custom express middleware
 module.exports = (app) ->
   
@@ -163,7 +155,7 @@ module.exports = (app) ->
   , verifyHandler)
   ###
   app.use passport.initialize()
-  app.use passport.session()
+  #app.use passport.session()
   return
 
 #

@@ -1,4 +1,4 @@
-
+passport = require 'passport'
 
 module.exports = (app) ->
 
@@ -81,26 +81,29 @@ module.exports = (app) ->
 			console.log('err is ', dbError)
 			return res.send(500, error: 'Internal Server Error')
 
+	app.post '/auth/google/authcode', passport.authenticate('google-authcode'), (req, res) ->
+		logger.info 'google authenticating with ', req.body
+		res.json(req.user? 200 : 401, req.user)
 
 
 
 acceptablePassword = (params, res) ->
-  if params.password isnt params.passwordConfirmation
-    console.log "passwords didnt match"
-    res.send 400,
-      errors:
-        passwordConfirmation: "Passwords don't match"
+	if params.password isnt params.passwordConfirmation
+		console.log "passwords didnt match"
+		res.send 400,
+			errors:
+				passwordConfirmation: "Passwords don't match"
 
-    false
-  
-  #check password length
-  else if typeof (params.password) is "undefined" or params.password.length < 6
-    console.log "password too short"
-    res.send 400,
-      errors:
-        password: "Password must be at least 6 characters"
+		false
+	
+	#check password length
+	else if typeof (params.password) is "undefined" or params.password.length < 6
+		console.log "password too short"
+		res.send 400,
+			errors:
+				password: "Password must be at least 6 characters"
 
-    false
-  else
-    true
+		false
+	else
+		true
 

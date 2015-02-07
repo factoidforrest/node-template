@@ -7,6 +7,7 @@ module.exports = (req, res, next) ->
 		return next()
 	else
 		Token.forge(key: key).fetch(withRelated: ['tokenable']).then (token) ->
+			logger.info 'fetched token from database', token
 			if not token?
 				logger.info('token invalid')
 				return res.send(401, {error: 'Token Invalid', token: 'Invalid'})

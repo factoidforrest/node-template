@@ -22,13 +22,17 @@ module.exports = (bookshelf) ->
 
 		initialize: () ->
 
+		#relations
 		tokens: ->
-    	return this.morphMany(Token, 'tokenable')
+			return @morphMany(Token, 'tokenable')
 
-    createToken: ->
-    	#returns a promise
-    	@related('tokens').create()
-  	
+		authentications: ->
+			return @hasMany(Authentication)
+
+		createToken: ->
+			#returns a promise
+			@related('tokens').create()
+		
 		validPassword: (password) ->
 			logger.info "checking password"
 			

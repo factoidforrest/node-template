@@ -31,6 +31,7 @@
     "node-sass": "~0.8.3",
     "object-assign": "^2.0.0",
     "passport": "^0.2.1",
+    "passport-google-authcode": "^0.1.1",
     "pg": "~3.6.2",
     "postgeo": "~0.1.2",
     "q": "~1.1.1",

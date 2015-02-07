@@ -19,6 +19,7 @@ class Database
 		@models = {
 			user: require('./models/user')(@bookshelf)
 			token: require('./models/token')(@bookshelf)
+			authentication: require('./models/authentication')(@bookshelf)
 		}
 		console.log("Database connected")
 

@@ -80,7 +80,7 @@ app.set('token_expiry', [1, 'days'])
 app.use require './server/middleware/token'
 require('./server/config/roles')(app)
 
-#require('./server/middleware/passport')(app)
+require('./server/middleware/passport')(app)
 require('./server/config/routes')(app)
 
 logger.info("Node Env: " +  app.get('env'))

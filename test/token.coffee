@@ -18,6 +18,7 @@ describe 'tokens', ()->
 
 	it 'should expire properly', (done)->
 		Token.fetchAll().then (tokens) ->
+			console.log 'fetched tokens ', tokens.models
 			token = tokens.models[0]
 			expired = token.expired(1, 'days')
 			console.log 'new token is expired?', expired
