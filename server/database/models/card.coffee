@@ -10,7 +10,7 @@ moment = require 'moment'
 
 module.exports = (bookshelf) ->
 	global.Card = bookshelf.Model.extend({
-		tableName: 'tokens'
+		tableName: 'cards'
 		hasTimestamps: true
 
 
@@ -27,7 +27,7 @@ module.exports = (bookshelf) ->
 			###
 
 		user: ->
-			return @hasOne(Authentication)
+			return @belongsTo(User)
 	  
 		#TODO make this safe
 		toJSON: ->

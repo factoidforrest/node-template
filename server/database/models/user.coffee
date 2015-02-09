@@ -31,6 +31,7 @@ module.exports = (bookshelf) ->
 
 		cards: ->
 			return @hasMany(Card)
+			
 		createToken: ->
 			#returns a promise
 			@related('tokens').create()

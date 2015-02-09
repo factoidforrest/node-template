@@ -2,7 +2,7 @@
 exports.up = (knex, Promise) ->
 	knex.schema.createTable 'cards', (t) ->
 	  t.increments().primary().index()
-	  t.string('card_number').notNull().unique().index()
+	  t.string('number').notNull().unique().index()
 	  t.float('init_value')
 	  t.float('remaining_value')
 	  t.float('balance')

@@ -1,0 +1,218 @@
+merge = require('merge')
+request = require('request')
+q = require('q')
+
+header = 
+	{
+    'hdr':
+      'live': ''
+      'fmt': 'MGC'
+      'ver': '1.0.0'
+      'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
+      'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
+      'cliId': sails.config.clientID
+      'locId': 1
+      'rcId': 0
+      'term': '1'
+      'srvId': 518
+      'srvNm': ''
+      'key': ''
+      'chk': '12345'}
+  }
+inquiryBody = (card) ->
+  {
+    'hdr':
+      'live': ''
+      'fmt': 'MGC'
+      'ver': '1.0.0'
+      'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
+      'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
+      'cliId': sails.config.clientID
+      'locId': 1
+      'rcId': 0
+      'term': '1'
+      'srvId': 518
+      'srvNm': ''
+      'key': ''
+      'chk': '12345'
+    'txs': [ {
+      'typ': 2
+      'crd': card
+      'amt': ''
+    } ]
+  }
+
+activateBody = (card, amount) ->
+  {
+    'hdr':
+      'live': ''
+      'fmt': 'MGC'
+      'ver': '1.0.0'
+      'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
+      'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
+      'cliId': sails.config.clientID
+      'locId': 1
+      'rcId': 0
+      'term': '1'
+      'srvId': 518
+      'srvNm': ''
+      'key': ''
+      'chk': '12345'
+    'txs': [ {
+      'typ': 4
+      'crd': card
+      'amt': amount
+    } ]
+  }
+
+redeemBody = (card, amount) ->
+  {
+    'hdr':
+      'live': ''
+      'fmt': 'MGC'
+      'ver': '1.0.0'
+      'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
+      'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
+      'cliId': sails.config.clientID
+      'locId': 1
+      'rcId': 0
+      'term': '1'
+      'srvId': 518
+      'srvNm': ''
+      'key': ''
+      'chk': '12345'
+    'txs': [ {
+      'typ': 5
+      'crd': card
+      'amt': amount
+    } ]
+  }
+
+createBody = (amount, program) ->
+  {
+    'hdr':
+      'live': ''
+      'fmt': 'MGC'
+      'ver': '1.0.0'
+      'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
+      'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
+      'cliId': sails.config.clientID
+      'locId': 1
+      'rcId': 0
+      'term': '1'
+      'srvId': 518
+      'srvNm': ''
+      'txDtTm': '04/14/2014'
+      'key': ''
+      'chk': '12345'
+    'txs': [ {
+      'typ': 3
+      'amt': amount
+      'prog': program
+    } ]
+  }
+
+module.exports =
+  createCard: (amount, program) ->
+    deferred = q.defer()
+    url = sails.config.TCC
+    options = 
+      method: 'post'
+      body: createBody(amount, program)
+      json: true
+      url: url
+    console.log 'request to tcc for creating card is  ', options.body
+    request options, (err, httpResponse, body) ->
+      console.log 'res for creating card is ', body
+      if err or body.txs.length == 0
+        console.log 'rejecting promise with args ', [
+          err
+          body
+        ]
+        return deferred.reject([
+          err
+          body
+        ])
+      console.log 'resolving promise'
+      txn = body.txs[0]
+      deferred.resolve
+        card_number: txn.crd
+        status: txn.crdStat
+        balance: txn.bal
+        previousBalance: txn.prevBal
+      return
+    deferred.promise
+
+
+  getTCCInquiry: (card_number) ->
+    deferred = q.defer()
+    url = sails.config.TCC
+    options = 
+      method: 'post'
+      body: inquiryBody(card_number)
+      json: true
+      url: url
+    console.log 'request to tcc is  ', options.body
+    request options, (err, httpResponse, body) ->
+      console.log 'res body is', body
+      if err or body.txs.length == 0
+        console.log 'rejecting promise with args ', [
+          err
+          body
+        ]
+        return deferred.reject([
+          err
+          body
+        ])
+      console.log 'resolving promise'
+      txn = body.txs[0]
+      deferred.resolve
+        card_number: txn.crd
+        status: txn.crdStat
+        balance: txn.bal
+        previousBalance: txn.prevBal
+      return
+    deferred.promise
+  activateTCCCard: (card_number, amount) ->
+    deferred = q.defer()
+    body = activateBody(card_number, amount)
+    url = sails.config.TCC
+    options = 
+      method: 'post'
+      body: body
+      json: true
+      url: url
+    request options, (err, httpResponse, body) ->
+      if err or body.txs.length == 0
+        deferred.reject err
+      txn = body.txs[0]
+      deferred.resolve
+        card_number: txn.crd
+        status: txn.crdStat
+        balance: txn.bal
+        previousBalance: txn.prevBal
+      return
+    deferred.promise
+
+  redeemTCCCard: (card_number, amount) ->
+    deferred = q.defer()
+    url = sails.config.TCC
+    options = 
+      method: 'post'
+      body: redeemBody(card_number, amount)
+      json: true
+      url: url
+    request options, (err, httpResponse, body) ->
+      if err or body.txs.length == 0
+        deferred.reject err
+      txn = body.txs[0]
+      deferred.resolve
+        card_number: txn.crd
+        status: txn.crdStat
+        balance: txn.bal
+        previousBalance: txn.prevBal
+      return
+    deferred.promise
+
+# ---
+# generated by js2coffee 2.0.0
