@@ -1,6 +1,7 @@
 async = require 'async'
 
 registered = false
+process.env.NODE_ENV = 'test'
 
 unless registered
 	console.log('registering destroy hook')

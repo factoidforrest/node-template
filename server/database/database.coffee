@@ -20,6 +20,7 @@ class Database
 			user: require('./models/user')(@bookshelf)
 			token: require('./models/token')(@bookshelf)
 			authentication: require('./models/authentication')(@bookshelf)
+			card: require('./models/card')(@bookshelf)
 		}
 		console.log("Database connected")
 

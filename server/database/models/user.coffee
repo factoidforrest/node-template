@@ -29,6 +29,8 @@ module.exports = (bookshelf) ->
 		authentications: ->
 			return @hasMany(Authentication)
 
+		cards: ->
+			return @hasMany(Card)
 		createToken: ->
 			#returns a promise
 			@related('tokens').create()

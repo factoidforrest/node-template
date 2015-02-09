@@ -83,7 +83,7 @@ module.exports = (app) ->
 
 	app.post '/auth/google/authcode', passport.authenticate('google-authcode'), (req, res) ->
 		logger.info 'google authenticating with ', req.body
-		res.json(req.user? 200 : 401, req.user)
+		res.json(200, req.user)
 
 
 

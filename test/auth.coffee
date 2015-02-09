@@ -52,15 +52,15 @@ describe 'user', ->
 			console.log "login err: ", err
 			done(err)
 
+	###
 	it 'sign up with google', (done) ->
 		session = request.agent(app)
 		session.post("/auth/google/authcode").send({
-			code: "4/J8NkWqPdbxejbnSExgYdM0MrdDwuNReKfvZgT4D8lZ8.An10uTDtKjAXoiIBeO6P2m9KhIbAlgI"
+			code: "4/Oome4iVqJR78ucG65hjOJO2-Dcf1OYNgAhUNtpJCAAM.snfqCoSQ1nMZoiIBeO6P2m-OLPHTlgI"
 		}).expect(200).end (err, res) ->
-			
 			#console.log('login response:', res)
 			console.log "google authenticated with response", res
 			console.log "login err: ", err
 			done(err)
-
+	###
 		
