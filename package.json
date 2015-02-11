@@ -37,6 +37,7 @@
     "postgeo": "~0.1.2",
     "q": "~1.1.1",
     "replify": "~1.2.0",
+    "request": "^2.53.0",
     "sass": "~0.5.0",
     "sass-middleware": "~0.0.3",
     "serve-favicon": "~2.1.5",

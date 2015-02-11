@@ -10,24 +10,7 @@ header =
       'ver': '1.0.0'
       'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
       'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
-      'cliId': sails.config.clientID
-      'locId': 1
-      'rcId': 0
-      'term': '1'
-      'srvId': 518
-      'srvNm': ''
-      'key': ''
-      'chk': '12345'}
-  }
-inquiryBody = (card) ->
-  {
-    'hdr':
-      'live': ''
-      'fmt': 'MGC'
-      'ver': '1.0.0'
-      'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
-      'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
-      'cliId': sails.config.clientID
+      'cliId': 73 #factor into env var someday
       'locId': 1
       'rcId': 0
       'term': '1'
@@ -35,6 +18,11 @@ inquiryBody = (card) ->
       'srvNm': ''
       'key': ''
       'chk': '12345'
+  }
+
+inquiryBody = (card) ->
+	merge header,
+	{
     'txs': [ {
       'typ': 2
       'crd': card
@@ -43,21 +31,8 @@ inquiryBody = (card) ->
   }
 
 activateBody = (card, amount) ->
-  {
-    'hdr':
-      'live': ''
-      'fmt': 'MGC'
-      'ver': '1.0.0'
-      'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
-      'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
-      'cliId': sails.config.clientID
-      'locId': 1
-      'rcId': 0
-      'term': '1'
-      'srvId': 518
-      'srvNm': ''
-      'key': ''
-      'chk': '12345'
+	merge header,
+ 	{
     'txs': [ {
       'typ': 4
       'crd': card
@@ -66,21 +41,8 @@ activateBody = (card, amount) ->
   }
 
 redeemBody = (card, amount) ->
+	merge header,
   {
-    'hdr':
-      'live': ''
-      'fmt': 'MGC'
-      'ver': '1.0.0'
-      'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
-      'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
-      'cliId': sails.config.clientID
-      'locId': 1
-      'rcId': 0
-      'term': '1'
-      'srvId': 518
-      'srvNm': ''
-      'key': ''
-      'chk': '12345'
     'txs': [ {
       'typ': 5
       'crd': card
@@ -89,22 +51,8 @@ redeemBody = (card, amount) ->
   }
 
 createBody = (amount, program) ->
+	merge header,
   {
-    'hdr':
-      'live': ''
-      'fmt': 'MGC'
-      'ver': '1.0.0'
-      'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
-      'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
-      'cliId': sails.config.clientID
-      'locId': 1
-      'rcId': 0
-      'term': '1'
-      'srvId': 518
-      'srvNm': ''
-      'txDtTm': '04/14/2014'
-      'key': ''
-      'chk': '12345'
     'txs': [ {
       'typ': 3
       'amt': amount
@@ -115,7 +63,7 @@ createBody = (amount, program) ->
 module.exports =
   createCard: (amount, program) ->
     deferred = q.defer()
-    url = sails.config.TCC
+    url = app.get('tcc')
     options = 
       method: 'post'
       body: createBody(amount, program)
@@ -146,7 +94,7 @@ module.exports =
 
   getTCCInquiry: (card_number) ->
     deferred = q.defer()
-    url = sails.config.TCC
+    url = app.get('tcc')
     options = 
       method: 'post'
       body: inquiryBody(card_number)
@@ -173,10 +121,12 @@ module.exports =
         previousBalance: txn.prevBal
       return
     deferred.promise
+
+
   activateTCCCard: (card_number, amount) ->
     deferred = q.defer()
     body = activateBody(card_number, amount)
-    url = sails.config.TCC
+    url = app.get('tcc')
     options = 
       method: 'post'
       body: body
@@ -194,9 +144,10 @@ module.exports =
       return
     deferred.promise
 
+
   redeemTCCCard: (card_number, amount) ->
     deferred = q.defer()
-    url = sails.config.TCC
+    url = app.get('tcc')
     options = 
       method: 'post'
       body: redeemBody(card_number, amount)
