@@ -21,4 +21,3 @@ module.exports.destroy = destroy = (model, cb) ->
 	model.collection().fetch().then (collection) ->
 		collection.invokeThen('destroy').then -> 
 			cb()
-
