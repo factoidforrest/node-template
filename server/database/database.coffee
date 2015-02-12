@@ -1,7 +1,7 @@
 #should probably switch to some appdir var instead of relative pathing
 adapters = require('../../knexfile')
 
-env = process.env.MGC_ENV || "development"
+env = process.env.NODE_ENV || "development"
 
 ###
 adapter = {
@@ -10,6 +10,7 @@ adapter = {
 	"production": adapters.production
 }
 ###
+console.log(adapters[env]);
 
 class Database
 	constructor: () ->
