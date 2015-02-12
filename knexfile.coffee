@@ -26,6 +26,7 @@ module.exports =
       directory: __dirname + "/server/database/migrations"
 
 
+
   production:
     client: 'postgresql'
     seeds: {
