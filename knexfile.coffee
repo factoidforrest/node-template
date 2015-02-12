@@ -27,7 +27,7 @@ module.exports =
 
 
   production:
-    client: 'mobilegiftcardproduction'
+    client: 'postgresql'
     seeds: {
       directory: './server/database/seeds/'
     }
