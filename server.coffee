@@ -11,7 +11,8 @@ parser = require 'body-parser'
 global.winston = require('winston')
 expressWinston = require('express-winston');
 
-production = app.get('env') != 'development'
+#production = app.get('env') != 'development'
+production = process.env.MGC_ENV != 'development'
 
 #logging
 
