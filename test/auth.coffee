@@ -16,7 +16,7 @@ describe 'user', ->
 		session.post("/auth/register").send({
 			email: "light24bulbs@gmail.com"
 			password: "secretpassword"
-			passwordConfirmation: 'secretpassword'
+			password_confirmation: 'secretpassword'
 		}).expect(200).end (err, res) ->
 			
 			#console.log('login response:', res)

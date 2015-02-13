@@ -5,6 +5,7 @@ module.exports = (app) ->
 	app.post '/auth/register', (req,res) ->
 		winston.info "registering user with params: ", req.body
 		params = req.body
+		console.log params
 
 		#verify passwords match and are long enough 
 		if acceptablePassword(params, res)
@@ -88,11 +89,11 @@ module.exports = (app) ->
 
 
 acceptablePassword = (params, res) ->
-	if params.password isnt params.passwordConfirmation
+	if params.password isnt params.password_confirmation
 		console.log "passwords didnt match"
 		res.send 400,
 			errors:
-				passwordConfirmation: "Passwords don't match"
+				password_confirmation: "Passwords don't match"
 
 		false
 	
