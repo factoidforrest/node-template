@@ -2,6 +2,7 @@ request = require("supertest")
 savedSession = undefined
 module.exports = (params, callback) ->
   unless savedSession
+    console.log('creating new login session')
     session = request.agent(sails.express.app)
     session.post("/auth/local").send(
       email: "light24bulbs@gmail.com"

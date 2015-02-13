@@ -1,4 +1,3 @@
-app = require('../server')
 request = require('supertest');
 setup = require('./libs/setup')
 expect = require('chai').expect

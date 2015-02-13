@@ -9,10 +9,13 @@ module.exports.createHooks = (params) ->
 	unless hooksCreated
 		before (done) ->
 			module.exports.createUser params, done
-			registeredDestroyHook = true
+		after (done) ->
+			setup.destroy(User, done)
+
 
 
 module.exports.createUser = (params, done) ->
+	console.log 'hooks created?', hooksCreated
 	params ?= {}
 	userProperties = 
 		email: 'light24bulbs@gmail.com'
@@ -20,11 +23,11 @@ module.exports.createUser = (params, done) ->
 		first_name: 'testFirst'
 	objectAssign userProperties, params
 	User.forge(userProperties).save().then (user) ->
-		console.log('created user with properties: ', user.attributes)
 		user.set('confirmation_token', null)
-		#need to do this in it's own step so it doesn't trigger password confirmation via email
 		user.setPassword 'secretpassword', ->
 			user.save().then (user) ->
+				console.log('created user with properties: ', user.attributes)
+				hooksCreated = true
 				#console.log('created user for testing:', user)
 				done()
  

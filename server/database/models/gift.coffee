@@ -26,8 +26,9 @@ module.exports = (bookshelf) ->
 				return deferred.promise
 			###
 
-		user: ->
-			return @belongsTo(User)
+		from: ->
+			return @belongsTo(User, 'from_id')
+
 	  
 		#TODO make this safe
 		toJSON: ->

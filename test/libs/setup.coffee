@@ -1,5 +1,5 @@
 async = require 'async'
-
+app = require('../../server')
 registered = false
 process.env.NODE_ENV = 'test'
 

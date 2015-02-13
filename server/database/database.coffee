@@ -22,6 +22,8 @@ class Database
 			token: require('./models/token')(@bookshelf)
 			authentication: require('./models/authentication')(@bookshelf)
 			card: require('./models/card')(@bookshelf)
+			gift: require('./models/gift')(@bookshelf)
+
 		}
 		console.log("Database connected")
 
