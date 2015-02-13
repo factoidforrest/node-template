@@ -4,6 +4,9 @@
   "engines": {
     "node": "0.10.x"
   },
+  "config": {
+    "unsafe-perm":true
+  },
   "description": "",
   "main": "server.coffee",
   "dependencies": {

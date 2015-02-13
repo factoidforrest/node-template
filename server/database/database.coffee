@@ -10,6 +10,7 @@ adapter = {
 	"production": adapters.production
 }
 ###
+console.log(adapters[env]);
 
 class Database
 	constructor: () ->
