@@ -10,8 +10,8 @@ googleToken= 'ya29.GgFRpbrNp6vFkNumoXQL3vu5LbnMpMFvYrhVR6kQkFIyZ-gBYpJ7fZsABAF5r
 googleRefresh= '1/d4gp7M7An08kIlB6BbWXPLBdCdk4V07VIhID700y1hsMEudVrK5jSpoR30zcRFq6'
 
 describe 'user', ->
-	this.timeout(15000)
-	
+	this.timeout(20000)
+
 	before userLib.manuallyDestroyUser
 
 	it 'sign up', (done) ->
@@ -118,6 +118,24 @@ describe 'user', ->
 			console.log('authenticated with token and got response:', res.body)
 			done(err)
 	
+	it 'should communicate directly with facebook', (done)->
+		FB = require 'fb'
+		FB.api 'oauth/access_token', {
+			client_id: '332366616957466',
+			client_secret: 'd9a99a29bf4ac4e02ba496a6fd04f37b',
+			grant_type: 'client_credentials'
+		},  (res) ->
+			if !res || res.error
+				console.log(!res ? 'error occurred' : res.error)
+				done(res.error)
 
-
+			accessToken = res.access_token
+			console.log('got token', accessToken)
+			FB.setAccessToken(accessToken)
+			FB.api 'me', {
+				access_token: 'CAAEuSSIjkhoBAKVu2XMQ4zji1ToZCWhnaKLQ9KPIw2KhsyOp2pjKftpyFr06zyWaBLK2ym21b5hEIpgGXOhCnhJzF6sFK7YBIhK5Kw0Ica6yfO3QocIDZAMfyZAuC6t3COKDlxlhqFiu8LgpQFFOTV8xPryEkYYGflvbHsaZA7nkUG7stvVrS3GkYZBVyARcQVrGSBjIZBVVH7q0YlZBWRvbAN84fmUnE8ZD'
+				scope: 'email'
+			},  (debugRes) ->
+				console.log('checked token with response', debugRes)
+				done(res.error)
 		

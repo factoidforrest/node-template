@@ -10,6 +10,9 @@ google = require('googleapis')
 OAuth2 = google.auth.OAuth2;
 plus = google.plus('v1')
 
+#facebook
+FB = require 'fb'
+
 
 module.exports = (bookshelf) ->
 	global.Authentication = bookshelf.Model.extend({
@@ -46,7 +49,6 @@ module.exports = (bookshelf) ->
 		###
 		},{
 			findOrCreateGoogle: (accessToken, refreshToken, next) ->
-				console.log('google credentials: ', process.env.GOOGLE_ID, process.env.GOOGLE_SECRET )
 				oauth2Client = new OAuth2(
 					process.env.GOOGLE_ID,
 					process.env.GOOGLE_SECRET
@@ -72,7 +74,23 @@ module.exports = (bookshelf) ->
 						refresh_token: refreshToken
 					}
 					findOrCreate(profile, next)
-					
+			###
+			findOrCreateFacebook: (code, next) ->
+				FB.api('oauth/access_token', {
+			    client_id: '332366616957466',
+			    client_secret: 'd9a99a29bf4ac4e02ba496a6fd04f37b',
+			    redirect_uri: 'localhost:3000/callback',
+			    code: code
+				},  (res) -> 
+			    if !res? || res.error
+		        console.log(!res ? 'error occurred' : res.error)
+		        return
+			  
+			    accessToken = res.access_token;
+			    expires = res.expires ? res.expires : 0
+			###
+				
+									
 
 		})
 	return Authentication
