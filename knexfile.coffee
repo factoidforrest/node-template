@@ -17,10 +17,11 @@ module.exports =
 
   test:
     client: 'postgresql'
-    connection:
+    connection: process.env.TEST_DATABASE_URL || {
       database: 'mobilegiftcardtest'
       user:     'root'
       password: ''
+    }
     migrations:
       tableName: 'knex_migrations'
       directory: __dirname + "/server/database/migrations"

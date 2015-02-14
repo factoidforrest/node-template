@@ -47,9 +47,9 @@ module.exports = (bookshelf) ->
 		},{
 			findOrCreateGoogle: (accessToken, refreshToken, next) ->
 				oauth2Client = new OAuth2(
-					'808716966460-mu0tt4jvafitf5vvf2rolj2dpjfvdrba.apps.googleusercontent.com',
-					'NBZ-UcUjZsXrUB3CCod-m-Ww', 
-					'localhost:3000'
+					process.env.GOOGLE_ID,
+					process.env.GOOGLE_SECRET, 
+					'doesthisevenmatter'
 				)
 				# Retrieve tokens via token exchange explained above or set them:
 				oauth2Client.setCredentials

@@ -56,7 +56,10 @@ module.exports = (bookshelf) ->
 			return
 
 		name: () ->
-			@get('firstname') + ' ' + @get('lastname')
+			if @get('first_name')?
+				@get('first_name') + ' ' + @get('last_name')
+			else
+				@get('email')
 
 		#promisification on this doesnt seem to work, so its deprecated
 		hashPassword: (password) -> 
@@ -91,7 +94,12 @@ module.exports = (bookshelf) ->
 
 
 		json: ->
-			@attributes
+			return {
+				id: @get('id')
+				name: @name()
+				email: @get('email')
+				admin: @get('admin')
+			}
 			
 		#this just doesnt work
 		toJSON: ->
