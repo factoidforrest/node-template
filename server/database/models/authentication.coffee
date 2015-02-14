@@ -46,10 +46,10 @@ module.exports = (bookshelf) ->
 		###
 		},{
 			findOrCreateGoogle: (accessToken, refreshToken, next) ->
+				console.log('google credentials: ', process.env.GOOGLE_ID, process.env.GOOGLE_SECRET )
 				oauth2Client = new OAuth2(
 					process.env.GOOGLE_ID,
-					process.env.GOOGLE_SECRET, 
-					'doesthisevenmatter'
+					process.env.GOOGLE_SECRET
 				)
 				# Retrieve tokens via token exchange explained above or set them:
 				oauth2Client.setCredentials

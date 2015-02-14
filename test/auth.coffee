@@ -6,8 +6,12 @@ expect = require('chai').expect
 userLib = require('./libs/user')
 
 key = null
-describe 'user', ->
+googleToken= 'ya29.GgFRpbrNp6vFkNumoXQL3vu5LbnMpMFvYrhVR6kQkFIyZ-gBYpJ7fZsABAF5rKO6BuphZmXe6Oeysg'
+googleRefresh= '1/d4gp7M7An08kIlB6BbWXPLBdCdk4V07VIhID700y1hsMEudVrK5jSpoR30zcRFq6'
 
+describe 'user', ->
+	this.timeout(15000)
+	
 	before userLib.manuallyDestroyUser
 
 	it 'sign up', (done) ->
@@ -68,8 +72,8 @@ describe 'user', ->
 	it 'test google api with new auth', (done) ->
 		this.timeout 15000
 		Authentication.findOrCreateGoogle(
-			'ya29.GgHyg6LixugCR5nDV-9UV6cNQWmW-5auXDjxKacVpr84CQbL__QS2-jEhmPtlvVMx3vl_e65r5nR2g',
-			'1/q9Vt7hh9Z-5iQZc0-zRpyXNWJxSgCqNtJTFpYsu2vlU',
+			googleToken,
+			googleRefresh,
 			(err, user) ->
 				console.log('got err ', err)
 				console.log('got user from auth google create', user)
@@ -80,8 +84,8 @@ describe 'user', ->
 	it 'test google api with already existing auth', (done) ->
 		this.timeout 15000
 		Authentication.findOrCreateGoogle(
-			'ya29.GgHyg6LixugCR5nDV-9UV6cNQWmW-5auXDjxKacVpr84CQbL__QS2-jEhmPtlvVMx3vl_e65r5nR2g',
-			'1/q9Vt7hh9Z-5iQZc0-zRpyXNWJxSgCqNtJTFpYsu2vlU',
+			googleToken,
+			googleRefresh,
 			(err, user) ->
 				console.log('got err ', err)
 				console.log('got user from auth google create', user)
@@ -92,8 +96,8 @@ describe 'user', ->
 	it 'test google signin using mobile gift card api', (done) ->
 		session = request.agent(app)
 		session.post("/auth/google/clientside").send(
-			access_token: 'ya29.GgHyg6LixugCR5nDV-9UV6cNQWmW-5auXDjxKacVpr84CQbL__QS2-jEhmPtlvVMx3vl_e65r5nR2g'
-			refresh_token: '1/q9Vt7hh9Z-5iQZc0-zRpyXNWJxSgCqNtJTFpYsu2vlU'
+			access_token: googleToken
+			refresh_token: googleRefresh
 		).expect(200).end (err, res) ->
 			
 			#console.log('login response:', res)
@@ -104,6 +108,7 @@ describe 'user', ->
 			done(err)
 
 	it 'token return from google signin should be valid', (done) ->
+		this.timeout 15000
 		session = request.agent(app)
 		session.post("/user/testtoken").send({
 			token: key
