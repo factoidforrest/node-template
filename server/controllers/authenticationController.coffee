@@ -74,7 +74,7 @@ module.exports = (app) ->
 				user.createToken().then (token) ->
 					res.json {token:token}
 			else
-				res.send(400, error: "Account disabled.")
+				res.send(403, error: "Account disabled.")
 
 			return
 		).catch (dbError) ->
