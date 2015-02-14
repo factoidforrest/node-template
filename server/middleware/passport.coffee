@@ -19,7 +19,7 @@ passport.use new GoogleAuthCodeStrategy({
   clientID: "808716966460-mu0tt4jvafitf5vvf2rolj2dpjfvdrba.apps.googleusercontent.com"
   clientSecret: "NBZ-UcUjZsXrUB3CCod-m-Ww"
 }, (accessToken, refreshToken, profile, done) ->
-  console.log('got profile from google:', profile)
+  console.log('got profile from google!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:', profile)
   Authentication.findOrCreateGoogle accessToken, refreshToken, profile, (err, user) ->
     done err, user
 )

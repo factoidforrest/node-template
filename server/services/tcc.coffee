@@ -63,7 +63,9 @@ createBody = (amount, program) ->
 module.exports =
   createCard: (amount, program) ->
     deferred = q.defer()
-    url = app.get('tcc')
+
+    url = app.get('tccURL')
+    console.log('url is' , url)
     options = 
       method: 'post'
       body: createBody(amount, program)
@@ -94,7 +96,7 @@ module.exports =
 
   getTCCInquiry: (card_number) ->
     deferred = q.defer()
-    url = app.get('tcc')
+    url = app.get('tccURL')
     options = 
       method: 'post'
       body: inquiryBody(card_number)
@@ -126,7 +128,7 @@ module.exports =
   activateTCCCard: (card_number, amount) ->
     deferred = q.defer()
     body = activateBody(card_number, amount)
-    url = app.get('tcc')
+    url = app.get('tccURL')
     options = 
       method: 'post'
       body: body
@@ -147,7 +149,7 @@ module.exports =
 
   redeemTCCCard: (card_number, amount) ->
     deferred = q.defer()
-    url = app.get('tcc')
+    url = app.get('tccURL')
     options = 
       method: 'post'
       body: redeemBody(card_number, amount)

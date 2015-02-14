@@ -29,9 +29,10 @@ module.exports = (bookshelf) ->
 		user: ->
 			return @belongsTo(User)
 	  
-		#TODO make this safe
+		#THIS IS NOT WORKING, it just doesn't get called
 		toJSON: ->
-			this
+			console.log('converting to json')
+			return this.attributes
 		},{
 			#class methods
 

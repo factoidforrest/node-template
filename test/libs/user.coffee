@@ -41,7 +41,7 @@ module.exports.getUser = () ->
 savedSession = undefined
 module.exports.login = (params, callback) ->
   unless savedSession
-    session = request.agent(sails.express.app)
+    session = request.agent(app)
     session.post("/auth/local").send(
       email: "light24bulbs@gmail.com"
       password: "secretpassword"
@@ -51,7 +51,7 @@ module.exports.login = (params, callback) ->
       console.log "logged in to new session with response", res.body
       console.log "login err: ", err
       savedSession = session
-      callback session
+      callback session, res.body.token.key
       return
 
   

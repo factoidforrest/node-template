@@ -90,9 +90,10 @@ module.exports = (bookshelf) ->
 			#.then(sendConfirmationEmail) do after
 
 
-
-		
-		#TODO make this safe
+		json: ->
+			@attributes
+			
+		#this just doesnt work
 		toJSON: ->
 			@attributes
 
@@ -116,6 +117,27 @@ module.exports = (bookshelf) ->
 					return
 
 				return
+
+			findOrCreate: (auth, callback) ->
+				User.where(email:auth.get('email')).fetch().then (user) ->
+					if user?
+						console.log('associating existing user to authentication', user)
+						return callback(user)
+					else
+
+						names = auth.get('name').split(' ')
+						User.forge(
+							email: auth.get('email')
+							first_name: names[0]
+							last_name: names[1]
+						).save().then (newUser) ->
+							console.log('saved new user for authentication', newUser)
+							#need to set this to avoid another database call.  It is set automatically by the database but knex doesn't know that here so we just set it manually
+							newUser.set('active', true)
+							return callback(newUser)
+
 		})
+
+			
 	return User
 			

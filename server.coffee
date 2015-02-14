@@ -75,7 +75,7 @@ app.get('/', handlers.root)
 app.post('/locations', handlers.locations)
 ###
 
-#authentication stuff
+#authentication stuff, refactor to config file in time
 app.set('token_expiry', [1, 'days'])
 app.use require './server/middleware/token'
 require('./server/config/roles')(app)

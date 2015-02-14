@@ -17,8 +17,12 @@ module.exports = (req, res, next) ->
 			else
 				logger.info('token accepted')
 				user = token.related('tokenable')
-				req.user = user
-				return next()
+				console.log('got user', user)
+				if user.get('active')
+					req.user = user
+					return next()
+				else
+					return res.send(403, error: "Account disabled.")
 
 
 

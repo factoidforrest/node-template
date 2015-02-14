@@ -10,9 +10,9 @@ module.exports = (app) ->
 
 	app.post '/card/info', roles.is('logged in'), (req, res) ->
 		cardId = req.body.id
-		Card.forge(user_id: req.user.id, id: cardId).fetchl().then((card) ->
+		Card.forge(user_id: req.user.id, id: cardId).fetch().then((card) ->
 			if card?
-				res.json(card)
+				res.json(card.json())
 			else
 				res.send(404, error: "Card not found")
 		)
@@ -20,5 +20,7 @@ module.exports = (app) ->
 	app.post '/card/list', roles.is('logged in'),  (req, res) ->
 		#maybe take more params and join them to the query to optionally filter
 		Card.forge(user_id: req.user.id).fetchAll().then((cards) ->
-			res.json(cards)
+			console.log('retreived cards ', cards.models[0].toJSON())
+			res.json cards.models.map (card)  ->
+				return card.json()
 		)

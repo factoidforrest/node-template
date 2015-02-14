@@ -5,6 +5,10 @@ bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
 crypto = Promise.promisifyAll require 'crypto'
 Mail = Promise.promisifyAll require '../../services/mail'
 ###
+#google stuff
+google = require('googleapis')
+OAuth2 = google.auth.OAuth2;
+plus = google.plus('v1')
 
 
 module.exports = (bookshelf) ->
@@ -26,9 +30,9 @@ module.exports = (bookshelf) ->
 				###
 
 		user: () ->
-	    return @belongsTo(User)
-	  
-	  ###
+			return @belongsTo(User)
+		
+		###
 		expired: (timeLength, timeUnits) ->
 			if moment().subtract(timeLength, timeUnits).isAfter(@get('createdAt'))
 				return true
@@ -41,10 +45,59 @@ module.exports = (bookshelf) ->
 
 		###
 		},{
-			findOrCreateGoogle: (accessToken, refreshToken, profile, next) ->
-
-			#class methods
+			findOrCreateGoogle: (accessToken, refreshToken, next) ->
+				oauth2Client = new OAuth2(
+					'808716966460-mu0tt4jvafitf5vvf2rolj2dpjfvdrba.apps.googleusercontent.com',
+					'NBZ-UcUjZsXrUB3CCod-m-Ww', 
+					'localhost:3000'
+				)
+				# Retrieve tokens via token exchange explained above or set them:
+				oauth2Client.setCredentials
+					access_token: accessToken
+					refresh_token: refreshToken
+				plus.people.get {
+					userId: 'me'
+					auth: oauth2Client
+				}, (err, data) ->
+					if err?
+						logger.info 'Google api error', err
+						return next(err)
+					
+					profile = {
+						uid : data.id
+						provider: 'google'
+						email: data.emails[0].value
+						name: data.displayName
+						access_token: accessToken
+						refresh_token: refreshToken
+					}
+					findOrCreate(profile, next)
+					
 
 		})
 	return Authentication
 			
+findOrCreate = (profile, next) ->
+	logger.info('finding or creating auth from', profile)
+	forgedAuth = Authentication.forge({uid: profile.uid, provider: profile.provider})
+
+	#check if already authenticated using this provider
+	forgedAuth.fetch({withRelated: ['user']}).then (auth) ->
+		if auth?
+			console.log 'found existing authentication', auth
+			console.log 'with related user', auth.relations.user
+			return next(null, auth.relations.user)
+		else
+			forgedAuth.set(
+				email: profile.email
+				name: profile.name
+			)
+			console.log 'creating new auth', forgedAuth
+			User.findOrCreate forgedAuth, (user) ->
+				forgedAuth.set('user_id', user.get('id'))
+				console.log 'saving new authentication', forgedAuth
+				forgedAuth.save().then (newAuth) ->
+					return next(null, user)
+
+
+
