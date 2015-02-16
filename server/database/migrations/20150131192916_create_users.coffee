@@ -8,6 +8,7 @@ exports.up = (knex, Promise) ->
 	  t.string('confirmation_token').index()
 	  t.string('first_name')
 	  t.string('last_name')
+	  t.string('display_name')
 	  t.boolean('admin').defaultTo(false)
 	  t.boolean('active').notNull().defaultTo(true)
 	  t.timestamps()

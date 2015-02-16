@@ -71,7 +71,7 @@ module.exports = (bookshelf) ->
 				self.set('password', hash)
 				return
 
-		generateToken: (next) ->
+		generateConfirmationToken: (next) ->
 			console.log('generating token')
 			self = this
 			return crypto.randomBytes(48, (ex, buf) ->
@@ -85,12 +85,19 @@ module.exports = (bookshelf) ->
 			#promise
 			return Mail.sendConfirmation @attributes, null,  done
 
-		setupLocalUser: (password) ->
-			#promise
-			@setPassword password, (err) ->
-				@generateToken
+		setupLocalUser: (password, next) ->
+			self = this
+			self.setPassword password, () ->
+				self.generateConfirmationToken () ->
+					self.save().then (saved)->
+						console.log "the user was saved as", saved
+						#res.json({success: true, errors: {}})
+						self.sendConfirmationEmail (err) ->
+							return logger.error 'email error' + err if err
+							logger.info 'email sent'
 
-			#.then(sendConfirmationEmail) do after
+						next(null)
+
 
 
 		json: ->
@@ -126,18 +133,18 @@ module.exports = (bookshelf) ->
 
 				return
 
-			findOrCreate: (auth, callback) ->
-				User.where(email:auth.get('email')).fetch().then (user) ->
+			findOrCreate: (profile, callback) ->
+				User.where(email:profile.email).fetch().then (user) ->
 					if user?
 						console.log('associating existing user to authentication', user)
+						#we could set the names if we didn't have them in the user
 						return callback(user)
 					else
-
-						names = auth.get('name').split(' ')
 						User.forge(
-							email: auth.get('email')
-							first_name: names[0]
-							last_name: names[1]
+							email: profile.email
+							first_name: profile.first_name
+							last_name: profile.last_name
+							display_name: profile.display_name
 						).save().then (newUser) ->
 							console.log('saved new user for authentication', newUser)
 							#need to set this to avoid another database call.  It is set automatically by the database but knex doesn't know that here so we just set it manually

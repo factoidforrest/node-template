@@ -3,10 +3,32 @@ passport = require 'passport'
 module.exports = (app) ->
 
 	app.post '/card/import', roles.is('logged in'),  (req, res) ->
-		
+		properties = {
+			number:req.body.number
+			user: req.user
+		}
+
+		Card.import properties, (err, card) ->
+
 	app.post '/card/create', roles.is('logged in'), (req, res) ->
-		
+		properties = {
+			balance: req.body.balance
+			restaurant: req.body.restaurant
+			#payment stuff
+		}
+
+		Card.create properties, (err, card) ->
+
+
 	app.post '/card/refill', roles.is('logged in'), (req, res) ->
+		properties = {
+			balance: req.body.balance
+			restaurant: req.body.restaurant
+			#payment stuff
+		}
+
+		Card.refill properties, (err, card) ->
+			
 
 	app.post '/card/info', roles.is('logged in'), (req, res) ->
 		cardId = req.body.id

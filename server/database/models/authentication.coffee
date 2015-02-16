@@ -12,6 +12,17 @@ plus = google.plus('v1')
 
 #facebook
 FB = require 'fb'
+FB.api 'oauth/access_token', {
+	client_id: '332366616957466',
+	client_secret: 'd9a99a29bf4ac4e02ba496a6fd04f37b',
+	grant_type: 'client_credentials'
+},  (res) ->
+	if !res || res.error
+		logger.error('Error assigning facebook token, facebook auth WILL NOT WORK ' + !res ? '' : res.error)
+		return
+	accessToken = res.access_token
+	logger.info 'Got facebook access token, storing'
+	FB.setAccessToken(accessToken)
 
 
 module.exports = (bookshelf) ->
@@ -64,38 +75,55 @@ module.exports = (bookshelf) ->
 					if err?
 						logger.info 'Google api error', err
 						return next(err)
-					
+					console.log('got google data', data)
 					profile = {
 						uid : data.id
 						provider: 'google'
 						email: data.emails[0].value
-						name: data.displayName
+						display_name: data.displayName
+						first_name: data.name.givenName
+						last_name: data.name.familyName
+						#not storing these tokens for now
 						access_token: accessToken
 						refresh_token: refreshToken
 					}
+					console.log('profile is ', profile)
 					findOrCreate(profile, next)
-			###
-			findOrCreateFacebook: (code, next) ->
-				FB.api('oauth/access_token', {
-			    client_id: '332366616957466',
-			    client_secret: 'd9a99a29bf4ac4e02ba496a6fd04f37b',
-			    redirect_uri: 'localhost:3000/callback',
-			    code: code
-				},  (res) -> 
-			    if !res? || res.error
-		        console.log(!res ? 'error occurred' : res.error)
-		        return
-			  
-			    accessToken = res.access_token;
-			    expires = res.expires ? res.expires : 0
-			###
+
+			findOrCreateFacebook: (token, next) ->
+				FB.api 'me', {
+					access_token: token
+					scope: 'email'
+				},  (data) ->
+					console.log('checked facebook user data with response', data)
+					if !data || data.error
+						errorMessage = !data ? 'Error getting facebook api data' : data.error
+						logger.error(errorMessage)
+						return next(errorMessage)
+					profile = {
+						uid: data.id
+						provider: 'facebook'
+						email: data.email
+						first_name: data.first_name
+						last_name: data.last_name
+						display_name: data.name
+					}
+
+					findOrCreate(profile, next)
+					
+					
+
+
 				
 									
 
 		})
 	return Authentication
 			
+
 findOrCreate = (profile, next) ->
+	if not profile.email?
+		return next('No email associated with this account')
 	logger.info('finding or creating auth from', profile)
 	forgedAuth = Authentication.forge({uid: profile.uid, provider: profile.provider})
 
@@ -108,10 +136,10 @@ findOrCreate = (profile, next) ->
 		else
 			forgedAuth.set(
 				email: profile.email
-				name: profile.name
+				name: profile.display_name
 			)
 			console.log 'creating new auth', forgedAuth
-			User.findOrCreate forgedAuth, (user) ->
+			User.findOrCreate profile, (user) ->
 				forgedAuth.set('user_id', user.get('id'))
 				console.log 'saving new authentication', forgedAuth
 				forgedAuth.save().then (newAuth) ->
