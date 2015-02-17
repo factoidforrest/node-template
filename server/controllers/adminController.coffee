@@ -1,7 +1,7 @@
 
 module.exports= (app) ->
 
-	app.post '/admin/deactiveuser', roles.is('admin'), (req, res) ->
+	app.post '/admin/deactivateuser', roles.is('admin'), (req, res) ->
 		if req.body.user_id?
 			query = {user_id: req.body.user_id}
 		else if req.body.email?
