@@ -11,3 +11,4 @@ module.exports = (app) ->
 	require('../controllers/cardController')(app)
 	require('../controllers/mealController')(app)
 	require('../controllers/adminController')(app)
+	
