@@ -27,7 +27,7 @@ module.exports.sendConfirmation = (userAttrs, to, next) ->
       return next(err)
     console.log 'read jade template file data: ', file
     template = jade.compile(file)
-    link = app.get('apiRoot') + '/auth/confirm?token=' + userAttrs.confirmation_token
+    link = app.get('apiRoot') + '/user/confirm?token=' + userAttrs.confirmation_token
     html = template(
       name: userAttrs.full_name
       link: link)

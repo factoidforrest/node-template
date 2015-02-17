@@ -33,8 +33,8 @@ describe 'user', ->
 			session
 			.get("/user/confirm?token=" + user.get('confirmation_token') )
 			.expect(302).end (err, res) ->
-				console.log "logged in to new session with response", res.body
-				console.log "login err: ", err
+				console.log "confirm email with response", res.body
+				console.log "confirmation err: ", err
 				User.where(email: 'light24bulbs@gmail.com').fetch().then (confirmed) ->
 					expect(confirmed.get('confirmation_token')).to.equal(null)
 				#console.log('login response:', res)
