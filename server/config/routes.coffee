@@ -9,3 +9,4 @@ module.exports = (app) ->
 	require('../controllers/userController')(app)
 	require('../controllers/giftController')(app)
 	require('../controllers/cardController')(app)
+	require('../controllers/mealController')(app)

@@ -23,6 +23,7 @@ class Database
 			authentication: require('./models/authentication')(@bookshelf)
 			card: require('./models/card')(@bookshelf)
 			gift: require('./models/gift')(@bookshelf)
+			meal: require('./models/meal')(@bookshelf)
 
 		}
 		console.log("Database connected")

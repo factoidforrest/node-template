@@ -23,7 +23,7 @@ describe 'TCC API', ->
 
 	it 'should query card data from tcc', (done) ->
 		cardNumber = '2073183100123127'
-		tcc.getTCCInquiry(cardNumber).then((tcc_card) ->
+		tcc.cardInfo(cardNumber).then((tcc_card) ->
 			console.log 'got card: ', tcc_card
 			done()
 			return

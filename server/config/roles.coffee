@@ -7,16 +7,21 @@ module.exports = (app) ->
 		failureHandler: (req, res, action) ->
 			# optional function to customise code that runs when
 			# user fails authorisation
-			if req.user? and req.user.get('active')
+			if req.user? and !req.user.get('active')
 				res.send(403, {error: 'Account Disabled', token: 'Account Disabled'})
 			else
-				res.send(403, {error: 'Access Denied - You don\'t have permission to: ' + action, token: 'Insufficient Roles'})
+				res.send(403, {error: 'Access Denied - You don\'t have permission for: ' + action, token: 'Insufficient Roles'})
 
 			#async: true
 	)
 
 	app.use(roles.middleware())
 
+	roles.use 'POS', (req)->
+		if req.body.pos_secret == (process.env.POS_SECRET || '123abc')
+			return true
+		else
+			return null
 
 	roles.use 'logged in', (req) -> 
 		if req.user? and req.user.get('active')
@@ -27,7 +32,7 @@ module.exports = (app) ->
 
 		
 	roles.use 'admin', (req) -> 
-		if req.user.get('admin') == true 
+		if req.user? and req.user.get('admin') == true 
 			return true
 
 		

@@ -7,8 +7,11 @@ module.exports = (app) ->
 			number:req.body.number
 			user: req.user
 		}
-
 		Card.import properties, (err, card) ->
+			if err?
+				return res.send(err.code, {error: err.message})
+			res.send card.json()
+
 
 	app.post '/card/create', roles.is('logged in'), (req, res) ->
 		properties = {
@@ -16,8 +19,10 @@ module.exports = (app) ->
 			restaurant: req.body.restaurant
 			#payment stuff
 		}
-
 		Card.create properties, (err, card) ->
+			if err?
+				return res.send(err.code, {error: err.message})
+			res.send card.json()
 
 
 	app.post '/card/refill', roles.is('logged in'), (req, res) ->
@@ -26,9 +31,11 @@ module.exports = (app) ->
 			restaurant: req.body.restaurant
 			#payment stuff
 		}
-
 		Card.refill properties, (err, card) ->
-			
+			if err?
+				return res.send(err.code, {error: err.message})
+			res.send card.json()
+
 
 	app.post '/card/info', roles.is('logged in'), (req, res) ->
 		cardId = req.body.id

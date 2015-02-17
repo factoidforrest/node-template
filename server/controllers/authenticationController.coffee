@@ -26,7 +26,6 @@ module.exports = (app) ->
 						usr.setupLocalUser params.password, (err) ->
 							res.json({success: true, errors: {}})
 
-
 					else
 						res.send 400,
 							errors:

@@ -94,7 +94,7 @@ module.exports =
     deferred.promise
 
 
-  getTCCInquiry: (card_number) ->
+  cardInfo: (card_number) ->
     deferred = q.defer()
     url = app.get('tccURL')
     options = 

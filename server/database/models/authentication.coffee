@@ -1,4 +1,3 @@
-db = require('./../database')
 Promise = require("bluebird")
 ###
 bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))

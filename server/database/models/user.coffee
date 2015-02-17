@@ -1,10 +1,4 @@
-db = require('./../database')
-#Promise = require("bluebird")
-###
-bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
-crypto = Promise.promisifyAll require 'crypto'
-Mail = Promise.promisifyAll require '../../services/mail'
-###
+
 bcrypt = require('bcrypt-nodejs')
 crypto = require 'crypto'
 Mail = require '../../services/mail'
