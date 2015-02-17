@@ -9,7 +9,7 @@ module.exports = (app) ->
 		User.confirmEmail token, (err) ->
 			return res.redirect(app.assetRoot + '#/?message=confirmfail') if (err) 
 			console.log('confirmed user email by token')
-			res.redirect(app.assetRoot + '#/?message=confirmsuccess')
+			res.redirect(app.get('assetRoot') + '#/?message=confirmsuccess')
 
 
 	app.post '/user/info', roles.is('logged in'), (req, res) ->
