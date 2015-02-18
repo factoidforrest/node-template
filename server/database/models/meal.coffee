@@ -16,12 +16,11 @@ module.exports = (bookshelf) ->
 		initialize: () ->
 			this.on 'saving', (model, attrs, options) ->
 				deferred = Promise.pending()
-				require('crypto').randomBytes 4, (ex, buf) ->
-		      model.set 'key', buf.toString('hex')
-		      deferred.fulfill 'token created'
+				generateKey model, ->
+					deferred.fulfill 'token created'
 				return deferred.promise
 
-	  
+		
 		#TODO make this safe
 		toJSON: ->
 			this
@@ -30,4 +29,20 @@ module.exports = (bookshelf) ->
 
 		})
 	return Meal
+
+#need to check the key didn't already exist, probably pointless but could prevent strange errors someday
+generateKey = (model, next) ->
+	require('crypto').randomBytes 8, (ex, buf) ->
+		key = buf.toString('hex')
+		Meal.forge(key:key).fetch().then (existingMeal) ->
+			if existingMeal?
+				#can't figure out how to test this so there is a small possibility it will break.  It will probably never happen anyway
+				console.log('meal key already existed, generating another')
+				generateKey(model, next)
+			else
+				console.log('meal key is unique, saving')
+				model.set 'key', key
+				next()
+
+
 			

@@ -27,6 +27,7 @@ module.exports = (bookshelf) ->
 	    return @morphTo('tokenable', User);
 	  
 		generateToken: (length, next) ->
+			#chance of two tokens being the same is insanely small, I don't think we really need to check the database to verify
 			length or= 48
 			console.log('generating token')
 			self = this
