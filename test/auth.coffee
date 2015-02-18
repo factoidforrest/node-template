@@ -41,6 +41,20 @@ describe 'user', ->
 
 					done(err)
 
+	it 'confirm email should fail when already confirmed', (done) ->
+		User.where(email: 'light24bulbs@gmail.com').fetch().then (user) ->
+			session = request.agent(app)
+			session
+			.get("/user/confirm?token=" + user.get('confirmation_token') )
+			.expect(302).end (err, res) ->
+				console.log "confirm email with response", res
+				console.log "confirmation err: ", err
+				User.where(email: 'light24bulbs@gmail.com').fetch().then (confirmed) ->
+					expect(confirmed.get('confirmation_token')).to.equal(null)
+				#console.log('login response:', res)
+
+					done(err)
+
 
 	it 'local sign in', (done) ->
 		session = request.agent(app)

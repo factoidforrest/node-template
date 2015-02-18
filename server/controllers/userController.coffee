@@ -7,7 +7,7 @@ module.exports = (app) ->
 		console.log('got confirm request with token: ', token)
 
 		User.confirmEmail token, (err) ->
-			return res.redirect(app.assetRoot + '#/?message=confirmfail') if (err) 
+			return res.redirect(app.get('assetRoot') + '#/?message=confirmfail') if (err) 
 			console.log('confirmed user email by token')
 			res.redirect(app.get('assetRoot') + '#/?message=confirmsuccess')
 
