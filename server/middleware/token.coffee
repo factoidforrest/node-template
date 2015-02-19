@@ -6,7 +6,7 @@ module.exports = (req, res, next) ->
 	if not key?
 		return next()
 	else
-		Token.forge(key: key).fetch(withRelated: ['tokenable']).then (token) ->
+		Token.forge(key: key, type:'login').fetch(withRelated: ['tokenable']).then (token) ->
 			logger.info 'fetched token from database', token
 			if not token?
 				logger.info('token invalid')

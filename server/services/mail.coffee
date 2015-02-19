@@ -51,12 +51,12 @@ module.exports.sendPasswordReset = (user, token, next) ->
       return next(err)
     console.log 'read jade template file data: ', file
     template = jade.compile(file)
-    link = app.get('apiRoot') + '#resetpassword?token=' + token.key
+    link = app.get('apiRoot') + '#resetpassword?token=' + token.get('key')
     html = template(
-      name: user.full_name
+      name: user.get('display_name')
       link: link)
     mail =
-      to: user.email
+      to: user.get('email')
       from: 'no-reply@dinersgroup.com'
       text: 'Diners Group password reset.  You have HTML disabled in your email client.  Paste this link into your browser to reset your password: ' + link
       attachment:

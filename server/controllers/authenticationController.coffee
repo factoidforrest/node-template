@@ -82,12 +82,12 @@ module.exports = (app) ->
 
 loginIfActive = (user, res) ->
 	if user.get('active')
-		user.createToken().then (token) ->
+		user.createToken(type:'login').then (token) ->
 			res.json {token:token}
 	else
 		res.send(403, error: "Account disabled.")
 
-acceptablePassword = (params, res) ->
+module.exports.acceptablePassword = acceptablePassword = (params, res) ->
 	if params.password isnt params.password_confirmation
 		console.log "passwords didnt match"
 		res.send 400,
@@ -106,4 +106,6 @@ acceptablePassword = (params, res) ->
 		false
 	else
 		true
+
+
 

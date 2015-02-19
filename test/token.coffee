@@ -10,7 +10,7 @@ key = null
 
 describe 'tokens', ()->
 	it 'should create', (done) ->
-		Token.forge().save().then (token) ->
+		Token.forge(type:'login').save().then (token) ->
 			console.log('token:', token)
 			expect(token).to.exist
 			done()
@@ -36,7 +36,7 @@ describe 'tokens', ()->
 	it 'should associate to a user', (done)->
 		userLib.getUser().then((user) ->
 			console.log('fetched user ', user)
-			user.related('tokens').create().yield(user)
+			user.related('tokens').create(type:'login').yield(user)
 		).then (user) ->
 			console.log('user after relation ', user)
 			token = user.related('tokens').models[0].attributes

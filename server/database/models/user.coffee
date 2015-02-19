@@ -26,9 +26,10 @@ module.exports = (bookshelf) ->
 		cards: ->
 			return @hasMany(Card)
 			
-		createToken: ->
+		createToken: (attrs) ->
 			#returns a promise
-			@related('tokens').create()
+			console.log('creating token with attributes', attrs)
+			@related('tokens').create(attrs)
 		
 		validPassword: (password) ->
 			logger.info "checking password"
@@ -92,7 +93,11 @@ module.exports = (bookshelf) ->
 
 						next(null)
 
-
+		sendPasswordReset: (next) ->
+			user = this
+			@related('tokens').create(type:'reset').then (token) ->
+				console.log('created reset token:', token)
+				Mail.sendPasswordReset(user, token, next)
 
 		json: ->
 			return {
