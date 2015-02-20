@@ -51,7 +51,7 @@ module.exports.sendPasswordReset = (user, token, next) ->
       return next(err)
     console.log 'read jade template file data: ', file
     template = jade.compile(file)
-    link = app.get('apiRoot') + '#resetpassword?token=' + token.get('key')
+    link = app.get('assetRoot') + '#resetpassword?token=' + token.get('key')
     html = template(
       name: user.get('display_name')
       link: link)

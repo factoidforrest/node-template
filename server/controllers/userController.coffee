@@ -31,7 +31,7 @@ module.exports = (app) ->
 		password = req.body.password
 		Token.forge(key: key).fetch(withRelated: ['tokenable']).then (token) ->
 			if !token?
-				return res.send(404, error: 'Token not found')
+				return res.send(404, {error: 'Token not found', token: 'Token not found'})
 			if acceptablePassword(req.body, res)
 				user = token.related('tokenable')
 				user.setPassword req.body.password, () ->

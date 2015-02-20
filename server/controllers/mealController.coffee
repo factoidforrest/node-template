@@ -7,3 +7,4 @@ module.exports = (app) ->
 			console.log('created meal: ', meal)
 			response = {key:meal.get('key')}
 			res.send(response)
+		

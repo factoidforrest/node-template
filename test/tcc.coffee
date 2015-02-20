@@ -4,11 +4,12 @@ should = require('chai').should()
 userLib = require './libs/user'
 userLib.createHooks {}
 request = require('supertest')
-tcc = require '../server/services/tcc'
+
 
 describe 'TCC API', ->
 
 	@timeout 15000
+
 
 	it 'should create a new card using svAlloc', (done) ->
 		tcc.createCard(10, '149').then((card) ->
@@ -31,6 +32,9 @@ describe 'TCC API', ->
 			done err
 			return
 		return
+
+
+
 
 	
 
