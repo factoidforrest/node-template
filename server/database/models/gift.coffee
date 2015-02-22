@@ -8,7 +8,7 @@ crypto = require 'crypto'
 moment = require 'moment'
 
 module.exports = (bookshelf) ->
-	global.Card = bookshelf.Model.extend({
+	global.Gift = bookshelf.Model.extend({
 		tableName: 'cards'
 		hasTimestamps: true
 
@@ -36,5 +36,5 @@ module.exports = (bookshelf) ->
 			#class methods
 
 		})
-	return Card
+	return Gift
 			

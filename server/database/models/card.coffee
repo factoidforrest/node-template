@@ -30,16 +30,20 @@ module.exports = (bookshelf) ->
 			return @belongsTo(User)
 
 		sync: (done) ->
+			console.log('syncing card')
 			card = this
 			TCC.cardInfo(@get('number')).done (err, data) ->
 				#HANDLE SYNC ERROR
 				if err?
+					console.log('sync error with tcc')
 					return done(err)
 				if card.get('balance') != data.balance
+					console.log('updating out of date card balance')
 					card.set('balance', data.balance)
 					card.save().then (saved) ->
 						done(null, saved)
 				else
+					console.log('card balance already up to date, continuing')
 					done(null, card)
 
 	  json: () ->
@@ -48,13 +52,13 @@ module.exports = (bookshelf) ->
 		toJSON: ->
 			console.log('converting to json')
 			return this.attributes
-		},{
-			syncGroup : (cards) ->
-				async.map cards, syncCard, (err, synced) ->
-					console.log('cards synced: ', synced)
-			#class methods
+	},{
+		syncGroup : (cards, done) ->
+			console.log('syncing card group:', cards)
+			async.map cards, syncCard, done
+		#class methods
 
-		})
+	})
 	return Card
 			
 syncCard = (card, cb) ->

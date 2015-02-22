@@ -51,6 +51,5 @@ module.exports = (app) ->
 		Card.forge(user_id: req.user.id).fetchAll().then((cards) ->
 			console.log('retreived cards ', cards.models[0].toJSON())
 			res.json cards.models.map (card)  ->
-				console.log('about to jsonify card:', card)
-				return card.attributes
+				return card.json()
 		)

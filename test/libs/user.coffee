@@ -39,7 +39,8 @@ module.exports.getUser = () ->
 	User.where(email: 'light24bulbs@gmail.com').fetch()
 
 
-savedSession = undefined
+savedSession = null
+savedToken = null
 module.exports.login = (params, callback) ->
   unless savedSession
     session = request.agent(app)
@@ -52,10 +53,11 @@ module.exports.login = (params, callback) ->
       console.log "logged in to new session with response", res.body
       console.log "login err: ", err
       savedSession = session
+      savedToken = res.body.token.key
       callback session, res.body.token.key
       return
 
   else
     console.log "using saved session"
-    callback savedSession
+    callback savedSession, savedToken
   return
