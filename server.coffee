@@ -48,6 +48,28 @@ app.use(coffeescript({
   compress: production
 }))
 
+
+# Add headers
+app.use(`function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+}`)
+
+
 if production
 	cachetime = 86400000
 else
@@ -84,7 +106,7 @@ require('./server/middleware/passport')(app)
 require('./server/config/routes')(app)
 
 logger.info("Node Env: " +  app.get('env'))
-logger.log('silly', 'a silly log')
+logger.log('silly', 'a silly log');
 
 app.listen(process.env.PORT || 3000)
 #replify('realtime-101', app)
