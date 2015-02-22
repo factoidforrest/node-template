@@ -33,13 +33,38 @@ module.exports.sendConfirmation = (userAttrs, to, next) ->
       link: link)
     mail =
       to: to or userAttrs.email
-      from: 'no-reply@dinersgroup.com'
+      from: 'no-reply@mobile-gift-card.com'
       text: 'You have HTML disabled in your email client.  Paste this link into your browser to confirm your email: ' + link
       attachment:
         data: html
         alternative: true
       subject: 'Diner\'s Group confirmation'
     console.log('about to send mail ', mail)
+    send mail, next
+    return
+  return
+
+module.exports.giftNotify = (gift, from, next) ->
+  console.log 'sending a gift notification email'
+  fs.readFile 'views/gift-email.jade', 'utf8', (err, file) ->
+    if err
+      return next(err)
+    console.log 'read jade template file data: ', file
+    template = jade.compile(file)
+    link = app.get('assetRoot')
+    html = template(
+      from: from.get('display_name')
+      balance: gift.get('balance')
+      link: link
+    )
+    mail =
+      to: gift.get('to_email')
+      from: 'no-reply@mobilegiftcard.com'
+      text: 'Your email client does not support HTML.  You have received a gift card on Mobile Gift Card.  Please visit the site to accept your gift: ' + link
+      attachment:
+        data: html
+        alternative: true
+      subject: 'You received a gift card'
     send mail, next
     return
   return
@@ -57,7 +82,7 @@ module.exports.sendPasswordReset = (user, token, next) ->
       link: link)
     mail =
       to: user.get('email')
-      from: 'no-reply@dinersgroup.com'
+      from: 'no-reply@mobile-gift-card.com'
       text: 'Diners Group password reset.  You have HTML disabled in your email client.  Paste this link into your browser to reset your password: ' + link
       attachment:
         data: html
@@ -78,7 +103,7 @@ module.exports.invite = (email, next) ->
     html = template(link: link)
     mail =
       to: email
-      from: 'no-reply@dinersgroup.com'
+      from: 'no-reply@mobile-gift-card.com'
       text: 'Diners Group Invitation.  You have HTML disabled in your email client.  Paste this link into your browser to accept your invitation: ' + link
       attachment:
         data: html

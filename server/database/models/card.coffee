@@ -29,22 +29,23 @@ module.exports = (bookshelf) ->
 		user: ->
 			return @belongsTo(User)
 
-		sync: (done) ->
+		TCCSync: (done) ->
 			console.log('syncing card')
 			card = this
-			TCC.cardInfo(@get('number')).done (err, data) ->
-				#HANDLE SYNC ERROR
-				if err?
-					console.log('sync error with tcc')
-					return done(err)
-				if card.get('balance') != data.balance
-					console.log('updating out of date card balance')
+			TCC.cardInfo(@get('number')).then( (data) ->
+				newBalance = Number(data.balance)
+				if card.get('balance') != newBalance
+					console.log('updating out of date card')
 					card.set('balance', data.balance)
 					card.save().then (saved) ->
 						done(null, saved)
 				else
 					console.log('card balance already up to date, continuing')
 					done(null, card)
+				).catch( (err) ->
+					console.log('sync error with tcc', err)
+					done(err)
+				)
 
 	  json: () ->
 	  	return this.attributes
@@ -62,4 +63,4 @@ module.exports = (bookshelf) ->
 	return Card
 			
 syncCard = (card, cb) ->
-	card.sync (cb)
+	card.TCCSync (cb)

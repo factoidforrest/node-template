@@ -7,14 +7,18 @@ header =
     'hdr':
       'live': ''
       'fmt': 'MGC'
+       #factor into env var from here
       'ver': '1.0.0'
       'uid': '14d4fd5a-488e-4544-ba4a-c73cd978c5bb'
       'cliUid': '59344556-3C62-42B0-81A1-284EACCFF949'
-      'cliId': 73 #factor into env var someday
+      'cliId': 73
+      'prog':'183'
+      #to here
       'locId': 1
       'rcId': 0
       'term': '1'
       'srvId': 518
+
       'srvNm': ''
       'key': ''
       'chk': '12345'
@@ -104,7 +108,7 @@ module.exports =
       url: url
     console.log 'request to tcc is  ', options.body
     request options, (err, httpResponse, body) ->
-      console.log 'res body is', body
+      console.log 'res body is', JSON.stringify(body)
       if err or body.txs.length == 0
         console.log 'rejecting promise with args ', [
           err
