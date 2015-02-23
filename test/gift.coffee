@@ -39,6 +39,20 @@ describe 'gift', ->
 					expect(gift.related('card').get('balance')).to.equal(1)
 					done(err)
 
+	it 'should list the gift', (done) ->
+		login {}, (session, token) ->
+			console.log('gift list login complete, about to send request')
+			session
+			.post("/gift/list").send(
+				token: token
+			).expect(200).end (err, res) ->
+				console.log('gift list response:', res.body)
+				expect(res.body.outgoing.length).to.equal(1)
+				console.log('outgoing attached user:', res.body.outgoing[0].from)
+				console.log('outgoing attached card:', res.body.outgoing[0].card)
+				expect(res.body.incoming.length).to.equal(0)
+				done()
+
 	it 'should revoke', (done) ->
 		Gift.forge({to_email:'light24bulbs+gifted@gmail.com'}).fetch({withRelated: ['card']}).then (gift) ->
 			gift.revoke ->

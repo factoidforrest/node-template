@@ -19,7 +19,7 @@ module.exports = (app) ->
 			restaurant: req.body.restaurant
 			#payment stuff
 		}
-		Card.create properties, (err, card) ->
+		Card.generate properties, (err, card) ->
 			if err?
 				return res.send(err.code, {error: err.message})
 			res.send card.json()

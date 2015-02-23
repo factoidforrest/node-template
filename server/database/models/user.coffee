@@ -8,6 +8,16 @@ module.exports = (bookshelf) ->
 	global.User = bookshelf.Model.extend({
 		tableName: 'users'
 		hasTimestamps: true
+		#https://github.com/tgriesser/bookshelf/wiki/Plugin:-Visibility
+		hidden: ['password', 'confirmation_token']
+		#https://github.com/tgriesser/bookshelf/wiki/Plugin:-Virtuals
+		virtuals: {
+			###
+	    fullName: function() {
+	        return this.get('firstName') + ' ' + this.get('lastName');
+	    }
+	    ###
+	  }
 
 		###
 		cards: () ->
@@ -108,9 +118,10 @@ module.exports = (bookshelf) ->
 			}
 			
 		#this just doesnt work
+		###
 		toJSON: ->
 			@attributes
-
+		###
 		},{
 			#class methods
 			confirmEmail: (token, next) ->
@@ -149,6 +160,9 @@ module.exports = (bookshelf) ->
 							#need to set this to avoid another database call.  It is set automatically by the database but knex doesn't know that here so we just set it manually
 							newUser.set('active', true)
 							return callback(newUser)
+
+			invite: (email, from, done) ->
+				
 
 		})
 

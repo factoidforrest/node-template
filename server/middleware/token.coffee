@@ -17,8 +17,9 @@ module.exports = (req, res, next) ->
 			else
 				logger.info('token accepted')
 				user = token.related('tokenable')
-				console.log('got user', user)
+
 				if user.get('active')
+					logger.info('logged in user:', JSON.stringify(user))
 					req.user = user
 					return next()
 				else

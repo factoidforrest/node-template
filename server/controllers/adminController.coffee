@@ -18,3 +18,18 @@ module.exports= (app) ->
 			user.set 'active', false
 			user.save().then (deactivated) ->
 				res.send(200, {status: 'deactivated'})
+
+	app.post '/admin/config', roles.is('admin'), (req, res) ->
+		console.log('admin config called')
+		#NOT WORKING RIGHT NOW, SILENT ERROR
+		Configuration.fetchOne().then((config) ->
+			console.log('fetched config:', config)
+			settings = req.body.settings
+			if !settings?
+				res.json configuration
+			else
+				config.set('settings', settings)
+				config.save().then (savedConfig) ->
+					res.json savedConfig
+		).catch (err) ->
+			res.send(500, {error: err})

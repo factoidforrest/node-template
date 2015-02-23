@@ -59,6 +59,11 @@ module.exports = (bookshelf) ->
 			async.map cards, syncCard, done
 		#class methods
 
+		generate: (properties, done) ->
+			#check payment data
+			#create card at tcc and use response
+			
+
 	})
 	return Card
 			

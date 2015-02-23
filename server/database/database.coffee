@@ -16,6 +16,8 @@ class Database
 	constructor: () ->
 		@knex = require('knex')(adapters[env])
 		@bookshelf = require('bookshelf')(@knex)
+		@bookshelf.plugin('virtuals')
+		@bookshelf.plugin('visibility')
 		#console.log(@bookshelf)
 		@models = {
 			user: require('./models/user')(@bookshelf)
@@ -24,6 +26,7 @@ class Database
 			card: require('./models/card')(@bookshelf)
 			gift: require('./models/gift')(@bookshelf)
 			meal: require('./models/meal')(@bookshelf)
+			configuration: require('./models/configuration')(@bookshelf)
 
 		}
 		console.log("Database connected")

@@ -16,6 +16,9 @@ module.exports =
       directory: __dirname + "/server/database/migrations"
 
   test:
+    seeds: {
+      directory: './server/database/seeds/'
+    }
     client: 'postgresql'
     connection: process.env.TEST_DATABASE_URL || {
       database: 'mobilegiftcardtest'

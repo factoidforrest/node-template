@@ -18,7 +18,6 @@ header =
       'rcId': 0
       'term': '1'
       'srvId': 518
-
       'srvNm': ''
       'key': ''
       'chk': '12345'

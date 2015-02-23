@@ -44,3 +44,5 @@ module.exports = (app) ->
 		user = req.user
 		res.send(user.json())
 
+	
+

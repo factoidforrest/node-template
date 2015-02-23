@@ -59,8 +59,10 @@ module.exports = (bookshelf) ->
 
 	  	
 		#TODO make this safe
+		###
 		toJSON: ->
 			this
+		###
 	},{
 		#class methods
 		send: (params, from, done) ->
@@ -81,6 +83,7 @@ module.exports = (bookshelf) ->
 					return done('Not enough value in the card to gift.')
 				newBalance = card.get('balance') - params.balance  
 				card.set('balance', newBalance)
+				#should also call svRed(eem) to deduct the value from the card
 				card.save().then (savedCard) -> 
 					forged.save().then (savedGift) ->
 						console.log('saved gift:', savedGift)

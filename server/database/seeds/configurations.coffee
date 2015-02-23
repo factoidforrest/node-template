@@ -8,7 +8,7 @@
 
 exports.seed = (knex, Promise) ->
   knex('configurations').insert(
-  	data: {
+  	settings: {
       requestLimit: 500
       transactionLimit: 100
     }

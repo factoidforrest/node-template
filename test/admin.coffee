@@ -46,3 +46,12 @@ describe 'admin', ->
 			.end (err, res) ->
 				console.log('got response attempting to access admin functions as normal user:', res.body)
 				done(err)
+
+	it 'should get settings', (done)->
+		session
+		.post('/admin/config').send(
+			token: adminToken
+		).expect(200)
+		.end (err, res) ->
+			console.log('got config response:', res.body)
+			done(err)
