@@ -33,7 +33,7 @@ module.exports.sendConfirmation = (userAttrs, to, next) ->
       link: link)
     mail =
       to: to or userAttrs.email
-      from: 'no-reply@mobile-gift-card.com'
+      from: 'no-reply@mobilegiftcard.com'
       text: 'You have HTML disabled in your email client.  Paste this link into your browser to confirm your email: ' + link
       attachment:
         data: html
@@ -82,7 +82,7 @@ module.exports.sendPasswordReset = (user, token, next) ->
       link: link)
     mail =
       to: user.get('email')
-      from: 'no-reply@mobile-gift-card.com'
+      from: 'no-reply@mobilegiftcard.com'
       text: 'Diners Group password reset.  You have HTML disabled in your email client.  Paste this link into your browser to reset your password: ' + link
       attachment:
         data: html
@@ -103,7 +103,7 @@ module.exports.invite = (email, next) ->
     html = template(link: link)
     mail =
       to: email
-      from: 'no-reply@mobile-gift-card.com'
+      from: 'no-reply@mobilegiftcard.com'
       text: 'Diners Group Invitation.  You have HTML disabled in your email client.  Paste this link into your browser to accept your invitation: ' + link
       attachment:
         data: html

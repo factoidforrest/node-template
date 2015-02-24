@@ -60,21 +60,16 @@ module.exports = (bookshelf) ->
 			#create card at tcc and use response
 
 		import: (properties, done) ->
-			console.log('Card.import called with props', properties)
 
 			if !properties.number?
 				return done({name:'numberInvalid', message:'Card number empty'})
-			console.log('about to query existing cards')
 			card = Card.forge(number: properties.number)
 			card.fetch().then((existing)->
-				console.log('found existing card:', existing)
 				if existing?
 					return done({name: 'dupCard', message: 'Card has already been imported'})
 				else
 					card.set(properties)	
-					console.log('set users properties on card:', card.attributes)
 					card.TCCSync (err) ->
-						console.log('set tcc properties on card:', card.attributes)
 						return done(err) if err?
 						card.save().then (savedCard) ->
 							done(null, savedCard)

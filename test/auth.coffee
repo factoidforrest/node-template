@@ -84,4 +84,6 @@ describe 'user', ->
 					expect(fetched.get('password')).to.exist
 					done(err)
 
+	it 'wait for emails to send...hacks for now', (done) ->
+		setTimeout(done, 10000)
 
