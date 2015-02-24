@@ -37,6 +37,18 @@ describe 'card', ->
 				#console.log('got api logged in test response of:', res)
 				done err
 
+	it 'should create a card', (done) ->
+		login {}, (session, token) ->
+			session
+			.post('/card/create').
+			send({
+				program: '183'
+				balance: 10
+				token:token})
+			.expect(200).end (err, res) ->
+				console.log('got response creating card ', res.body)
+				done(err)
+
 	it 'should import a card through the MGC api', (done) ->
 		validNumber = '2073183109657266'
 		login {}, (session, token) ->

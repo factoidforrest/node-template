@@ -22,15 +22,17 @@ module.exports = (app) ->
 
 
 	app.post '/card/create', roles.is('logged in'), (req, res) ->
+		console.log('card create controller called with params ', req.body)
 		properties = {
 			balance: req.body.balance
-			restaurant: req.body.restaurant
+			program: req.body.program
+			user_id: req.user.get('id')
 			#payment stuff
 		}
 		Card.generate properties, (err, card) ->
 			if err?
-				return res.send(err.code, {error: err.message})
-			res.send card.json()
+				return res.send(400, err)
+			res.send card
 
 
 	app.post '/card/refill', roles.is('logged in'), (req, res) ->

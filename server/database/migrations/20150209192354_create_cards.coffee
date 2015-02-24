@@ -9,6 +9,7 @@ exports.up = (knex, Promise) ->
 	  t.string('gift_status')
 	  t.integer('user_id').notNull().index()
 	  t.string('status')
+	  t.integer('program_id')
 	  t.timestamps()
 
 exports.down = (knex, Promise) ->

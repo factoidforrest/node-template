@@ -54,14 +54,27 @@ module.exports = (bookshelf) ->
 
 		#this also saves the changes to the database, if there were any
 		syncGroup : (cards, done) ->
+			#this needs to somehow handle when one of the cards throws an error
 			console.log('syncing card group:', JSON.stringify(cards))
 			async.map cards, syncCard, done
 		
 
 
 		generate: (properties, done) ->
-			#check payment data
-			#create card at tcc and use response
+			if !properties.balance? or !properties.program?
+				return done({name:'argumentsInvalid', message: 'You must specify a restaurant and amount'})
+			card = Card.forge(user_id: properties.user_id, program_id: properties.program)
+			TCC.createCard(properties.amount, properties.program).then((data) ->
+				card.set('balance', data.balance)
+				card.set('status', data.status)
+				card.set('number', data.card_number)
+				card.save().then (savedCard) ->
+					done(null, savedCard)
+			).catch( (err) ->
+				console.log('tcc error', err)
+				logger.error(err)
+				done(err)
+			)
 
 		import: (properties, done) ->
 

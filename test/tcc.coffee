@@ -12,7 +12,7 @@ describe 'TCC API', ->
 
 
 	it 'should create a new card using svAlloc', (done) ->
-		TCC.createCard(10, '149').then((card) ->
+		TCC.createCard(10, '183').then((card) ->
 			console.log 'new card created:', card
 			done()
 			return
