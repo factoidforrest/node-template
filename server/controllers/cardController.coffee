@@ -57,10 +57,12 @@ module.exports = (app) ->
 	app.post '/card/list', roles.is('logged in'),  (req, res) ->
 		#maybe take more params and join them to the query to optionally filter
 		Card.forge(user_id: req.user.id).fetchAll().then((cards) ->
-			console.log('retreived cards ', cards.models[0].toJSON())
-			res.json cards
-			###
-			res.json cards.models.map (card)  ->
-				return card.json()
-			###
+			console.log('retreived cards ', JSON.stringify(cards))
+			Card.syncGroup cards, (err, syncedCards) ->
+				console.log('synced with tcc and saved cards ', JSON.stringify(syncedCards))
+				res.json syncedCards
+				###
+				res.json cards.models.map (card)  ->
+					return card.json()
+				###
 		)

@@ -29,6 +29,7 @@ module.exports = (bookshelf) ->
 		user: ->
 			return @belongsTo(User)
 
+		#doesn't save, just updates in place
 		TCCSync: (done) ->
 			console.log('syncing card')
 			card = this
@@ -50,10 +51,13 @@ module.exports = (bookshelf) ->
 			console.log('converting to json')
 			return this.attributes
 	},{
+
+		#this also saves the changes to the database, if there were any
 		syncGroup : (cards, done) ->
-			console.log('syncing card group:', cards)
+			console.log('syncing card group:', JSON.stringify(cards))
 			async.map cards, syncCard, done
-		#class methods
+		
+
 
 		generate: (properties, done) ->
 			#check payment data
@@ -75,14 +79,20 @@ module.exports = (bookshelf) ->
 							done(null, savedCard)
 
 			).catch (err) ->#done
-				console.log('caught db error:', err)
+				logger.error(err)
 				done(err)
 
 	})
 	return Card
 			
 syncCard = (card, cb) ->
-	card.TCCSync (cb)
+	card.TCCSync (err, card) ->
+		return done(err) if err?
+		if card.hasChanged()
+			card.save().then (savedCard) ->
+				cb(null, savedCard)
+		else
+			cb(null, card)
 
 
 	
