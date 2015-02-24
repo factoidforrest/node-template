@@ -3,14 +3,22 @@ passport = require 'passport'
 module.exports = (app) ->
 
 	app.post '/card/import', roles.is('logged in'),  (req, res) ->
-		properties = {
-			number:req.body.number
-			user: req.user
-		}
-		Card.import properties, (err, card) ->
-			if err?
-				return res.send(err.code, {error: err.message})
-			res.send card.json()
+		try 
+			console.log('import card called with params:', req.body)
+			properties = {
+				number:req.body.card_number
+				user_id: req.user.get('id')
+			}
+			Card.import properties, (err, card) ->
+				console.log('got error importing:', err)
+				if err?
+					return res.send(400, {name:err.name, error: err.message})
+				res.send card
+		
+		catch e
+			console.log('caught exception ', e)
+		
+
 
 
 	app.post '/card/create', roles.is('logged in'), (req, res) ->
@@ -50,6 +58,9 @@ module.exports = (app) ->
 		#maybe take more params and join them to the query to optionally filter
 		Card.forge(user_id: req.user.id).fetchAll().then((cards) ->
 			console.log('retreived cards ', cards.models[0].toJSON())
+			res.json cards
+			###
 			res.json cards.models.map (card)  ->
 				return card.json()
+			###
 		)

@@ -8,6 +8,7 @@ exports.up = (knex, Promise) ->
 	  t.float('balance')
 	  t.string('gift_status')
 	  t.integer('user_id').notNull().index()
+	  t.string('status')
 	  t.timestamps()
 
 exports.down = (knex, Promise) ->
