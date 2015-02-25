@@ -38,20 +38,20 @@ module.exports = (app) ->
 	app.post '/card/refill', roles.is('logged in'), (req, res) ->
 		properties = {
 			balance: req.body.balance
-			restaurant: req.body.restaurant
+			id: req.body.id
 			#payment stuff
 		}
 		Card.refill properties, (err, card) ->
 			if err?
-				return res.send(err.code, {error: err.message})
-			res.send card.json()
+				return res.send(err.code, err)
+			res.send card
 
 
 	app.post '/card/info', roles.is('logged in'), (req, res) ->
 		cardId = req.body.id
 		Card.forge(user_id: req.user.id, id: cardId).fetch().then((card) ->
 			if card?
-				res.json(card.json())
+				res.json(card)
 			else
 				res.send(404, error: "Card not found")
 		)

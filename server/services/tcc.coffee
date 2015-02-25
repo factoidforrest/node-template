@@ -29,6 +29,7 @@ inquiryBody = (card) ->
     } ]
   }
 
+#activate can also refill
 activateBody = (card, amount) ->
 	merge header,
  	{
@@ -110,8 +111,8 @@ module.exports =
       return
     deferred.promise
 
-
-  activateTCCCard: (card_number, amount) ->
+  #can also activate a card
+  refillCard: (card_number, amount) ->
     deferred = q.defer()
     body = activateBody(card_number, amount)
     url = app.get('tccURL')
@@ -131,6 +132,8 @@ module.exports =
         previousBalance: txn.prevBal
       return
     deferred.promise
+
+
 
 
   redeemTCCCard: (card_number, amount) ->

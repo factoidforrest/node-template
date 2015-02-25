@@ -40,7 +40,7 @@ module.exports = (bookshelf) ->
 				card.set('status', data.status)
 				done(null, card)
 			).catch( (err) ->
-					console.log('sync error with tcc', err)
+				console.log('sync error with tcc', err)
 				if err.name == 'connectionError'
 					done({name:'connectionError', error:err, message: 'Trouble contacting the card server'})
 				else if err.name == 'TCCError'
@@ -49,12 +49,20 @@ module.exports = (bookshelf) ->
 					done(err)
 			)
 
-	  json: () ->
-	  	return this.attributes
-		#THIS IS NOT WORKING, it just doesn't get called
-		toJSON: ->
-			console.log('converting to json')
-			return this.attributes
+		refill: (amount, done) ->
+			card = this
+			TCC.refillCard(this.get('number'), amount).then((data) ->
+				card.set({balance: data.balance, status: data.status})
+				card.save().then () ->
+					done(null, card)
+			).catch (err) ->
+				console.log('sync error with tcc', err)
+				if err.name == 'connectionError'
+					done({code: 500, name:'connectionError', error:err, message: 'Trouble contacting the card server'})
+				else if err.name == 'TCCError'
+					done({code: 500, name:'TCCErr', error: err, message: 'Please double check the card number'})
+				else 
+					done(err)
 	},{
 
 		#this also saves the changes to the database, if there were any
@@ -64,7 +72,7 @@ module.exports = (bookshelf) ->
 			async.map cards, syncCard, done
 		
 
-
+		#create
 		generate: (properties, done) ->
 			if !properties.balance? or !properties.program?
 				return done({name:'argumentsInvalid', message: 'You must specify a restaurant and amount'})
@@ -99,6 +107,13 @@ module.exports = (bookshelf) ->
 			).catch (err) ->#done
 				logger.error(err)
 				done(err)
+
+		refill: (properties, done) ->
+			Card.forge(id: properties.id).fetch().then (card) ->
+				return done({code: 400, name:'cardNotFound', message: 'No matching card was found'}) if !card?
+				card.refill properties.balance, done
+
+
 
 	})
 	return Card
