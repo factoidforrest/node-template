@@ -9,6 +9,8 @@ login = userLib.login
 testCard = null
 
 describe 'card', ->
+	this.timeout 10000 
+	
 	before (done) -> 
 		User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
 
@@ -22,7 +24,21 @@ describe 'card', ->
 
 
 
-	it 'should list one card for the logged in user', (done) ->
+
+
+	it 'should create a card', (done) ->
+		login {}, (session, token) ->
+			session
+			.post('/card/create').
+			send({
+				program: '183'
+				balance: 10
+				token:token})
+			.expect(200).end (err, res) ->
+				console.log('got response creating card ', res.body)
+				done(err)
+
+	it 'should list two cards for the logged in user', (done) ->
 		login {}, (session, token) ->
 			console.log('logged in, now attempting to list cards')
 			session
@@ -36,18 +52,6 @@ describe 'card', ->
 				
 				#console.log('got api logged in test response of:', res)
 				done err
-
-	it 'should create a card', (done) ->
-		login {}, (session, token) ->
-			session
-			.post('/card/create').
-			send({
-				program: '183'
-				balance: 10
-				token:token})
-			.expect(200).end (err, res) ->
-				console.log('got response creating card ', res.body)
-				done(err)
 
 	it 'should import a card through the MGC api', (done) ->
 		validNumber = '2073183109657266'

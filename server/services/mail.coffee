@@ -93,7 +93,7 @@ module.exports.sendPasswordReset = (user, token, next) ->
   return
 
 module.exports.invite = (email, next) ->
-  sails.log 'info', 'sending an invitation'
+  logger.info  'sending an invitation'
   fs.readFile 'views/invite-email.jade', 'utf8', (err, file) ->
     if err
       return next(err)
@@ -109,6 +109,7 @@ module.exports.invite = (email, next) ->
         data: html
         alternative: true
       subject: 'Diner\'s Group Invite'
+    console.log('about to send message: ', mail)
     send mail, next
     return
   return

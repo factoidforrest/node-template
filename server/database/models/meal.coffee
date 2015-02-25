@@ -22,9 +22,7 @@ module.exports = (bookshelf) ->
 
 		
 		#TODO make this safe
-		toJSON: ->
-			this
-		},{
+	},{
 			#class methods
 
 		})

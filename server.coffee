@@ -112,5 +112,5 @@ app.listen(process.env.PORT || 3000)
 #replify('realtime-101', app)
 
 global.app = module.exports = app
-logger.log('Your are in this mode: ' + process.env.NODE_ENV + ' and your database environment is: ' + process.env.DATABASE_URL);
+logger.log('Server launched in mode: ' + process.env.NODE_ENV + ' and connected to database environment: ' + process.env.DATABASE_URL);
 

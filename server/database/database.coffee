@@ -20,6 +20,7 @@ class Database
 		@bookshelf.plugin('visibility')
 		#console.log(@bookshelf)
 		@models = {
+			#should probably just batch load everything in the folder
 			user: require('./models/user')(@bookshelf)
 			token: require('./models/token')(@bookshelf)
 			authentication: require('./models/authentication')(@bookshelf)
@@ -27,6 +28,7 @@ class Database
 			gift: require('./models/gift')(@bookshelf)
 			meal: require('./models/meal')(@bookshelf)
 			configuration: require('./models/configuration')(@bookshelf)
+			invitation: require('./models/invitation')(@bookshelf)
 
 		}
 		console.log("Database connected")

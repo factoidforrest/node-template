@@ -12,7 +12,7 @@ unless registered
 
 module.exports.destroyAll = destroyAll = (done) ->
 	console.log('calling async destroy on models')
-	async.map [User, Token, Card, Authentication, Meal, Gift], destroy, (err, results) ->
+	async.map [User, Token, Card, Authentication, Meal, Gift, Invitation], destroy, (err, results) ->
 		console.log('destroyed all')
 		done()
 
