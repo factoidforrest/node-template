@@ -11,6 +11,8 @@ module.exports = (bookshelf) ->
 	},{
 			#class methods
 		invite: (email, from, done) ->
+			if !email?
+				done({name:'emailInvalid', message:'You must specify an email to invite'})
 			Invitation = this
 			User.forge(email:email).fetch().then (existingUser) ->
 				if existingUser?
@@ -24,6 +26,6 @@ module.exports = (bookshelf) ->
 						Mail.invite saved.get('email'), (err) ->
 							if err?
 								logger.error(err)
-						done(err, saved)
+						done(null, saved)
 	})
 	return Invitation
