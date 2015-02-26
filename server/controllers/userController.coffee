@@ -14,7 +14,7 @@ module.exports = (app) ->
 
 
 	app.post '/user/info', roles.is('logged in'), (req, res) ->
-		res.send(req.user.json())
+		res.send(req.user)
 
 	app.post '/user/sendpasswordreset', (req, res) ->
 		email = req.body.email
@@ -39,10 +39,13 @@ module.exports = (app) ->
 						return res.send(200, {status: 'success'})
 
 
+
+
+
 	app.post '/user/testtoken', roles.is('logged in'), (req, res) ->
 		console.log('called token test')
 		user = req.user
-		res.send(user.json())
+		res.send(user)
 
 	
 

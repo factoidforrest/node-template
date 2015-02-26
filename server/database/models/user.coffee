@@ -12,12 +12,17 @@ module.exports = (bookshelf) ->
 		hidden: ['password', 'confirmation_token']
 		#https://github.com/tgriesser/bookshelf/wiki/Plugin:-Virtuals
 		virtuals: {
-			###
-	    fullName: function() {
-	        return this.get('firstName') + ' ' + this.get('lastName');
-	    }
-	    ###
-	  }
+			
+			name: () -> 
+				if this.get('display_name')?
+					return this.get('display_name')
+				else if this.get('first_name')?
+					return this.get('first_name') + ' ' + this.get('last_name')
+				else
+					return this.get('email')
+			
+			
+		}
 
 		###
 		cards: () ->
