@@ -57,7 +57,7 @@ module.exports = (app) ->
 		).catch (dbError) ->
 			logger.error('error with database request on local login' + dbError)
 			console.log('err is ', dbError)
-			return res.send(500, error: 'Internal Server Error')
+			return res.send(500, error: 'Internal Database Error', databaseError: dbError)
 
 	app.post '/auth/google/clientside', (req, res) ->
 		accessToken = req.body.access_token

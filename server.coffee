@@ -23,6 +23,9 @@ global.logger = new (winston.Logger)({
   ]
 })
 ###
+winston.remove(winston.transports.Console)
+winston.add(winston.transports.Console, {'timestamp':true})
+
 global.logger = winston
 
 
