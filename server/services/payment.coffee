@@ -33,25 +33,19 @@ class Payment
 			logger.info('payment authorization completed with err: ', err, ' and result: ', result)
 			#TODO clean up this error handling somehow
 			if err?
-				logger.info('payment authorization error: ', err)
 				return done({code:400, name:'TransactionErr', message: ('Transaction authorization failed: ' + err), transaction: result})
 
 			if !result.success
-				for error in result.errors.deepErrors() 
-					logger.info('payment authorization error: ', error.message, ' full error: ', error)
-				return done({code:400, name:'TransactionErr', message: ('Transaction authorization failed: ' + result.transaction.status), transaction: result.transaction})
+				return done({code:400, errors: result.errors.deepErrors(), name:'TransactionErr', message: ('Transaction authorization failed: ' + result.transaction.status), transaction: result.transaction})
 			done(err, result)
 
 	settle: (transaction, done) ->
 		@gateway.transaction.submitForSettlement transaction.id, (err, settlement) ->
 			logger.info('payment settlement completed with err ', err, ' and response ', settlement)
 			if err?
-				logger.info('settlement error: ', err)
 				return done({code:400, name:'TransactionErr', message: ('Transaction settlement failed: ' + err), transaction: settlement})
 			if !settlement.success?
-				for error in result.errors.deepErrors() 
-					logger.info('settlement error: ', error.message, ' full error: ', error)
-				return done({code:400, name:'TransactionErr', message: ('Transaction settlement failed: ' + settlement.transaction.status), transaction: settlement})
+				return done({code:400, errors: result.errors.deepErrors(), name:'TransactionErr', message: ('Transaction settlement failed: ' + settlement.transaction.status), transaction: settlement})
 			done(err, settlement)
 
 

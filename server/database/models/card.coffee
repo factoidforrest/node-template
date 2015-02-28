@@ -88,7 +88,6 @@ module.exports = (bookshelf) ->
 					Payment.settle authorization.transaction, (settleErr, settlement) ->
 						if settleErr?
 							#need to handle canceling the card at tcc!!!!!!!
-							logger.error('Settlement error: ', settleErr)
 							return done(settleErr)
 
 						card.set('balance', settlement.transaction.amount)
@@ -106,12 +105,11 @@ module.exports = (bookshelf) ->
 								status: settlement.transaction.status
 								data: {authorization: authorization.transaction, settlement: settlement.transaction}
 							).save().then (savedTransaction) ->
-								console.log('saved transaction ', savedTransaction)
+								logger.info('transaction saved: ', savedTransaction)
 								done(null, savedCard)
 
 				).catch( (err) ->
-					console.log('tcc error', err)
-					logger.error(err)
+					logger.error('tcc error', err)
 					done(err)
 				)
 

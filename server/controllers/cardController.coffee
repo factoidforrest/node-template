@@ -28,7 +28,9 @@ module.exports = (app) ->
 		}
 		Card.generate properties, (err, card) ->
 			if err?
-				return res.send(400, err)
+				logger.info('Card Creation Error ', err)
+				console.log(err)
+				return res.send(err.code || 400, {name: err.name, message: err.message})
 			res.send card
 
 
