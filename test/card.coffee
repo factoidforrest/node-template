@@ -2,6 +2,7 @@ request = require('supertest');
 setup = require('./libs/setup')
 expect = require('chai').expect
 userLib = require './libs/user'
+braintree = require 'braintree'
 
 userLib.createHooks()
 login = userLib.login
@@ -35,10 +36,18 @@ describe 'card', ->
 			send({
 				program: '183'
 				balance: 10
+				nonce: braintree.Test.Nonces.Transactable
 				token:token})
 			.expect(200).end (err, res) ->
 				console.log('got response creating card ', res.body)
-				done(err)
+
+				if err?
+					return done(err)
+				Transaction.fetchAll({withRelated: ['user', 'card']}).then (transactions) ->
+					console.log('transactions are:', transactions)
+					expect(transactions.length).to.equal(1)
+					console.log('transaction created: ', transactions.first())
+					done(err)
 
 	it 'should refill a card', (done) ->
 		previousBalance = testCard.get('balance')

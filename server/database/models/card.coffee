@@ -7,6 +7,7 @@ Mail = Promise.promisifyAll require '../../services/mail'
 crypto = require 'crypto'
 moment = require 'moment'
 async = require 'async'
+Payment = require '../../services/payment'
 
 module.exports = (bookshelf) ->
 	global.Card = bookshelf.Model.extend({
@@ -74,20 +75,45 @@ module.exports = (bookshelf) ->
 
 		#create
 		generate: (properties, done) ->
-			if !properties.balance? or !properties.program?
-				return done({name:'argumentsInvalid', message: 'You must specify a restaurant and amount'})
-			card = Card.forge(user_id: properties.user_id, program_id: properties.program)
-			TCC.createCard(properties.amount, properties.program).then((data) ->
-				card.set('balance', data.balance)
-				card.set('status', data.status)
-				card.set('number', data.card_number)
-				card.save().then (savedCard) ->
-					done(null, savedCard)
-			).catch( (err) ->
-				console.log('tcc error', err)
-				logger.error(err)
-				done(err)
-			)
+			if !properties.balance? or !properties.program? or !properties.nonce?
+				return done({name:'argumentsInvalid', message: 'You must specify a restaurant, amount, and payment method'})
+
+			Payment.authorize properties.balance, properties.nonce, (authErr, authorization) ->
+
+				if authErr?
+					return done(authErr)
+				console.log('authorized payment ', authorization)
+				card = Card.forge(user_id: properties.user_id, program_id: properties.program)
+				TCC.createCard(authorization.transaction.amount, properties.program).then((data) ->
+					Payment.settle authorization.transaction, (settleErr, settlement) ->
+						if settleErr?
+							#need to handle canceling the card at tcc!!!!!!!
+							logger.error('Settlement error: ', settleErr)
+							return done(settleErr)
+
+						card.set('balance', settlement.transaction.amount)
+						card.set('status', data.status)
+						card.set('number', data.card_number)
+
+						card.save().then (savedCard) ->
+
+							Transaction.forge(
+								user_id: properties.user_id
+								card_id: savedCard.get('id')
+								card_number: savedCard.get('number')
+								amount: card.get('balance')
+								type: 'purchase'
+								status: settlement.transaction.status
+								data: {authorization: authorization.transaction, settlement: settlement.transaction}
+							).save().then (savedTransaction) ->
+								console.log('saved transaction ', savedTransaction)
+								done(null, savedCard)
+
+				).catch( (err) ->
+					console.log('tcc error', err)
+					logger.error(err)
+					done(err)
+				)
 
 		import: (properties, done) ->
 

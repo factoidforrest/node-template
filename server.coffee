@@ -14,7 +14,7 @@ expressWinston = require('express-winston');
 production = app.get('env') != 'development'
 
 #logging
-
+###
 logLevel = production ? 'silly' : 'info'
 global.logger = new (winston.Logger)({
   transports: [
@@ -22,6 +22,9 @@ global.logger = new (winston.Logger)({
     #new (winston.transports.File)({ filename: 'somefile.log', level: 'error' })
   ]
 })
+###
+global.logger = winston
+
 
 app.use(express.compress())
 app.use(parser.urlencoded({ extended: true }))

@@ -3,22 +3,18 @@ passport = require 'passport'
 module.exports = (app) ->
 
 	app.post '/card/import', roles.is('logged in'),  (req, res) ->
-		try 
-			console.log('import card called with params:', req.body)
-			properties = {
-				number:req.body.card_number
-				user_id: req.user.get('id')
-			}
-			Card.import properties, (err, card) ->
-				console.log('got error importing:', err)
-				if err?
-					return res.send(400, {name:err.name, error: err.message})
-				res.send card
-		
-		catch e
-			console.log('caught exception ', e)
-		
-
+		console.log('import card called with params:', req.body)
+		properties = {
+			number:req.body.card_number
+			user_id: req.user.get('id')
+		}
+		Card.import properties, (err, card) ->
+			console.log('got error importing:', err)
+			if err?
+				return res.send(400, {name:err.name, error: err.message})
+			res.send card
+	
+	
 
 
 	app.post '/card/create', roles.is('logged in'), (req, res) ->
@@ -27,6 +23,7 @@ module.exports = (app) ->
 			balance: req.body.balance
 			program: req.body.program
 			user_id: req.user.get('id')
+			nonce: req.body.nonce
 			#payment stuff
 		}
 		Card.generate properties, (err, card) ->

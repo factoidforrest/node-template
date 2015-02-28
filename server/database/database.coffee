@@ -29,7 +29,7 @@ class Database
 			meal: require('./models/meal')(@bookshelf)
 			configuration: require('./models/configuration')(@bookshelf)
 			invitation: require('./models/invitation')(@bookshelf)
-
+			transaction: require('./models/transaction')(@bookshelf)
 		}
 		console.log("Database connected")
 
