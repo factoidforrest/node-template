@@ -9,7 +9,8 @@ global.db = require('./server/database/database')
 replify = require('replify')
 parser = require 'body-parser'
 global.winston = require('winston')
-expressWinston = require('express-winston');
+expressWinston = require('express-winston')
+rate = require 'express-rate'
 
 production = app.get('env') != 'development'
 
@@ -32,57 +33,24 @@ global.logger = winston
 app.use(express.compress())
 app.use(parser.urlencoded({ extended: true }))
 app.use(parser.json())
-app.set('views', __dirname + '/views')
 app.use(express.logger())
-app.use(favicon(path.join(__dirname,'public','images','favicon.ico')))
-app.locals.uglify = production
-
-app.set('view engine', 'jade')
-
-app.use(sass.middleware({
-  src: __dirname + '/views/stylesheets',
-  dest: __dirname + '/public',
-  debug: !production,
-  outputStyle: if production then 'compressed' else 'nested'
-}))
-
-#TODO: switch to a compiler with compression support or maybe not and just have require minifier do it later
-app.use(coffeescript({
-  src: __dirname + '/views/js',
-  dest: __dirname + '/public',
-  bare: true,
-  compress: production
-}))
 
 
 # Add headers
-app.use(`function (req, res, next) {
+app.use((req, res, next) ->
+  # Website you wish to allow to connect
+  res.setHeader 'Access-Control-Allow-Origin', process.env.ASSETROOT || 'http://localhost:3001'
+  # Request methods you wish to allow
+  res.setHeader 'Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'
+  # Request headers you wish to allow
+  res.setHeader 'Access-Control-Allow-Headers', 'X-Requested-With,content-type'
+  # Set to true if you need the website to include cookies in the requests sent
+  # to the API (e.g. in case you use sessions)
+  res.setHeader 'Access-Control-Allow-Credentials', true
+  # Pass to next layer of middleware
+  next()
+)
 
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
-
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-
-    // Pass to next layer of middleware
-    next();
-}`)
-
-
-if production
-	cachetime = 86400000
-else
-	cachetime = 0
-
-#static assets
-app.use(express.static(__dirname + '/public', { maxAge: cachetime }))
 
 
 #request logging
@@ -94,14 +62,14 @@ app.use(expressWinston.logger({
     })
   ]
 }));
- 
-###
-#root
-app.get('/', handlers.root)
 
-#api
-app.post('/locations', handlers.locations)
-###
+#rate limiting
+limiter = new rate.Memory.MemoryRateHandler()
+#TODO set this up to use config settings 
+limiterMiddleware = rate.middleware({handler: limiter, interval: 20, limit: 300})
+#rate limit all requests for now
+#app.use(limiterMiddleware)
+
 
 #authentication stuff, refactor to config file in time
 app.set('token_expiry', [1, 'days'])

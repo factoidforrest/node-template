@@ -55,3 +55,15 @@ describe 'admin', ->
 		.end (err, res) ->
 			console.log('got config response:', res.body)
 			done(err)
+
+	it 'should set setings', (done) ->
+		randomSetting = Math.random() * 10000
+		session
+		.post('/admin/config').send(
+			token: adminToken
+			settings: { requestLimit: 500, transactionLimit: randomSetting }
+		).expect(200)
+		.end (err, res) ->
+			console.log('got config response:', res.body)
+			expect(res.body.transactionLimit).to.equal(randomSetting)
+			done(err)

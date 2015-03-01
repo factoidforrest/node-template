@@ -20,23 +20,21 @@ module.exports= (app) ->
 				res.send(200, {status: 'deactivated'})
 
 	app.post '/admin/config', roles.is('admin'), (req, res) ->
-		try
-			console.log('admin config called')
-			#NOT WORKING RIGHT NOW, SILENT ERROR
-			Configuration.fetchAll().then((configs) ->
-				console.log('fetched configs ',configs)
-				config = configs.first()
-				console.log('fetched config:', config)
-				settings = req.body.settings
-				if !settings?
-					res.json config.get('settings')
-				else
-					config.set('settings', settings)
-					config.save().then (savedConfig) ->
-						res.json savedConfig.get('settings')
-			).catch (err) ->
-				console.log('caught db err : ', err)
-				res.send(500, {name: 'DBerr', error: err})
-		catch e
-			console.log e
-			res.send(500, {name: 'I have no idea', error: e})
+		console.log('admin config called')
+		#NOT WORKING RIGHT NOW, SILENT ERROR
+		Configuration.fetchAll().then((configs) ->
+			config = configs.first()
+			logger.info('fetched config:', config.attributes)
+			settings = req.body.settings
+			if !settings?
+				res.json config.get('settings')
+			else
+				logger.info('config updated by ', req.user.get('email'), ' to ', settings)
+				config.set('settings', settings)
+				config.save().then (savedConfig) ->
+					res.json savedConfig.get('settings')
+		).catch (err) ->
+			console.log('caught db err : ', err)
+			res.send(500, {name: 'DBerr', error: err})
+
+
