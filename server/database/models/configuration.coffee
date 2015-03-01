@@ -2,7 +2,7 @@
 
 module.exports = (bookshelf) ->
 	global.Configuration = bookshelf.Model.extend({
-		tableName: 'configuration'
+		tableName: 'configurations'
 		hasTimestamps: true
 
 		
