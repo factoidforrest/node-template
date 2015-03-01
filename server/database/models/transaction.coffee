@@ -8,14 +8,14 @@ module.exports = (bookshelf) ->
 	global.Transaction = bookshelf.Model.extend({
 		tableName: 'transactions'
 		hasTimestamps: true
-		###
-		hidden: ['password', 'confirmation_token']
+
+		hidden: ['data']
 		#https://github.com/tgriesser/bookshelf/wiki/Plugin:-Virtuals
 		virtuals: {
 			
 			
 		}
-		###
+
 
 
 		#relations

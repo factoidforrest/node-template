@@ -40,6 +40,9 @@ module.exports = (bookshelf) ->
 
 		cards: ->
 			return @hasMany(Card)
+
+		transactions: ->
+			return @hasMany(Transaction)
 			
 		createToken: (attrs) ->
 			#returns a promise

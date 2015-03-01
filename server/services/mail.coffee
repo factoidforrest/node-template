@@ -14,9 +14,9 @@ send = (params, next) ->
     logger.info message
     if err
       console.log(err)
-      next err
+      return next err
     else
-      next()
+      return next()
     return
 
 module.exports.sendConfirmation = (userAttrs, to, next) ->

@@ -18,8 +18,8 @@ production = app.get('env') != 'development'
 logLevel = production ? 'silly' : 'info'
 global.logger = new (winston.Logger)({
   transports: [
-    new (winston.transports.Console)({ level: logLevel }),
-    #new (winston.transports.File)({ filename: 'somefile.log', level: 'error' })
+    new (winston.transports.Console)({ level: logLevel, 'timestamp':true }),
+    #new (winston.transports.File)({ filename: 'somefile.log', level: 'error', 'timestamp':true})
   ]
 })
 ###

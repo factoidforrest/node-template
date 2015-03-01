@@ -123,7 +123,7 @@ module.exports =
       url: url
     request options, (err, httpResponse, body) ->
       if err or body.txs.length == 0
-        deferred.reject err
+        return handleError(err, body, deferred)
       txn = body.txs[0]
       deferred.resolve
         card_number: txn.crd

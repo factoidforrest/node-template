@@ -30,6 +30,9 @@ module.exports = (bookshelf) ->
 		user: ->
 			return @belongsTo(User)
 
+		transactions: ->
+			return @hasMany(Transaction)
+
 		#doesn't save, just updates in place
 		TCCSync: (done) ->
 			console.log('syncing card')
@@ -76,7 +79,7 @@ module.exports = (bookshelf) ->
 		#create
 		generate: (properties, done) ->
 			if !properties.balance? or !properties.program? or !properties.nonce?
-				return done({name:'argumentsInvalid', message: 'You must specify a restaurant, amount, and payment method'})
+				return done({code: 400, name:'argumentsInvalid', message: 'You must specify a restaurant, amount, and payment method'})
 
 			Payment.authorize properties.balance, properties.nonce, (authErr, authorization) ->
 
@@ -100,7 +103,7 @@ module.exports = (bookshelf) ->
 								user_id: properties.user_id
 								card_id: savedCard.get('id')
 								card_number: savedCard.get('number')
-								amount: card.get('balance')
+								amount: settlement.transaction.amount
 								type: 'purchase'
 								status: settlement.transaction.status
 								data: {authorization: authorization.transaction, settlement: settlement.transaction}

@@ -47,5 +47,8 @@ module.exports = (app) ->
 		user = req.user
 		res.send(user)
 
+	#this should be in its own controller.  just tests if the API is online
+	app.get '/uptimerobot', (req, res) ->
+		res.send(200)
 	
 
