@@ -61,9 +61,9 @@ app.use(expressWinston.logger({
       colorize: true
     })
   ]
-}));
+}))
 
-#rate limiting
+#rate limiting, Better to use redis if using a cluster
 limiter = new rate.Memory.MemoryRateHandler()
 #TODO set this up to use config settings 
 limiterMiddleware = rate.middleware({handler: limiter, interval: 20, limit: 300})
