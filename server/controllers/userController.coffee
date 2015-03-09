@@ -38,9 +38,17 @@ module.exports = (app) ->
 					user.save().then (user) ->
 						return res.send(200, {status: 'success'})
 
+	app.post '/user/update', roles.is('logged in'), (req, res) ->
+		console.log('user update called with params', req.body)
+		req.user.update req.body.user, (err) ->
+			if err?
+				console.log("CAUGHT ERROR IN CALLBACK", err)
+				return res.send(err.code, err)
+			else
+				return res.json(req.user)
 
 
-
+	app.post '/user/testtoken'
 
 	app.post '/user/testtoken', roles.is('logged in'), (req, res) ->
 		console.log('called token test')

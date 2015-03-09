@@ -10,7 +10,7 @@ module.exports = (app) ->
 		#verify passwords match and are long enough 
 		if acceptablePassword(params, res)
 			User.forge({email : params.email}).fetch().then (usr) ->
-				winston.info 'checked for user with matching email: ' + usr
+				logger.info 'checked for user with matching email: ' + usr
 				if not usr?
 					user = User.forge({email: params.email})
 					winston.info 'forged user', user

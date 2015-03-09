@@ -13,7 +13,10 @@ expressWinston = require('express-winston')
 rate = require 'express-rate'
 
 production = app.get('env') != 'development'
-
+###
+process.on 'uncaughtException',  (error) ->
+  console.log(error.stack)
+###
 #logging
 ###
 logLevel = production ? 'silly' : 'info'

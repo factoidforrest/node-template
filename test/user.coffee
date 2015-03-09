@@ -36,3 +36,21 @@ describe 'user', ->
 						expect(user.validPassword('resetpassword')).to.equal(true)
 						done(err)
 
+	it 'should update the user', (done) ->
+		userLib.login {}, (session, token) ->
+			session.post('/user/update').send({
+				token: token
+				user:
+					password: 'updatedPassword'
+					password_confirmation: 'updatedPassword'
+					email: 'light24bulbs+newemail@gmail.com'
+					first_name: 'newFirstName'
+					last_name: 'newLastName'
+					display_name: 'newDisplay Name'
+				})
+			.expect(200)
+			.end (err, res) ->
+				console.log('response updating user:', res.body)
+				done(err)
+
+

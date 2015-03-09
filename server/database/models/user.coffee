@@ -14,14 +14,12 @@ module.exports = (bookshelf) ->
 		virtuals: {
 			
 			name: () -> 
-				if this.get('display_name')?
+				if !!this.get('display_name')
 					return this.get('display_name')
-				else if this.get('first_name')?
+				else if !!this.get('first_name')
 					return this.get('first_name') + ' ' + this.get('last_name')
 				else
 					return this.get('email')
-			
-			
 		}
 
 		###
@@ -96,7 +94,7 @@ module.exports = (bookshelf) ->
 
 		sendConfirmationEmail: (done) ->
 			#promise
-			return Mail.sendConfirmation @attributes, null,  done
+			return Mail.sendConfirmation @attributes, @get('new_email'),  done
 
 		setupLocalUser: (password, next) ->
 			self = this
@@ -110,6 +108,45 @@ module.exports = (bookshelf) ->
 							logger.info 'email sent'
 
 						next(null)
+
+		update: (properties, next) ->
+			try
+				user = this
+				console.log('user is', user)
+				###
+				for value in properties when key in ['first_name', 'last_name', 'display_name']
+
+					logger.info('updating key, value on user', key, '  ', value)
+					@set(key, value)
+				###
+				# instead just
+				@set(
+					first_name: properties.first_name
+					last_name: properties.last_name
+					display_name: properties.display_name
+					)
+				#we are dropping the error for email confirmation and not waiting for it to finish by passing an empty callback
+				if properties.email != user.get('email')
+					user.set('new_email', properties.email)
+					user.sendConfirmationEmail(->)
+
+				if !!properties.password
+					if properties.password isnt properties.password_confirmation
+						return next({code:400, name: 'passwordConfirmation', field: 'password', message: "Passwords didn't match."})
+					if properties.password.length < 6
+						return next({code:400, name: 'passwordTooShort', field: 'password', message: "Passwords didn't match."})
+					user.setPassword properties.password, -> 
+						user.save().then (savedUser) ->
+							next()
+				else
+					user.save().then (user) ->
+						next()
+			catch e
+				console.log("THROWING ERROR ", e, e.stack)
+				e.code = 500
+				next(e)
+
+
 
 		sendPasswordReset: (next) ->
 			user = this
@@ -140,10 +177,12 @@ module.exports = (bookshelf) ->
 					return next("This user is already confirmed, please log in.")  if user.get('confirmation_token') is null
 					
 					#swap with new email if the user was updating an existing email
-					user.set('email', user.new_email) if user.hasOwnProperty("new_email")
+					if user.get("new_email")?
+						user.set('email', user.get('new_email')) 
+						user.set('new_email', null)
 					user.set('confirmation_token', null)
 					user.save().then (saved) ->
-						logger.info "updated user to remove token: ", saved
+						logger.info "updated user to confirm their email: ", saved
 						next()
 						return
 
