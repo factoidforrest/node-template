@@ -11,7 +11,7 @@ module.exports = (bookshelf) ->
 	global.Token = bookshelf.Model.extend({
 		tableName: 'tokens'
 		hasTimestamps: true
-
+		visible: ['key', 'created_at']
 
 		initialize: () ->
 			this.on 'saving', (model, attrs, options) ->
@@ -48,8 +48,11 @@ module.exports = (bookshelf) ->
 
 		
 		#TODO make this safe
+		###
 		toJSON: ->
 			key: @get('key')
+		###
+
 		},{
 			#class methods
 

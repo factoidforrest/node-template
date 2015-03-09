@@ -21,7 +21,10 @@ module.exports = (bookshelf) ->
 				return deferred.promise
 
 		
-		#TODO make this safe
+		transactions: ->
+			@hasMany(Transaction)
+
+
 	},{
 			#class methods
 

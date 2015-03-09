@@ -4,9 +4,10 @@ exports.up = (knex, Promise) ->
 	  t.increments().primary().index()
 	  t.integer('restaurant_id').index()
 	  t.float('balance')
+	  t.float('price')
 	  t.json('items')
 	  t.string('key').index()
-	  t.string('status').defaultTo('unpaid')
+	  t.string('status').defaultTo('pending')
 	  t.timestamps()
 
 exports.down = (knex, Promise) ->

@@ -38,12 +38,23 @@ module.exports = (app) ->
 		properties = {
 			balance: req.body.balance
 			id: req.body.id
+			user_id: req.user.get('id')
 			#payment stuff
 		}
 		Card.refill properties, (err, card) ->
 			if err?
 				return res.send(err.code, err)
 			res.send card
+
+	app.post '/card/redeem', roles.is('logged in'), (req, res) ->
+		console.log('card redeem with props', req.body)
+		properties = req.body
+		properties.user = req.user.get('id')
+
+		Card.redeem properties, (err, data) ->
+			if err?
+				return res.send(err.code, err)
+			res.send data
 
 
 	app.post '/card/info', roles.is('logged in'), (req, res) ->

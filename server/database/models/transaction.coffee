@@ -19,6 +19,9 @@ module.exports = (bookshelf) ->
 
 
 		#relations
+		#doesnt always have a meal, depending on the transaction type
+		meal: ->
+			return @belongsTo(Meal)
 		user: ->
 			return @belongsTo(User)
 
