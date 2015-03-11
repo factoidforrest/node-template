@@ -53,4 +53,20 @@ describe 'user', ->
 				console.log('response updating user:', res.body)
 				done(err)
 
+	it 'should confirm the updated email', (done) ->
+		User.where(email: 'light24bulbs@gmail.com').fetch().then (user) ->
+			console.log('fetched user to confirm: ', user.attributes)
+			session = request.agent(app)
+			session
+			.get("/user/confirm?token=" + user.get('confirmation_token') )
+			.expect(302).end (err, res) ->
+				console.log "confirm email with response", res.body
+				console.log "confirmation err: ", err
+				User.where(email: 'light24bulbs+newemail@gmail.com').fetch().then (confirmed) ->
+					expect(confirmed.get('confirmation_token')).to.equal(null)
+					console.log('updated user attrs after confirmation: ', confirmed.attributes)
+				#console.log('login response:', res)
+
+					done(err)
+
 

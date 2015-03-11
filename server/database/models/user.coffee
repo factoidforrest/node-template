@@ -113,13 +113,6 @@ module.exports = (bookshelf) ->
 			try
 				user = this
 				console.log('user is', user)
-				###
-				for value in properties when key in ['first_name', 'last_name', 'display_name']
-
-					logger.info('updating key, value on user', key, '  ', value)
-					@set(key, value)
-				###
-				# instead just
 				@set(
 					first_name: properties.first_name
 					last_name: properties.last_name
@@ -128,19 +121,24 @@ module.exports = (bookshelf) ->
 				#we are dropping the error for email confirmation and not waiting for it to finish by passing an empty callback
 				if properties.email != user.get('email')
 					user.set('new_email', properties.email)
-					user.sendConfirmationEmail(->)
-
-				if !!properties.password
-					if properties.password isnt properties.password_confirmation
-						return next({code:400, name: 'passwordConfirmation', field: 'password', message: "Passwords didn't match."})
-					if properties.password.length < 6
-						return next({code:400, name: 'passwordTooShort', field: 'password', message: "Passwords didn't match."})
-					user.setPassword properties.password, -> 
-						user.save().then (savedUser) ->
-							next()
+					user.generateConfirmationToken () ->
+						user.sendConfirmationEmail(->)
+						setupPassword()
 				else
-					user.save().then (user) ->
-						next()
+					setupPassword()
+
+				setupPassword = ->
+					if !!properties.password
+						if properties.password isnt properties.password_confirmation
+							return next({code:400, name: 'passwordConfirmation', field: 'password', message: "Passwords didn't match."})
+						if properties.password.length < 6
+							return next({code:400, name: 'passwordTooShort', field: 'password', message: "Passwords didn't match."})
+						user.setPassword properties.password, -> 
+							user.save().then (savedUser) ->
+								next()
+					else
+						user.save().then (user) ->
+							next()
 			catch e
 				console.log("THROWING ERROR ", e, e.stack)
 				e.code = 500
