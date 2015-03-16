@@ -136,7 +136,7 @@ module.exports =
 
 
 
-  redeemTCCCard: (card_number, amount) ->
+  redeemCard: (card_number, amount) ->
     deferred = q.defer()
     url = app.get('tccURL')
     options = 
@@ -145,8 +145,10 @@ module.exports =
       json: true
       url: url
     request options, (err, httpResponse, body) ->
+      console.log 'res body is', body
       if err or body.txs.length == 0
-        deferred.reject err
+        return handleError(err, body, deferred)
+      console.log 'resolving promise'
       txn = body.txs[0]
       deferred.resolve
         card_number: txn.crd

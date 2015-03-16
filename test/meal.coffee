@@ -52,17 +52,28 @@ describe 'Meals', ->
 			done(err)
 
 	it 'should spend a card on the meal', (done) ->
-		userLib.login {}, (session, token) ->
-			session
-			.post('/card/redeem').send(
-				token: token
-				meal_key: mealKey
-				id: cardId
-				amount: 1
-			).expect(200)
-			.end (err, res) ->
-				console.log('redeemed meal with response', res.body)
-				done(err)
+		Card.fetchAll().then (cards) ->
+			console.log('found existing cards ', cards)
+			console.log('test attempting to redeem card id: ', cardId)
+			userLib.login {}, (session, token) ->
+				session
+				.post('/card/redeem').send(
+					token: token
+					meal_key: mealKey
+					id: cardId
+					amount: 1
+				).expect(200)
+				.end (err, res) ->
+					console.log('redeemed card with response', res.body)
+					Card.fetchAll().then (cards) ->
+						console.log('redeemed card in db is: ', cards.first())
+						done(err)
 
-
-
+	it 'should checkout the meal', (done) ->
+		session
+		.post('/meal/checkout').send(
+			pos_secret:'123abc',
+			meal_key: mealKey
+		).expect(200).end (err, res) ->
+			console.log('checked out with response ', res.body)
+			done(err)

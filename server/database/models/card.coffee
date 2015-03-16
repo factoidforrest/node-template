@@ -71,8 +71,9 @@ module.exports = (bookshelf) ->
 		redeem: (properties, done) ->
 			if @balance < properties.amount
 				return done({code: 400, name: 'balanceExceeded', message: 'Your card does not have enough value remaining to make this transaction'})
-			
-			Meal.forge(key: properties.meal_key).fetch.then (meal) ->
+			card = this
+			Meal.forge(key: properties.meal_key).fetch().then (meal) ->
+				logger.info 'redeeming card on meal: ', meal.attributes
 				#VALIDATE PROGRAM FROM CARD AND MEAL MATCH
 				return done({code: 400, name: 'mealNotFound', message: 'No meal matching that key was found'}) if !meal?
 				if meal.get('status') != 'pending'
@@ -87,13 +88,19 @@ module.exports = (bookshelf) ->
 					amount: properties.amount
 					type: 'redeem'
 					data: {card_type: 'local'}
-					).save.then (transaction) ->
-
-					#need to use the SQL decrement to avoid race condition of just doing it node side
-					@query('decrement','balance', properties.amount).save().then (savedCard) ->
-						meal.query('decrement','balance', properties.amount).save().then (savedMeal) ->
-							#not sure those amounts will actually go down on the returned object, we may need to fetch again
-							done(null, {card: savedCard, meal: savedMeal})
+					).save().then (transaction) ->
+					#card.query().decrement('balance', properties.amount).then (savedCard) ->
+					TCC.redeemCard(card.get('number'), properties.amount).then((tccResponse) ->
+						console.log 'got redeemed card: ', tcc_response
+						card.set(balance:tccResponse.balance).save().then (savedCard) ->
+							meal.query().decrement('balance', properties.amount).then () ->
+								#update decremented meal from database..not super efficient to call again
+								Meal.forge({id:meal.get('id')}).fetch().then (savedMeal) ->
+									done(null, {card: savedCard, meal: savedMeal})
+						return
+					).fail (err) ->
+						done err
+						#need to use the SQL decrement to avoid race condition of just doing it node side
 
 	},{
 
@@ -169,7 +176,9 @@ module.exports = (bookshelf) ->
 				card.refill properties.balance, done
 
 		redeem: (properties, done) ->
+			logger.info 'card redeeming by properties: ', properties
 			Card.forge(id: properties.id, user_id: properties.user_id).fetch().then (card) ->
+				logger.info 'found card to redeem', card
 				return done({code: 400, name:'cardNotFound', message: 'No matching card was found'}) if !card?
 				card.redeem properties, done
 

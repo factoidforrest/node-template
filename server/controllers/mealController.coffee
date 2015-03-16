@@ -22,7 +22,7 @@ module.exports = (app) ->
 		req.body.meal.balance ?= req.body.meal.price
 		Meal.forge(req.body.meal).save().then (meal) ->
 			logger.info('created meal: ', meal)
-			response = {key:meal.get('key')}
+			response = meal
 			res.send(response)
 		
 	app.post '/meal/update', roles.is('POS'), (req, res) ->
@@ -35,9 +35,9 @@ module.exports = (app) ->
 				res.send savedMeal
 
 
-	app.post '/meal/checkout', (req, res) ->
+	app.post '/meal/checkout', roles.is('POS'), (req, res) ->
 		console.log('checkout with params:' , req.body)
-		Meal.forge(key: req.body.key).fetch(withRelated: ['transactions']).then (meal) ->
+		Meal.forge(key: req.body.key).fetch(withRelated: ['transactions.cards']).then (meal) ->
 			logger.info('got meal ', meal)
 			console.log(meal)
 			if !meal?

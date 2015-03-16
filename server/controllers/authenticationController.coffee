@@ -1,5 +1,8 @@
 passport = require 'passport'
 
+
+#TODO move most of this logic out of here and into the user model
+
 module.exports = (app) ->
 
 	app.post '/auth/register', (req,res) ->
@@ -21,11 +24,8 @@ module.exports = (app) ->
 					#a user with this email already exists
 					if !usr.get('password')?
 						console.log "setting new password on old user:", usr
-						#FIX THIS TO BE LIKE ABOVE FLOW
-						#TODO: need to confirm the email before this login method becomes active
 						usr.setupLocalUser params.password, (err) ->
 							res.json({success: true, errors: {}})
-
 					else
 						res.send 400,
 							errors:
@@ -43,7 +43,7 @@ module.exports = (app) ->
 		})
 		console.log('the query is:', query)
 		query.fetch().then( (user) ->
-			console.log "localhandler found one user", user
+			logger.info "localhandler found one user", user.toJSON()
 			return res.send(400, error: "Incorrect email.")  unless user
 			return res.send(400, error: "You have previously logged in with this email through a social network, but not using a password.  You can register this email with a password by clicking register below and the accounts will merge, or log in with a social network.")  if !user.get('password')?
 			return res.send(400, error: "Incorrect password.")  unless user.validPassword(password)

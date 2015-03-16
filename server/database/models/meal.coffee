@@ -25,6 +25,15 @@ module.exports = (bookshelf) ->
 			@hasMany(Transaction)
 
 
+		###
+		#not sure through is what we want to use here
+		cards: ->
+			@hasMany(Card).through(Transaction)
+		###
+		checkout: (params, next) ->
+			
+
+
 	},{
 			#class methods
 

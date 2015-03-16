@@ -49,7 +49,7 @@ module.exports = (app) ->
 	app.post '/card/redeem', roles.is('logged in'), (req, res) ->
 		console.log('card redeem with props', req.body)
 		properties = req.body
-		properties.user = req.user.get('id')
+		properties.user_id = req.user.get('id')
 
 		Card.redeem properties, (err, data) ->
 			if err?

@@ -1,10 +1,12 @@
 
 require './libs/setup'
-should = require('chai').should()
+expect = require('chai').expect
 userLib = require './libs/user'
 userLib.createHooks {}
 request = require('supertest')
 tcc = require '../server/services/tcc'
+
+cardNumber = null
 
 describe 'TCC API', ->
 
@@ -14,24 +16,39 @@ describe 'TCC API', ->
 	it 'should create a new card using svAlloc', (done) ->
 		TCC.createCard(10, '183').then((card) ->
 			console.log 'new card created:', card
+			cardNumber = card.card_number
 			done()
 			return
 		).fail (err) ->
 			console.log 'card creation failed with error:', err
+
 			done err
 			return
 		return
 
 	it 'should query card data from tcc', (done) ->
-		cardNumber = '2073183100123127'
+		#cardNumber = '2073183100123127'
 		TCC.cardInfo(cardNumber).then((tcc_card) ->
 			console.log 'got card: ', tcc_card
+			expect(tcc_card.balance).to.equal('10.00')
 			done()
 			return
 		).fail (err) ->
 			done err
 			return
 		return
+
+	it 'should redeem some value from tcc', (done) ->
+		TCC.redeemCard(cardNumber, 1.50).then((tcc_card) ->
+			console.log 'got redeemed card: ', tcc_card
+			expect(tcc_card.balance).to.equal('8.50')
+			done()
+			return
+		).fail (err) ->
+			done err
+			return
+		return
+
 
 
 

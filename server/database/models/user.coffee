@@ -139,6 +139,7 @@ module.exports = (bookshelf) ->
 					else
 						user.save().then (user) ->
 							next()
+			#hacks because errors aren't propogating properly in testing.  
 			catch e
 				console.log("THROWING ERROR ", e, e.stack)
 				e.code = 500
