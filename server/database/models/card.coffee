@@ -74,12 +74,14 @@ module.exports = (bookshelf) ->
 			card = this
 			Meal.forge(key: properties.meal_key).fetch().then (meal) ->
 				logger.info 'redeeming card on meal: ', meal.attributes
-				#VALIDATE PROGRAM FROM CARD AND MEAL MATCH
 				return done({code: 400, name: 'mealNotFound', message: 'No meal matching that key was found'}) if !meal?
+				if meal.get('program_id') != card.get('program_id')
+					return done({code:400, name: 'programErr', message: 'Card cannot be used at this restaurant'})
 				if meal.get('status') != 'pending'
 					return done({code: 400, name: 'mealClosed', message: 'The meal has already been checked out'}) 
 				if meal.get('balance') < properties.amount
 					return done({code: 400, name: 'overpaid', message: 'Payed more than the cost of the meal'}) 
+
 				Transaction.forge(
 					user_id: properties.user_id
 					card_number: card.get('number')
@@ -89,7 +91,7 @@ module.exports = (bookshelf) ->
 					type: 'redeem'
 					data: {card_type: 'local'}
 					).save().then (transaction) ->
-					#card.query().decrement('balance', properties.amount).then (savedCard) ->
+
 					TCC.redeemCard(card.get('number'), properties.amount).then((tccResponse) ->
 						console.log 'got redeemed card: ', tccResponse
 						card.set(balance:tccResponse.balance).save().then (savedCard) ->
@@ -101,6 +103,8 @@ module.exports = (bookshelf) ->
 					).fail (err) ->
 						done err
 						#need to use the SQL decrement to avoid race condition of just doing it node side
+
+
 
 	},{
 

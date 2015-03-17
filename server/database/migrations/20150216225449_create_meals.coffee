@@ -2,7 +2,7 @@
 exports.up = (knex, Promise) ->
 	knex.schema.createTable 'meals', (t) ->
 	  t.increments().primary().index()
-	  t.integer('restaurant_id').index()
+	  t.integer('program_id').index()
 	  t.float('balance')
 	  t.float('price')
 	  t.json('items')

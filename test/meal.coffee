@@ -13,7 +13,7 @@ describe 'Meals', ->
 	before (done) -> 
 		User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
 			#this card won't sync unless we change the number to something valid
-			return user.related('cards').create({number: '2073183100123127', balance: 2}).yield(user)#.save().then (card) ->
+			return user.related('cards').create({number: '2073183100123127', program_id: '183', balance: 2}).yield(user)#.save().then (card) ->
 		).then (user) ->
 			console.log('created card', user.related('cards').first())
 			cardId = user.related('cards').first().get('id')
@@ -25,7 +25,7 @@ describe 'Meals', ->
 			pos_secret:'123abc'
 			meal: 
 				balance: 5.52, 
-				restaurant_id: 1, 
+				program_id: 183, 
 				items: {test1:'test1', test2: {nested1: 'nested1', nested2: 'nested2'}}
 		
 		).expect(200)
@@ -65,7 +65,8 @@ describe 'Meals', ->
 					amount: 1
 				).expect(200)
 				.end (err, res) ->
-
+					if err?
+						return done(err)
 					console.log('redeemed card with response', res.body)
 					console.log('meal transactions: ', res.body.meal.transactions)
 					expect(res.body.meal.balance).to.equal(res.body.meal.price - 1)
@@ -80,5 +81,8 @@ describe 'Meals', ->
 			pos_secret:'123abc',
 			key: mealKey
 		).expect(200).end (err, res) ->
+
 			console.log('checked out with response ', res.body)
-			done(err)
+			Meal.fetchAll(withRelated: 'transactions.card').then (meals) ->
+				console.log 'meal in database is ', meals.first().toJSON()
+				done(err)
