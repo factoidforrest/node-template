@@ -9,7 +9,7 @@ exports.up = (knex, Promise) ->
 		t.float('amount')
 		t.string('type')
 		t.json('data')
-		t.string('status')
+		t.string('status').defaultTo('pending')
 		t.timestamps()
 
 exports.down = (knex, Promise) ->

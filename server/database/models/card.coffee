@@ -79,10 +79,10 @@ module.exports = (bookshelf) ->
 				if meal.get('status') != 'pending'
 					return done({code: 400, name: 'mealClosed', message: 'The meal has already been checked out'}) 
 				if meal.get('balance') < properties.amount
-					return done({code: 400, name: 'overpaid', message: 'Paid too much'}) 
+					return done({code: 400, name: 'overpaid', message: 'Payed more than the cost of the meal'}) 
 				Transaction.forge(
 					user_id: properties.user_id
-					card_number: @get('number')
+					card_number: card.get('number')
 					card_id: @get('id')
 					meal_id: meal.get('id')
 					amount: properties.amount
@@ -91,11 +91,11 @@ module.exports = (bookshelf) ->
 					).save().then (transaction) ->
 					#card.query().decrement('balance', properties.amount).then (savedCard) ->
 					TCC.redeemCard(card.get('number'), properties.amount).then((tccResponse) ->
-						console.log 'got redeemed card: ', tcc_response
+						console.log 'got redeemed card: ', tccResponse
 						card.set(balance:tccResponse.balance).save().then (savedCard) ->
 							meal.query().decrement('balance', properties.amount).then () ->
-								#update decremented meal from database..not super efficient to call again
-								Meal.forge({id:meal.get('id')}).fetch().then (savedMeal) ->
+								#update decremented meal from database..not super efficient but it works
+								Meal.forge({id:meal.get('id')}).fetch(withRelated: ['transactions.card']).then (savedMeal) ->
 									done(null, {card: savedCard, meal: savedMeal})
 						return
 					).fail (err) ->

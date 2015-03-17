@@ -5,6 +5,7 @@ crypto = Promise.promisifyAll require 'crypto'
 Mail = Promise.promisifyAll require '../../services/mail'
 ###
 crypto = require 'crypto'
+async = require 'async'
 
 
 module.exports = (bookshelf) ->
@@ -30,7 +31,16 @@ module.exports = (bookshelf) ->
 		cards: ->
 			@hasMany(Card).through(Transaction)
 		###
-		checkout: (params, next) ->
+		checkout: (next) ->
+			meal = this
+			console.log('checking out')
+			console.log(@related('transactions').toArray())
+			@related('transactions').each (transaction) ->
+				transaction.set('status', 'closed')
+			@set('status', 'closed')
+			@related('transactions').invokeThen('save').then () ->
+				meal.save().then () ->
+					next(null, meal)
 			
 
 

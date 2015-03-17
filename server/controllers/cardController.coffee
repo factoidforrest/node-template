@@ -53,6 +53,7 @@ module.exports = (app) ->
 
 		Card.redeem properties, (err, data) ->
 			if err?
+				console.log 'card redeem error ', err
 				return res.send(err.code, err)
 			res.send data
 

@@ -13,7 +13,7 @@ describe 'Meals', ->
 	before (done) -> 
 		User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
 			#this card won't sync unless we change the number to something valid
-			return user.related('cards').create({number: '123456789', balance: 2}).yield(user)#.save().then (card) ->
+			return user.related('cards').create({number: '2073183100123127', balance: 2}).yield(user)#.save().then (card) ->
 		).then (user) ->
 			console.log('created card', user.related('cards').first())
 			cardId = user.related('cards').first().get('id')
@@ -52,8 +52,9 @@ describe 'Meals', ->
 			done(err)
 
 	it 'should spend a card on the meal', (done) ->
+		this.timeout 10000
 		Card.fetchAll().then (cards) ->
-			console.log('found existing cards ', cards)
+			console.log('found existing cards ', cards)			
 			console.log('test attempting to redeem card id: ', cardId)
 			userLib.login {}, (session, token) ->
 				session
@@ -64,16 +65,20 @@ describe 'Meals', ->
 					amount: 1
 				).expect(200)
 				.end (err, res) ->
+
 					console.log('redeemed card with response', res.body)
+					console.log('meal transactions: ', res.body.meal.transactions)
+					expect(res.body.meal.balance).to.equal(res.body.meal.price - 1)
 					Card.fetchAll().then (cards) ->
 						console.log('redeemed card in db is: ', cards.first())
 						done(err)
 
 	it 'should checkout the meal', (done) ->
+		this.timeout 10000
 		session
 		.post('/meal/checkout').send(
 			pos_secret:'123abc',
-			meal_key: mealKey
+			key: mealKey
 		).expect(200).end (err, res) ->
 			console.log('checked out with response ', res.body)
 			done(err)

@@ -19,7 +19,7 @@ module.exports = (app) ->
 	  t.string('status').defaultTo('unpaid')
 	###
 	app.post '/meal/create', roles.is('POS'), (req, res) ->
-		req.body.meal.balance ?= req.body.meal.price
+		req.body.meal.price ?= req.body.meal.balance
 		Meal.forge(req.body.meal).save().then (meal) ->
 			logger.info('created meal: ', meal)
 			response = meal
@@ -37,12 +37,12 @@ module.exports = (app) ->
 
 	app.post '/meal/checkout', roles.is('POS'), (req, res) ->
 		console.log('checkout with params:' , req.body)
-		Meal.forge(key: req.body.key).fetch(withRelated: ['transactions.cards']).then (meal) ->
-			logger.info('got meal ', meal)
+		Meal.forge(key: req.body.key).fetch(withRelated: ['transactions.card']).then (meal) ->
+			logger.info('got meal ', meal.attributes)
 			console.log(meal)
 			if !meal?
 				return res.send(400, {name: 'notFound', message: 'No meal matching that key was found'})
-			meal.checkout req.body, (err, meal) ->
+			meal.checkout (err, meal) ->
 				if err?
 					return res.send(err.code, err)
 				res.send(meal)
