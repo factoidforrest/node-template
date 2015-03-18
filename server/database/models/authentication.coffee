@@ -1,4 +1,4 @@
- Promise = require("bluebird")
+Promise = require("bluebird")
 ###
 bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
 crypto = Promise.promisifyAll require 'crypto'
@@ -109,7 +109,6 @@ module.exports = (bookshelf) ->
 					}
 
 					findOrCreate(profile, next)
-					
 					
 					
 
