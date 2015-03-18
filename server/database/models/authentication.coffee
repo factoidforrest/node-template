@@ -1,4 +1,4 @@
-Promise = require("bluebird")
+ Promise = require("bluebird")
 ###
 bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
 crypto = Promise.promisifyAll require 'crypto'
@@ -95,7 +95,7 @@ module.exports = (bookshelf) ->
 					scope: 'email'
 				},  (data) ->
 					console.log('checked facebook user data with response', data)
-					if !data || data.error
+					if !data || data.error?
 						errorMessage = !data ? 'Error getting facebook api data' : data.error
 						logger.error(errorMessage)
 						return next(errorMessage)
@@ -109,6 +109,7 @@ module.exports = (bookshelf) ->
 					}
 
 					findOrCreate(profile, next)
+					
 					
 					
 
