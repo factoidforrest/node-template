@@ -99,6 +99,7 @@ module.exports =
     console.log 'request to tcc is  ', options.body
     request options, (err, httpResponse, body) ->
       console.log 'res body is', body
+      console.log('card header is: ', body.txs[0].hdr)
       if err or body.txs.length == 0
         return handleError(err, body, deferred)
       console.log 'resolving promise'

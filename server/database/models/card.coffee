@@ -104,6 +104,10 @@ module.exports = (bookshelf) ->
 						done err
 						#need to use the SQL decrement to avoid race condition of just doing it node side
 
+		unredeem: (properties, done) ->
+			Meal.forge(key: properties.meal_key).fetch().then (meal) ->
+
+
 
 
 	},{
