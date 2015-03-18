@@ -43,14 +43,14 @@ module.exports = (app) ->
 		})
 		console.log('the query is:', query)
 		query.fetch().then( (user) ->
-			logger.info "localhandler found one user", user.toJSON()
 			return res.send(400, error: "Incorrect email.")  unless user
 			return res.send(400, error: "You have previously logged in with this email through a social network, but not using a password.  You can register this email with a password by clicking register below and the accounts will merge, or log in with a social network.")  if !user.get('password')?
 			return res.send(400, error: "Incorrect password.")  unless user.validPassword(password)
 			
 			#if the user email hasn't been confirmed.  When updating a user there might be a token and the old email is still valid so we check for the new_email property
 			return res.send(400, error: "You must confirm your email.  Please check your inbox.")  if user.get('confirmation_token') isnt null and not user.get("new_email")?
-			
+			logger.info "localhandler found one user", user.toJSON()
+
 			loginIfActive(user, res)
 
 			return
