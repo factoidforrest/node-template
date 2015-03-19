@@ -96,9 +96,10 @@ module.exports = (bookshelf) ->
 				},  (data) ->
 					console.log('checked facebook user data with response', data)
 					if !data || data.error?
-						errorMessage = !data ? 'Error getting facebook api data' : data.error
-						logger.error(errorMessage)
-						return next(errorMessage)
+						errorMessage = data.error || 'Error getting facebook api data'
+						error = {code:401, name: 'facebookErr', error: errorMessage}
+						logger.error(error)
+						return next(error)
 					profile = {
 						uid: data.id
 						provider: 'facebook'

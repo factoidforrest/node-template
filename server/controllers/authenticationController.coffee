@@ -72,7 +72,7 @@ module.exports = (app) ->
 		token = req.body.access_token
 		Authentication.findOrCreateFacebook token, (err, user) ->
 			if (err) 
-				return res.send(401, {error: err})
+				return res.send(401, err)
 				
 			loginIfActive(user, res)
 

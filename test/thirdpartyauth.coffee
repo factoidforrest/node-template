@@ -64,6 +64,7 @@ describe 'third party auth', ()->
 	it 'should communicate directly with facebook', (done)->
 		token = 'CAAEuSSIjkhoBAPHohne0NsSEktpcCAy5RVqvgYZCIzQBTtNuj3UsgIuLR0b12o6INZBCOKtUVVcT8IAUAbyd2Tj4LRKdn5Qoo0nwBlgAIhB2zrJx2T3vgaoIy4q2IOUYI6EGyc44LLqtW2xS30W6eOUzZBzkNC6tqzcH143QBrJxCCRRmIJUM2ZA05pLeoTNCx67gxD7joJUGSZCxW40aOQiJYeBhGfsZD'
 		Authentication.findOrCreateFacebook token, (err, user) ->
+			console.log('findorcreatefacebook returned error: ', err)
 			done(err)
 
 	it 'test facebook signin using mobile gift card api', (done) ->
@@ -74,8 +75,21 @@ describe 'third party auth', ()->
 		).expect(200).end (err, res) ->
 			
 			#console.log('login response:', res)
-			console.log "google signed in with response", res.body
+			console.log "facebook signed in with response", res.body
 			console.log "login err: ", err
 			expect(res.body.token.key).to.exist
 			key = res.body.token.key
+			done(err)
+
+	it 'facebook signin should handle bad facebook token', (done) ->
+		token = "abc"
+		session = request.agent(app)
+		session.post("/auth/facebook/clientside").send(
+			access_token: token
+		).expect(200).end (err, res) ->
+			
+			#console.log('login response:', res)
+			console.log "bad facebook signed in with response", res.body
+			console.log "login err: ", err
+			expect(res.body.token.key).to.not.exist
 			done(err)
