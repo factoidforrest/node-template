@@ -11,6 +11,7 @@ parser = require 'body-parser'
 global.winston = require('winston')
 expressWinston = require('express-winston')
 rate = require 'express-rate'
+Logentries = require('winston-logentries-transport').Logentries
 
 production = app.get('env') != 'development'
 ###
@@ -26,10 +27,10 @@ global.logger = new (winston.Logger)({
     #new (winston.transports.File)({ filename: 'somefile.log', level: 'error', 'timestamp':true})
   ]
 })
-###
+### 
 winston.remove(winston.transports.Console)
 winston.add(winston.transports.Console, {'timestamp':true})
-
+winston.add(Logentries, { token: process.env.LOG_ENTRIES_TOKEN }) if production
 global.logger = winston
 
 
@@ -81,6 +82,7 @@ app.use require './server/middleware/token'
 require('./server/config/roles')(app)
 
 require('./server/middleware/passport')(app)
+
 require('./server/config/routes')(app)
 
 logger.info("Node Env: " +  app.get('env'))
@@ -90,5 +92,5 @@ app.listen(process.env.PORT || 3000)
 #replify('realtime-101', app)
 
 global.app = module.exports = app
-logger.log('Server launched in mode: ' + process.env.NODE_ENV + ' and connected to database environment: ' + process.env.DATABASE_URL);
+logger.log('Server launched in mode: ' + process.env.NODE_ENV + ' and connected to database environment: ' + process.env.DATABASE_URL)
 

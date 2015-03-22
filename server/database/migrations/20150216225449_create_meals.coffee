@@ -3,6 +3,7 @@ exports.up = (knex, Promise) ->
 	knex.schema.createTable 'meals', (t) ->
 	  t.increments().primary().index()
 	  t.integer('program_id').index()
+	  t.integer('location_id')
 	  t.float('balance')
 	  t.float('price')
 	  t.json('items')
