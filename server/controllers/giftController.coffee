@@ -11,15 +11,20 @@ module.exports = (app) ->
 			res.json {incoming: incoming, outgoing: outgoing}
 
 	app.post '/gift/revoke', roles.is('logged in'), (req, res) ->
-		giftId = req.body.gift_id
-		query = {where: {from_id: req.user.get('id')}, orWhere: {to_email: req.user.get('email')}, andWhere: {id : giftId}}
-		Gift.query(query).fetchOne().then (gift) ->
-			gift.revoke (err, gift) ->
-				if err?
-					return res.send(err.code, err)
-				res.json(gift)
-
-
+		try
+			giftId = req.body.gift_id
+			query = {where: {from_id: req.user.get('id')}, orWhere: {to_email: req.user.get('email')}, andWhere: {id : giftId}}
+			Gift.query(query).fetch({withRelated: ['card']}).then (gift) ->
+				logger.info('found gift to revoke', gift.attributes)
+				if !gift?
+					res.send(404, {name:'giftNotFound', message: "Couldn't find this gift"})
+				gift.revoke (err, gift) ->
+					if err?
+						console.log('gift controller caught error while revoking card: ', ere)
+						return res.send(err.code, err)
+					res.json(gift)
+		catch e
+			console.log('wtf ', e, e.stack)
 
 
 

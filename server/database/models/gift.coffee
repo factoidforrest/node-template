@@ -48,16 +48,21 @@ module.exports = (bookshelf) ->
 					return done(user)
 
 		revoke: (done) ->
+			self = this
 			#You must fetch the gift with the related card
 			if @get('status') != 'pending'
 				return done({code: 400, name:'cantRevoke', message: 'This gift is ' + @get('status') + ' and cannot be revoked'})
-			@set('status', 'revoked')
 			card = @related('card')
-			refundedBalance = card.get('balance') + @get('balance')
-			card.set('balance', refundedBalance)
-			card.save().then (savedCard) ->
-				@save().then (savedGift) ->
-					done(null, savedGift)
+			#refundedBalance = card.get('balance') + @get('balance')
+			#card.set('balance', refundedBalance)
+			card.changeTCCBalance 'add', @get('balance'), (err) ->
+				return done(err) if err?
+				self.set('status', 'revoked')
+
+
+				card.save().then (savedCard) ->
+					self.save().then (savedGift) ->
+						done(null, savedGift)
 
 
 	},{
@@ -77,18 +82,22 @@ module.exports = (bookshelf) ->
 					return done('No card with this id was found.')
 				card.TCCSync (err) ->
 					return done(err) if err?
-					if card.balance < params.balance
-						return done('Not enough value in the card to gift.')
+					if card.get('balance') < params.balance
+						return done(code: 400, name:'insufficientFunds', message: 'Not enough value in the card to gift.')
+					###
 					newBalance = card.get('balance') - params.balance  
+
 					card.set('balance', newBalance)
-					#should also call svRed(eem) to deduct the value from the card
-					card.save().then (savedCard) -> 
-						forged.save().then (savedGift) ->
-							console.log('saved gift:', savedGift)
-							Mail.giftNotify savedGift, from, (err) ->
-								if (err)
-									logger.error('error sending gift notification email:', err)
-								done()
+					###
+					card.changeTCCBalance 'subtract', params.balance, (err) ->
+						return done(err) if err?
+						card.save().then (savedCard) -> 
+							forged.save().then (savedGift) ->
+								console.log('saved gift:', savedGift)
+								Mail.giftNotify savedGift, from, (err) ->
+									if (err)
+										logger.error('error sending gift notification email:', err)
+									done()
 
 
 

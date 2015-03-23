@@ -178,7 +178,7 @@ module.exports = (bookshelf) ->
 								done(null, savedCard)
 
 				).catch( (err) ->
-					logger.error('tcc error', err)
+					logger.log('error', 'tcc error', err)
 					done(err)
 				)
 
