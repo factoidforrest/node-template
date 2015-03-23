@@ -55,6 +55,7 @@ module.exports = (bookshelf) ->
 
 		refill: (amount, done) ->
 			card = this
+			###
 			TCC.refillCard(this.get('number'), amount).then((data) ->
 				card.set({balance: data.balance, status: data.status})
 				card.save().then () ->
@@ -67,6 +68,11 @@ module.exports = (bookshelf) ->
 					done({code: 500, name:'TCCErr', error: err, message: 'Please double check the card number'})
 				else 
 					done(err)
+			###
+			@changeTCCBalance 'add', amount, (err) ->
+				return done(err) if err?
+				card.save().then () ->
+					done(null, card)
 
 		redeem: (properties, done) ->
 			if @balance < properties.amount
@@ -91,18 +97,35 @@ module.exports = (bookshelf) ->
 					type: 'redeem'
 					data: {card_type: 'local'}
 					).save().then (transaction) ->
-
+					###
 					TCC.redeemCard(card.get('number'), properties.amount).then((tccResponse) ->
 						console.log 'got redeemed card: ', tccResponse
 						card.set(balance:tccResponse.balance).save().then (savedCard) ->
+					###
+					card.changeTCCBalance 'subtract', properties.amount, (err) ->
+						card.save().then (savedCard) ->
 							meal.query().decrement('balance', properties.amount).then () ->
 								#update decremented meal from database..not super efficient but it works
 								Meal.forge({id:meal.get('id')}).fetch(withRelated: ['transactions.card']).then (savedMeal) ->
 									done(null, {card: savedCard, meal: savedMeal})
-						return
-					).fail (err) ->
-						done err
-						#need to use the SQL decrement to avoid race condition of just doing it node side
+
+		changeTCCBalance: (action, amount, done) ->
+			self = this
+			if action == 'add'
+				request = TCC.refillCard
+			else if action == 'subtract'
+				request = TCC.redeemCard
+			request(@get('number'), amount).then((data) ->
+				self.set({balance: data.balance, status: data.status})
+				done(null)
+			).catch (err) ->
+				logger.error('error with tcc', err, ' changing balance of card: ', self.attributes)
+				if err.name == 'connectionError'
+					done({code: 500, name:'connectionError', error:err, message: 'Trouble contacting the card server'})
+				else if err.name == 'TCCError'
+					done({code: 500, name:'TCCErr', error: err, message: 'Something went wrong.  Please double check the card number'})
+				else 
+					done(err)
 
 		unredeem: (properties, done) ->
 			Meal.forge(key: properties.meal_key).fetch().then (meal) ->

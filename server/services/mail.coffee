@@ -53,7 +53,7 @@ module.exports.giftNotify = (gift, from, next) ->
     template = jade.compile(file)
     link = app.get('assetRoot')
     html = template(
-      from: from.get('display_name')
+      from: from.get('name')
       balance: gift.get('balance')
       link: link
     )

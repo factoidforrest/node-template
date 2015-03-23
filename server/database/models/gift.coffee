@@ -49,20 +49,17 @@ module.exports = (bookshelf) ->
 
 		revoke: (done) ->
 			#You must fetch the gift with the related card
+			if @get('status') != 'pending'
+				return done({code: 400, name:'cantRevoke', message: 'This gift is ' + @get('status') + ' and cannot be revoked'})
 			@set('status', 'revoked')
 			card = @related('card')
 			refundedBalance = card.get('balance') + @get('balance')
 			card.set('balance', refundedBalance)
 			card.save().then (savedCard) ->
 				@save().then (savedGift) ->
-					done()
+					done(null, savedGift)
 
-	  	
-		#TODO make this safe
-		###
-		toJSON: ->
-			this
-		###
+
 	},{
 		#class methods
 		send: (params, from, done) ->
@@ -76,21 +73,22 @@ module.exports = (bookshelf) ->
 			})
 
 			Card.forge({id: params.card}).fetch().then (card) ->
-
 				if !card?
 					return done('No card with this id was found.')
-				if card.balance < params.balance
-					return done('Not enough value in the card to gift.')
-				newBalance = card.get('balance') - params.balance  
-				card.set('balance', newBalance)
-				#should also call svRed(eem) to deduct the value from the card
-				card.save().then (savedCard) -> 
-					forged.save().then (savedGift) ->
-						console.log('saved gift:', savedGift)
-						Mail.giftNotify savedGift, from, (err) ->
-							if (err)
-								logger.error('error sending gift notification email:', err)
-							done()
+				card.TCCSync (err) ->
+					return done(err) if err?
+					if card.balance < params.balance
+						return done('Not enough value in the card to gift.')
+					newBalance = card.get('balance') - params.balance  
+					card.set('balance', newBalance)
+					#should also call svRed(eem) to deduct the value from the card
+					card.save().then (savedCard) -> 
+						forged.save().then (savedGift) ->
+							console.log('saved gift:', savedGift)
+							Mail.giftNotify savedGift, from, (err) ->
+								if (err)
+									logger.error('error sending gift notification email:', err)
+								done()
 
 
 

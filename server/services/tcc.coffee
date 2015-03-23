@@ -98,10 +98,11 @@ module.exports =
       url: url
     console.log 'request to tcc is  ', options.body
     request options, (err, httpResponse, body) ->
-      console.log 'res body is', body
-      console.log('card header is: ', body.txs[0].hdr)
+      logger.info 'tcc res body is', body
       if err or body.txs.length == 0
         return handleError(err, body, deferred)
+      console.log('card header is: ', body.txs[0].hdr)
+
       console.log 'resolving promise'
       txn = body.txs[0]
       deferred.resolve

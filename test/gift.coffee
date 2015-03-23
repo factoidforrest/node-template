@@ -51,15 +51,28 @@ describe 'gift', ->
 				console.log('outgoing attached user:', res.body.outgoing[0].from)
 				console.log('outgoing attached card:', res.body.outgoing[0].card)
 				expect(res.body.incoming.length).to.equal(0)
-				done()
+				done(err)
 
-	it 'should revoke', (done) ->
+
+
+	it 'should revoke through model', (done) ->
 		Gift.forge({to_email:'light24bulbs+gifted@gmail.com'}).fetch({withRelated: ['card']}).then (gift) ->
 			gift.revoke ->
 				console.log('revoked gift is ', gift)
 				console.log('refunded gift is ', gift.related('card'))
 				gift.get('status')
 				done()
+
+	it 'should revoke through api', (done) ->
+		login {}, (session, token) ->
+			session
+			.post("/gift/revoke").send(
+				token: token
+				card: testCard.get('id')
+			).expect(200).end (err, res) ->
+				console.log('gift revoke response:', res.body)
+				done(err)
+
 
 
 		###
