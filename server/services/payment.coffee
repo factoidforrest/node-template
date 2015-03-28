@@ -36,7 +36,7 @@ class Payment
 				return done({code:400, name:'TransactionErr', message: ('Transaction authorization failed: ' + err), transaction: result})
 
 			if !result.success
-				return done({code:400, errors: result.errors.deepErrors(), name:'TransactionErr', message: ('Transaction authorization failed: ' + result.transaction.status), transaction: result.transaction})
+				return done({code:400, errors: result.errors.deepErrors(), name:'TransactionErr', message: ('Transaction authorization failed: ' + result), transaction: result.transaction})
 			done(err, result)
 
 	settle: (transaction, done) ->

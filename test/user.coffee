@@ -6,7 +6,7 @@ userLib.createHooks()
 
 describe 'user', ->
 	it 'should get info', (done)->
-		userLib.login {}, (session, token) ->
+		userLib.login null, (session, token) ->
 			session.post("/user/info").send({
 				token: token
 			}).expect(200).end (err, res) ->
@@ -37,7 +37,7 @@ describe 'user', ->
 						done(err)
 
 	it 'should update the user', (done) ->
-		userLib.login {}, (session, token) ->
+		userLib.login null, (session, token) ->
 			session.post('/user/update').send({
 				token: token
 				user:

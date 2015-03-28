@@ -182,6 +182,21 @@ module.exports = (bookshelf) ->
 					done(err)
 				)
 
+		build: (properties, done) ->
+			card = Card.forge(user_id: properties.user_id, program_id: properties.program_id)
+			TCC.createCard(properties.amount, properties.program_id).then((data) ->
+
+				card.set('balance', data.balance)
+				card.set('status', data.status)
+				card.set('number', data.card_number)
+
+				card.save().then (savedCard) ->
+					done(null, savedCard)
+			).catch (err) ->
+				logger.log('error', 'tcc error when building new card', err)
+				done(err)
+
+
 		import: (properties, done) ->
 
 			if !properties.number?

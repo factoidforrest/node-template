@@ -64,6 +64,23 @@ module.exports = (bookshelf) ->
 					self.save().then (savedGift) ->
 						done(null, savedGift)
 
+		accept: (user, done) ->
+			self = this
+			self.set('status', 'sent')
+			from_card = self.related('card')
+
+			cardProperties = {
+				user_id: user.get('id')
+				program_id: from_card.get('program_id')
+				amount: self.get('balance')
+			}
+			Card.build cardProperties, (err, card) ->
+				if err?
+					return done(err)
+				self.save().then ->
+					done(null, card)
+
+
 
 	},{
 		#class methods
@@ -97,7 +114,8 @@ module.exports = (bookshelf) ->
 								Mail.giftNotify savedGift, from, (err) ->
 									if (err)
 										logger.error('error sending gift notification email:', err)
-									done()
+									done(null, savedGift)
+
 
 
 

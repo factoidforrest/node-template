@@ -7,21 +7,22 @@ userLib.createHooks()
 login = userLib.login
 
 testCard = null
+testGift = null
 previousCardBalance = null
 describe 'gift', ->
 	this.timeout(10000)
 
 	before (done) -> 
-		User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
-
-			return user.related('cards').create({number:'2073183100123127', balance: 2}).yield(user)#.save().then (card) ->
-		).then (user) ->
-			testCard = user.related('cards').models[0]
-			Card.syncGroup [testCard], (err, cards) ->
-				card = cards[0]
-				console.log('synced card', card.attributes)
-				previousCardBalance = card.get('balance')
-				done()
+		userLib.createUser {email: 'light24bulbs+gifted@gmail.com'}, ->
+			User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
+				return user.related('cards').create({number:'2073183100123127', balance: 2}).yield(user)#.save().then (card) ->
+			).then (user) ->
+				testCard = user.related('cards').models[0]
+				Card.syncGroup [testCard], (err, cards) ->
+					card = cards[0]
+					console.log('synced card', card.attributes)
+					previousCardBalance = card.get('balance')
+					done()
 
 
 
@@ -33,9 +34,10 @@ describe 'gift', ->
 				email: 'light24bulbs+gifted@gmail.com'
 				card: testCard.get('id')
 				balance: 1
-			}, from, (err) ->
+			}, from, (err, gift) ->
 				console.log('sent gift with error: ', err)
 				return done(err) if err?
+				testGift = gift
 				Gift.forge({to_email:'light24bulbs+gifted@gmail.com'}).fetch({withRelated: ['from', 'card']}).then (gift) ->
 					console.log('the saved gift is ', gift)
 					expect(gift.related('from').get('email')).to.equal('light24bulbs@gmail.com')
@@ -74,7 +76,7 @@ describe 'gift', ->
 			session
 			.post("/gift/revoke").send(
 				token: token
-				card: testCard.get('id')
+				gift_id: testGift.get('id')
 			).expect(200).end (err, res) ->
 				console.log('gift revoke response:', res.body)
 				return done(err) if err?
@@ -85,6 +87,34 @@ describe 'gift', ->
 					expect(gift.get('status')).to.equal('revoked')
 					expect(card.get('balance')).to.equal(previousCardBalance)
 					done(err)
+
+	it 'should send another gift', (done) ->
+		userLib.getUser().then (from) ->
+			Gift.send {
+				email: 'light24bulbs+gifted@gmail.com'
+				card: testCard.get('id')
+				balance: 1
+			}, from, (err) ->
+				console.log('sent gift with error: ', err)
+				return done(err) if err?
+				Gift.forge({to_email:'light24bulbs+gifted@gmail.com'}).fetch({withRelated: ['from', 'card']}).then (gift) ->
+					console.log('the saved gift is ', gift)
+					testGift = gift
+					expect(gift.related('from').get('email')).to.equal('light24bulbs@gmail.com')
+					expect(gift.related('card').get('balance')).to.equal(previousCardBalance - 1)
+					done(err)
+
+	it 'should accept a gift', (done) ->
+		userLib.login {email:'light24bulbs+gifted@gmail.com', password: 'secretpassword'}, (session, token) ->
+			session
+			.post("/gift/accept").send(
+				token: token
+				gift_id: testGift.get('id')
+			).expect(200).end (err, res) ->
+				console.log('accept response:', res.body)
+				done(err)
+
+
 
 
 
