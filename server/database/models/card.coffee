@@ -146,41 +146,27 @@ module.exports = (bookshelf) ->
 		generate: (properties, done) ->
 			if !properties.balance? or !properties.program? or !properties.nonce?
 				return done({code: 400, name:'argumentsInvalid', message: 'You must specify a restaurant, amount, and payment method'})
+			Card.build properties, (err, card) ->
 
-			Payment.authorize properties.balance, properties.nonce, (authErr, authorization) ->
+				Payment.authorize {amount: properties.balance, nonce: properties.nonce, settle: true},  (paymentErr, authorization) ->
 
-				if authErr?
-					return done(authErr)
-				console.log('authorized payment ', authorization)
-				card = Card.forge(user_id: properties.user_id, program_id: properties.program)
-				TCC.createCard(authorization.transaction.amount, properties.program).then((data) ->
-					Payment.settle authorization.transaction, (settleErr, settlement) ->
-						if settleErr?
-							#need to handle canceling the card at tcc!!!!!!!
-							return done(settleErr)
+					if paymentErr?
+						return done(paymentErr)
+					console.log('authorized payment ', authorization)
 
-						card.set('balance', settlement.transaction.amount)
-						card.set('status', data.status)
-						card.set('number', data.card_number)
-
-						card.save().then (savedCard) ->
-
-							Transaction.forge(
-								user_id: properties.user_id
-								card_id: savedCard.get('id')
-								card_number: savedCard.get('number')
-								amount: settlement.transaction.amount
-								type: 'purchase'
-								status: settlement.transaction.status
-								data: {authorization: authorization.transaction, settlement: settlement.transaction}
-							).save().then (savedTransaction) ->
-								logger.info('transaction saved: ', savedTransaction)
-								done(null, savedCard)
-
-				).catch( (err) ->
-					logger.log('error', 'tcc error', err)
-					done(err)
-				)
+						Transaction.forge(
+							user_id: properties.user_id
+							card_id: card.get('id')
+							card_number: card.get('number')
+							amount: settlement.transaction.amount
+							type: 'purchase'
+							status: settlement.transaction.status
+							data: {authorization: authorization.transaction, settlement: settlement.transaction}
+						).save().then (savedTransaction) ->
+							logger.info('transaction saved: ', savedTransaction)
+							#pretty print to the console
+							console.log('sacedTransaction')
+							done(null, card)
 
 		build: (properties, done) ->
 			card = Card.forge(user_id: properties.user_id, program_id: properties.program_id)

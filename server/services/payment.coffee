@@ -20,16 +20,21 @@ class Payment
 			return done(null, clientToken)
 
 
-	authorize: (amount, nonce, done) ->
-		@gateway.transaction.sale {
-			amount: amount
-			paymentMethodNonce: nonce
+	authorize: (params, done) ->
+		saleProperties = {
+			amount: params.amount
+			paymentMethodNonce: params.nonce
 			###
 			options: {
 			 submitForSettlement: true  Actually collect the payment
 			}
 			###
-		},  (err, result) ->
+		}
+
+		if params.settle
+			saleProperties.options = {submitForSettlement: true}
+
+		@gateway.transaction.sale saleProperties,  (err, result) ->
 			logger.info('payment authorization completed with err: ', err, ' and result: ', result)
 			#TODO clean up this error handling somehow
 			if err?
