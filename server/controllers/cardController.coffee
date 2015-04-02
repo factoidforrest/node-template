@@ -26,11 +26,11 @@ module.exports = (app) ->
 			nonce: req.body.nonce
 			#payment stuff
 		}
-		Card.generate properties, (err, card) ->
+		Card.purchase properties, (err, card) ->
 			if err?
 				logger.info('Card Creation Error ', err)
 				console.log(err)
-				return res.send(err.code || 400, {name: err.name, message: err.message})
+				return res.send(err.code || 400, err)# {name: err.name, message: err.message})
 			res.send card
 
 

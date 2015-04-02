@@ -2,15 +2,21 @@ merge = require('merge')
 request = require('request')
 q = require('q')
 
-header = 
+header = (clientId) ->
   hdr:
     'live':'',
     'fmt':'MGC',
     'ver':'1.0.0',
+    #partner ID
+    'pauid': process.env.TCC_PARTNER_ID || 'CAB44F07-5038-4576-A43C-FD1A108CDB4A',
+    #client ID
+    'mauid': clientId,
+    ###
     'uid':process.env.TCC_UID || 'CAB44F07-5038-4576-A43C-FD1A108CDB4A',
     'cliUid':process.env.TCC_CLI_UID || '2EC26589-258A-448E-A1DA-AA0F443C5152',
     'cliId':process.env.TCC_CLI_ID || 73,
     'locId':process.env.TCC_LOC_ID || 1,
+    ###
     'rcId':0,
     'term':'1',
     'srvId':518,
@@ -19,8 +25,8 @@ header =
     'chk':'12345'
 
 
-inquiryBody = (card) ->
-	merge header,
+inquiryBody = (card, clientId) ->
+	merge header(clientId),
 	{
     'txs': [ {
       'typ': 2
@@ -30,8 +36,8 @@ inquiryBody = (card) ->
   }
 
 #activate can also refill
-activateBody = (card, amount) ->
-	merge header,
+activateBody = (card, clientId, amount) ->
+	merge header(clientId),
  	{
     'txs': [ {
       'typ': 4
@@ -40,8 +46,8 @@ activateBody = (card, amount) ->
     } ]
   }
 
-redeemBody = (card, amount) ->
-	merge header,
+redeemBody = (card, clientId, amount) ->
+	merge header(clientId),
   {
     'txs': [ {
       'typ': 5
@@ -50,8 +56,8 @@ redeemBody = (card, amount) ->
     } ]
   }
 
-createBody = (amount, program) ->
-	merge header,
+createBody = (amount, clientId, program) ->
+	merge header(clientId),
   {
     'txs': [ {
       'typ': 3
@@ -65,7 +71,7 @@ module.exports =
   createCard: (amount, program) ->
     deferred = q.defer()
 
-    url = app.get('tccURL')
+    url = app.get('tccURL') + '/ProcessJson'
     console.log('url is' , url)
     options = 
       method: 'post'
@@ -90,7 +96,7 @@ module.exports =
 
   cardInfo: (card_number) ->
     deferred = q.defer()
-    url = app.get('tccURL')
+    url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
       body: inquiryBody(card_number)
@@ -117,7 +123,7 @@ module.exports =
   refillCard: (card_number, amount) ->
     deferred = q.defer()
     body = activateBody(card_number, amount)
-    url = app.get('tccURL')
+    url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
       body: body
@@ -140,7 +146,7 @@ module.exports =
 
   redeemCard: (card_number, amount) ->
     deferred = q.defer()
-    url = app.get('tccURL')
+    url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
       body: redeemBody(card_number, amount)
@@ -159,6 +165,25 @@ module.exports =
         previousBalance: txn.prevBal
       return
     deferred.promise
+
+  getPrograms: (done) ->
+    url = app.get('tccURL') + '/WLapiAdmInqJson'
+    programBody = {
+      'pauid': process.env.TCC_PARTNER_ID || 'CAB44F07-5038-4576-A43C-FD1A108CDB4A'
+      'ser':'654321'
+    }
+    options = 
+      method: 'post'
+      body: programBody
+      json: true
+      url: url
+    console.log('making request with options ', options)
+    request options, (err, httpResponse, body) ->
+
+      if err? || !body.pa?
+        return done({code:500, name: 'TCCErr', message: 'Failed to get program list from tcc.', error: err, response: httpResponse, body: body})
+      done(null, body.pa)
+
 
 
 

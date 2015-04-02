@@ -143,30 +143,32 @@ module.exports = (bookshelf) ->
 		
 
 		#create
-		generate: (properties, done) ->
+		purchase: (properties, done) ->
 			if !properties.balance? or !properties.program? or !properties.nonce?
 				return done({code: 400, name:'argumentsInvalid', message: 'You must specify a restaurant, amount, and payment method'})
 			Card.build properties, (err, card) ->
-
+				if err?
+					logger.error('error allocating a new card for purchase at tcc', err)
+					return done(err)
 				Payment.authorize {amount: properties.balance, nonce: properties.nonce, settle: true},  (paymentErr, authorization) ->
-
 					if paymentErr?
+						#void card if failed
 						return done(paymentErr)
 					console.log('authorized payment ', authorization)
 
-						Transaction.forge(
-							user_id: properties.user_id
-							card_id: card.get('id')
-							card_number: card.get('number')
-							amount: settlement.transaction.amount
-							type: 'purchase'
-							status: settlement.transaction.status
-							data: {authorization: authorization.transaction, settlement: settlement.transaction}
-						).save().then (savedTransaction) ->
-							logger.info('transaction saved: ', savedTransaction)
-							#pretty print to the console
-							console.log('sacedTransaction')
-							done(null, card)
+					Transaction.forge(
+						user_id: properties.user_id
+						card_id: card.get('id')
+						card_number: card.get('number')
+						amount: settlement.transaction.amount
+						type: 'purchase'
+						status: settlement.transaction.status
+						data: {authorization: authorization.transaction, settlement: settlement.transaction}
+					).save().then (savedTransaction) ->
+						logger.info('transaction saved: ', savedTransaction)
+						#pretty print to the console
+						console.log(savedTransaction)
+						done(null, card)
 
 		build: (properties, done) ->
 			card = Card.forge(user_id: properties.user_id, program_id: properties.program_id)

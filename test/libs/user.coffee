@@ -44,8 +44,9 @@ savedToken = null
 module.exports.login = (params, callback) ->
   unless savedSession
     session = request.agent(app)
-    params ?= {email: "light24bulbs@gmail.com", password: "secretpassword"}
-    session.post("/auth/local").send(params).expect(200).end (err, res) ->
+    userDetails =  {email: "light24bulbs@gmail.com", password: "secretpassword"}
+    objectAssign userDetails, params
+    session.post("/auth/local").send(userDetails).expect(200).end (err, res) ->
       
       #console.log('login response:', res)
       console.log "logged in to new session with response", res.body

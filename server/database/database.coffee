@@ -30,6 +30,7 @@ class Database
 			configuration: require('./models/configuration')(@bookshelf)
 			invitation: require('./models/invitation')(@bookshelf)
 			transaction: require('./models/transaction')(@bookshelf)
+			program: require('./models/program')(@bookshelf)
 		}
 		console.log("Database connected")
 

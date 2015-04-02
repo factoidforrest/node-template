@@ -51,7 +51,9 @@
     "supertest": "~0.15.0",
     "twitter-bootstrap-node": "~0.1.2",
     "winston": "~0.8.3",
-    "winston-logentries-transport": "0.0.1"
+    "winston-logentries-transport": "0.0.1",
+    "express-rate": "0.0.1",
+    "negotiator": "~0.5.1"
   },
   "devDependencies": {
     "coffee-script": "~1.7.1"
