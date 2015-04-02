@@ -20,3 +20,12 @@ describe 'programs', () ->
 		Program.refresh (err) ->
 			console.log('refreshed programs')
 			done()
+
+	it 'should show a list of programs through the api', (done) ->
+		request.agent(app)
+		.post("/program/list")
+		.send({})
+		.expect(200)
+		.end (err, res) ->
+			console.log('got program list: ', res.body)
+			done(err)
