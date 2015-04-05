@@ -81,9 +81,10 @@ describe 'card', ->
 				token:token})
 			.expect(400).end (err, res) ->
 				console.log('reponse when failing to refill card is: ', res.body)
-				expect(Number(testCard.get('balance'))).to.equal(previousBalance)
-				
-				done(err)
+				Card.forge(id:testCard.get('id')).fetch().then (updatedCard)->
+					expect(Number(updatedCard.get('balance'))).to.equal(previousBalance)
+					
+					done(err)
 
 	it 'should list two cards for the logged in user', (done) ->
 		login {}, (session, token) ->

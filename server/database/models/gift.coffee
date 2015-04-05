@@ -72,7 +72,7 @@ module.exports = (bookshelf) ->
 			cardProperties = {
 				user_id: user.get('id')
 				program_id: from_card.get('program_id')
-				amount: self.get('balance')
+				balance: self.get('balance')
 			}
 			Card.build cardProperties, (err, card) ->
 				if err?

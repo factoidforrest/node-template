@@ -31,10 +31,13 @@ module.exports = (app) ->
 		giftId = req.body.gift_id
 
 		#edge case: user changes email after gift is sent
-		Gift.forge(id:giftId, to_email: req.user.get('email'), status: 'pending').fetch(withRelated:['card']).then (gift) ->
+		forged = Gift.forge(id:giftId, to_email: req.user.get('email'), status: 'pending')
+		console.log('forged query: ', forged.attributes)
+		forged.fetch(withRelated:['card']).then (gift) ->
+			console.log('found gift: ', gift)
 			if !gift?
 				return res.send(404, {name: 'giftNotFound', message: "No pending gift was found"})
-			gift.accept (err, card) ->
+			gift.accept req.user, (err, card) ->
 				if err?
 					return res.send(err.code, err)
 				res.send(card)

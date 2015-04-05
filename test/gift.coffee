@@ -97,7 +97,7 @@ describe 'gift', ->
 			}, from, (err) ->
 				console.log('sent gift with error: ', err)
 				return done(err) if err?
-				Gift.forge({to_email:'light24bulbs+gifted@gmail.com'}).fetch({withRelated: ['from', 'card']}).then (gift) ->
+				Gift.forge({to_email:'light24bulbs+gifted@gmail.com', status: 'pending'}).fetch({withRelated: ['from', 'card']}).then (gift) ->
 					console.log('the saved gift is ', gift)
 					testGift = gift
 					expect(gift.related('from').get('email')).to.equal('light24bulbs@gmail.com')
@@ -105,6 +105,7 @@ describe 'gift', ->
 					done(err)
 
 	it 'should accept a gift', (done) ->
+		console.log('attempting to accept this gift: ', testGift.attributes)
 		userLib.login {email:'light24bulbs+gifted@gmail.com', password: 'secretpassword'}, (session, token) ->
 			session
 			.post("/gift/accept").send(
@@ -112,7 +113,10 @@ describe 'gift', ->
 				gift_id: testGift.get('id')
 			).expect(200).end (err, res) ->
 				console.log('accept response:', res.body)
-				done(err)
+				expect(res.body.balance).to.equal('1.00')
+				Gift.forge(id: testGift.get('id')).fetch().then (gift)->
+					console.log('gift attributes: ', gift.attributes)
+					done(err)
 
 
 

@@ -237,6 +237,9 @@ module.exports = (bookshelf) ->
 				done(err)
 
 		refill: (properties, done) ->
+			if !properties.amount? or !properties.id? or !properties.nonce?
+				return done({code: 400, name:'argumentsInvalid', message: 'You must specify a card, amount, and payment nonce'})
+			Card.build properties, (err, card) ->
 			Card.forge(id: properties.id, user_id: properties.user_id).fetch().then (card) ->
 				return done({code: 400, name:'cardNotFound', message: 'No matching card was found'}) if !card?
 				card.refill properties, done
