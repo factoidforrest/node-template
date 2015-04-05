@@ -68,13 +68,13 @@ createBody = (amount, clientId, program) ->
     } ]
   }
 
-voidBody = (card) ->
+voidBody = (card, serial) ->
   merge header(null),#card.get('client_id')),
   {
     'txs': [ {
       'typ': 6
       'crd': card.get('number')
-      'ser': card.get('serial')
+      'ser': serial
     } ]
   }
 
@@ -153,6 +153,7 @@ module.exports =
         status: txn.crdStat
         balance: txn.bal
         previousBalance: txn.prevBal
+        serial: txn.hdr.ser
       return
     deferred.promise
 
@@ -179,14 +180,15 @@ module.exports =
         status: txn.crdStat
         balance: txn.bal
         previousBalance: txn.prevBal
+        serial: txn.hdr.ser
       return
     deferred.promise
 
-  voidCard: (card, done) ->
+  void: (card, serial, done) ->
     url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
-      body: voidBody(card)
+      body: voidBody(card, serial)
       json: true
       url: url
     console.log 'request to void card:  ', options.body

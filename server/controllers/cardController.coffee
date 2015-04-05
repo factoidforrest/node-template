@@ -36,9 +36,10 @@ module.exports = (app) ->
 
 	app.post '/card/refill', roles.is('logged in'), (req, res) ->
 		properties = {
-			balance: req.body.balance
+			amount: req.body.amount
 			id: req.body.id
 			user_id: req.user.get('id')
+			nonce: req.body.nonce
 			#payment stuff
 		}
 		Card.refill properties, (err, card) ->

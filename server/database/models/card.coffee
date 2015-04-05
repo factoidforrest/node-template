@@ -62,26 +62,31 @@ module.exports = (bookshelf) ->
 					done(err)
 			)
 
-		refill: (amount, done) ->
+		refill: (properties, done) ->
 			card = this
-			###
-			TCC.refillCard(this.get('number'), amount).then((data) ->
-				card.set({balance: data.balance, status: data.status})
-				card.save().then () ->
-					done(null, card)
-			).catch (err) ->
-				console.log('sync error with tcc', err)
-				if err.name == 'connectionError'
-					done({code: 500, name:'connectionError', error:err, message: 'Trouble contacting the card server'})
-				else if err.name == 'TCCError'
-					done({code: 500, name:'TCCErr', error: err, message: 'Please double check the card number'})
-				else 
-					done(err)
-			###
-			@changeTCCBalance 'add', amount, (err) ->
+			@changeTCCBalance 'add', properties.amount, (err, serial) ->
 				return done(err) if err?
-				card.save().then () ->
-					done(null, card)
+				Payment.authorize {amount: properties.amount, nonce: properties.nonce, settle: true},  (paymentErr, authorization) ->
+					if paymentErr?
+						logger.log 'error', 'error processing payment on refill of card: ', card.attributes, 'with error: ', paymentErr
+						console.log('payment error, about to void tcc transaction')
+						return TCC.void card, serial, (err) ->
+							#not efficient to call tcc again but it happens rarely
+							return card.TCCSync (err, syncedCard) ->
+								card.save().then (savedCard) ->
+									return done(paymentErr)
+					card.save().then () ->
+						Transaction.forge(
+							user_id: card.get('user_id')
+							card_id: card.get('id')
+							card_number: card.get('number')
+							amount: authorization.transaction.amount
+							type: 'refill'
+							status: authorization.transaction.status
+							data: {authorization: authorization.transaction}#, settlement: settlement.transaction}
+						).save().then (savedTransaction) ->
+
+							done(null, card)
 
 		redeem: (properties, done) ->
 			if @balance < properties.amount
@@ -126,9 +131,9 @@ module.exports = (bookshelf) ->
 				request = TCC.redeemCard
 			request(@get('number'), @get('client_id'), amount).then((data) ->
 				self.set({balance: data.balance, status: data.status})
-				done(null)
+				done(null, data.serial)
 			).catch (err) ->
-				logger.lopg('error','error with tcc', err, ' changing balance of card: ', self.attributes)
+				logger.log('error','error with tcc', err, ' changing balance of card: ', self.attributes)
 				if err.name == 'connectionError'
 					done({code: 500, name:'connectionError', error:err, message: 'Trouble contacting the card server'})
 				else if err.name == 'TCCError'
@@ -142,7 +147,7 @@ module.exports = (bookshelf) ->
 
 		void: (done) ->
 			self = this
-			TCC.voidCard self, (err) ->
+			TCC.void self, self.get('serial'), (err) ->
 				logger.log 'voided card: ', self.attributes, 'with tcc error: ', err
 				#we ignore the tcc error here pretty much because even if the card isn't void at tcc
 				#it needs to be void in our system anyway, which is probably good enough since we are
@@ -177,7 +182,7 @@ module.exports = (bookshelf) ->
 				Payment.authorize {amount: properties.balance, nonce: properties.nonce, settle: true},  (paymentErr, authorization) ->
 					if paymentErr?
 						console.log('payment error, about to void card')
-						card.void (err) ->
+						return card.void (err) ->
 							logger.error err if err?
 							return done(paymentErr)
 					console.log('authorized payment ', authorization)
@@ -234,7 +239,7 @@ module.exports = (bookshelf) ->
 		refill: (properties, done) ->
 			Card.forge(id: properties.id, user_id: properties.user_id).fetch().then (card) ->
 				return done({code: 400, name:'cardNotFound', message: 'No matching card was found'}) if !card?
-				card.refill properties.balance, done
+				card.refill properties, done
 
 		redeem: (properties, done) ->
 			logger.info 'card redeeming by properties: ', properties

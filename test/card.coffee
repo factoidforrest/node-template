@@ -60,11 +60,28 @@ describe 'card', ->
 			.post('/card/refill').
 			send({
 				id: testCard.get('id')
-				balance: 10
+				amount: 10
+				nonce: braintree.Test.Nonces.Transactable
 				token:token})
 			.expect(200).end (err, res) ->
 				console.log('reponse when refilling card is: ', res.body)
 				expect(Number(res.body.balance)).to.equal(previousBalance + 10)
+				
+				done(err)
+
+	it 'should fail to refill a card', (done) ->
+		previousBalance = testCard.get('balance')
+		login {}, (session, token) ->
+			session
+			.post('/card/refill').
+			send({
+				id: testCard.get('id')
+				amount: 2077.98
+				nonce: braintree.Test.Nonces.Transactable
+				token:token})
+			.expect(400).end (err, res) ->
+				console.log('reponse when failing to refill card is: ', res.body)
+				expect(Number(testCard.get('balance'))).to.equal(previousBalance)
 				
 				done(err)
 
@@ -155,4 +172,15 @@ describe 'card', ->
 						console.log('card after syncing: ', card)
 						done(err)
 
-
+	it 'should fail to purchase a card with a failing payment', (done) ->
+		login {}, (session, token) ->
+			session
+			.post('/card/create').
+			send({
+				balance: 2077.98
+				nonce: braintree.Test.Nonces.Transactable
+				token:token
+				program_id: program.get('id')})
+			.expect(400).end (err, res) ->
+				console.log('failing card purchase response: ', res.body)
+				done(err)
