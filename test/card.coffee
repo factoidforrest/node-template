@@ -9,6 +9,7 @@ login = userLib.login
 
 testCard = null
 program = null
+newCardId = null
 describe 'card', ->
 	this.timeout 10000 
 	
@@ -40,7 +41,9 @@ describe 'card', ->
 				token:token
 				program_id: program.get('id')})
 			.expect(200).end (err, res) ->
+				newCardId = res.body.id
 				console.log('got response creating card ', res.body)
+				expect(res.body.balance).to.equal('10.00')
 
 				if err?
 					return done(err)
@@ -141,9 +144,15 @@ describe 'card', ->
 				done(err)
 		
 	it 'should void a card', (done) ->
-		Card.forge(number:'2073183100123127').fetch().then (card) ->
-			card.void (err) ->
-				expect(card.get('status')).to.equal('void')
-				done(err)
+		Card.forge(id: newCardId).fetch().then (card) ->
+			card.TCCSync (err, card) ->
+				console.log('fetched card to void: ', card.attributes)
+				card.void (err) ->
+					return done(err) if err?
+					card.TCCSync (err, card) ->
+						expect(card.get('status')).to.equal('void')
+						expect(card.get('balance')).to.equal(0)
+						console.log('card after syncing: ', card)
+						done(err)
 
 

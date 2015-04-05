@@ -133,15 +133,17 @@ module.exports =
     deferred.promise
 
   #can also activate a card
-  refillCard: (card_number, amount) ->
+  refillCard: (card_number, client_id, amount) ->
+    console.log('refilling card $', amount)
     deferred = q.defer()
-    body = activateBody(card_number, amount)
+    body = activateBody(card_number, null, amount)
     url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
       body: body
       json: true
       url: url
+    console.log 'request to tcc for refilling card is  ', options.body
     request options, (err, httpResponse, body) ->
       if err or body.txs.length == 0
         return handleError(err, body, deferred)
@@ -157,7 +159,7 @@ module.exports =
 
 
 
-  redeemCard: (card_number, amount) ->
+  redeemCard: (card_number, client_id, amount) ->
     deferred = q.defer()
     url = app.get('tccURL') + '/ProcessJson'
     options = 
@@ -184,12 +186,14 @@ module.exports =
     url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
-      body: redeemBody(card_number, null, amount)
+      body: voidBody(card)
       json: true
       url: url
     console.log 'request to void card:  ', options.body
     request options, (err, httpResponse, body) ->
-      if err? 
+      logger.info('TCC response voiding card: ', body)
+      console.log(body)
+      if err? || body.hdr.rslt != 1
         return done({code:500, name: 'TCCErr', message: 'Failed to void card.', error: err, response: httpResponse, body: body})
       done()
 

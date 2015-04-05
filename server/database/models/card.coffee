@@ -15,7 +15,6 @@ module.exports = (bookshelf) ->
 		hasTimestamps: true
 		virtuals: 
 			description: () ->
-				console.log('attempting to attach program: ', @related('program').attributes, ' for card program id ', @get('program_id'))
 				if @related('program')?	
 					return @related('program').get('description')
 				else
@@ -51,7 +50,7 @@ module.exports = (bookshelf) ->
 				newBalance = Number(data.balance)
 				console.log('read card data from tcc: ', data)
 				card.set('balance', newBalance)
-				card.set('status', data.status)
+				#card.set('status', data.status) Ignore the TCC status, it doesn't void properly
 				done(null, card)
 			).catch( (err) ->
 				console.log('sync error with tcc', err)
@@ -143,7 +142,7 @@ module.exports = (bookshelf) ->
 
 		void: (done) ->
 			self = this
-			TCC.void self, (err) ->
+			TCC.voidCard self, (err) ->
 				logger.log 'voided card: ', self.attributes, 'with tcc error: ', err
 				#we ignore the tcc error here pretty much because even if the card isn't void at tcc
 				#it needs to be void in our system anyway, which is probably good enough since we are
@@ -151,6 +150,7 @@ module.exports = (bookshelf) ->
 				self.set('status', 'void')
 				self.set('balance', 0)
 				self.save().then (savedCard) ->
+					console.log('card attributes after being voided ', savedCard.attributes)
 					done(err)
 
 
@@ -198,7 +198,7 @@ module.exports = (bookshelf) ->
 
 		build: (properties, done) ->
 			card = Card.forge(user_id: properties.user_id, program_id: properties.program_id)
-			TCC.createCard(properties.amount, properties.program_id).then((data) ->
+			TCC.createCard(properties.balance, properties.program_id).then((data) ->
 
 				card.set('balance', data.balance)
 				card.set('status', data.status)
