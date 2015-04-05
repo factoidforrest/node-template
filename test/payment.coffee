@@ -17,6 +17,7 @@ describe 'payment', () ->
 			console.log('client token response: ', res.body)
 			done(err)
 
+	#PAYMENT ARGUMENTS HAVE CHANGED, TEST BROKEN
 	it 'should transact', (done) ->
 		Payment.authorize 10, braintree.Test.Nonces.Transactable, (err, result) ->
 			console.log('Authorization responded with err, ', err, ' and result: ', result)

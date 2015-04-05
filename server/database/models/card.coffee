@@ -49,9 +49,9 @@ module.exports = (bookshelf) ->
 			TCC.cardInfo(@get('number'), @get('client_id')).catch( (err) ->
 				console.log('sync error with tcc', err)
 				if err.name == 'connectionError'
-					done({name:'connectionError', error:err, message: 'Trouble contacting the card server'})
+					done({code: 500, name:'connectionError', error:err, message: 'Trouble contacting the card server'})
 				else if err.name == 'TCCError'
-					done({name:'TCCErr', error: err, message: 'Please double check the card number'})
+					done({code: 500, name:'TCCErr', error: err, message: 'Please double check the card number'})
 				else 
 					done(err)
 			).then( (data) ->

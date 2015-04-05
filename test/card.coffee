@@ -7,6 +7,7 @@ braintree = require 'braintree'
 userLib.createHooks()
 login = userLib.login
 
+previousBalance = null
 testCard = null
 program = null
 newCardId = null
@@ -66,11 +67,12 @@ describe 'card', ->
 			.expect(200).end (err, res) ->
 				console.log('reponse when refilling card is: ', res.body)
 				expect(Number(res.body.balance)).to.equal(previousBalance + 10)
-				
+				previousBalance = Number(res.body.balance)
+
 				done(err)
 
 	it 'should fail to refill a card', (done) ->
-		previousBalance = testCard.get('balance')
+
 		login {}, (session, token) ->
 			session
 			.post('/card/refill').

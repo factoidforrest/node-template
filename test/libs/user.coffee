@@ -42,7 +42,7 @@ module.exports.getUser = () ->
 savedSession = null
 savedToken = null
 module.exports.login = (params, callback) ->
-  if !savedSession or params.email?
+  if !savedSession or params? and params.email?
     session = request.agent(app)
     userDetails =  {email: "light24bulbs@gmail.com", password: "secretpassword"}
     objectAssign userDetails, params

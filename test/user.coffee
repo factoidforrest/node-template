@@ -40,14 +40,15 @@ describe 'user', ->
 		userLib.login null, (session, token) ->
 			session.post('/user/update').send({
 				token: token
-				user:
+				user: {
 					password: 'updatedPassword'
 					password_confirmation: 'updatedPassword'
 					email: 'light24bulbs+newemail@gmail.com'
 					first_name: 'newFirstName'
 					last_name: 'newLastName'
 					display_name: 'newDisplay Name'
-				})
+				}
+			})
 			.expect(200)
 			.end (err, res) ->
 				console.log('response updating user:', res.body)
