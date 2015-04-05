@@ -25,7 +25,27 @@ describe 'gift', ->
 					done()
 
 
+	it 'should send a gift', (done) ->
+		userLib.login {}, (session, token) ->
+			session
+			.post("/gift/send").send(
+				token: token
+				card_id: testCard.get('id')
+				email: 'light24bulbs+gifted@gmail.com'
+				amount: 1
+			).expect(200).end (err, res) ->
+				console.log('response sending gift ', res.body)
+				return done(err) if err?
+				expect(res.body.balance).to.equal(1)
+				Gift.forge(id: res.body.id).fetch({withRelated: ['card', 'from']}).then (gift) ->
+					testGift = gift
+					console.log('the saved gift is ', gift)
+					expect(gift.related('from').get('email')).to.equal('light24bulbs@gmail.com')
+					expect(gift.related('card').get('balance')).to.equal(previousCardBalance - 1)
+					#previousCardBalance = gift.related('card').get('balance')
+					done()
 
+	###
 	it 'should send a gift', (done) ->
 		this.timeout 15000
 		userLib.getUser().then (from) ->
@@ -43,6 +63,7 @@ describe 'gift', ->
 					expect(gift.related('from').get('email')).to.equal('light24bulbs@gmail.com')
 					expect(gift.related('card').get('balance')).to.equal(previousCardBalance - 1)
 					done(err)
+	###
 
 	it 'should list the gift', (done) ->
 		login {}, (session, token) ->
@@ -89,20 +110,24 @@ describe 'gift', ->
 					done(err)
 
 	it 'should send another gift', (done) ->
-		userLib.getUser().then (from) ->
-			Gift.send {
+		userLib.login {}, (session, token) ->
+			session
+			.post("/gift/send").send(
+				token: token
+				card_id: testCard.get('id')
 				email: 'light24bulbs+gifted@gmail.com'
-				card: testCard.get('id')
-				balance: 1
-			}, from, (err) ->
-				console.log('sent gift with error: ', err)
+				amount: 1
+			).expect(200).end (err, res) ->
+				console.log('response sending gift ', res.body)
 				return done(err) if err?
+				expect(res.body.balance).to.equal(1)
 				Gift.forge({to_email:'light24bulbs+gifted@gmail.com', status: 'pending'}).fetch({withRelated: ['from', 'card']}).then (gift) ->
 					console.log('the saved gift is ', gift)
 					testGift = gift
 					expect(gift.related('from').get('email')).to.equal('light24bulbs@gmail.com')
 					expect(gift.related('card').get('balance')).to.equal(previousCardBalance - 1)
 					done(err)
+
 
 	it 'should accept a gift', (done) ->
 		console.log('attempting to accept this gift: ', testGift.attributes)

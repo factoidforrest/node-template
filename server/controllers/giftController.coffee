@@ -1,6 +1,19 @@
 module.exports = (app) ->
 	app.post '/gift/send', roles.is('logged in'), (req, res) ->
-		#Gift.send(req.body, req.user, )
+		params = {
+			from_id: req.user.get('id')
+			balance: req.body.amount
+			card_id: req.body.card_id
+			to_email: req.body.email
+		}
+		console.log('gift sending params ', params)
+		if params.to_email == req.user.get('email')
+			return res.send(400, {err:'giftedSelf', message:'You cannot send a gift to yourself.'})
+		
+		Gift.send params, req.user,  (err, gift) ->
+			return res.send(err.code, err) if err?
+			res.json(gift)
+
 
 	app.post '/gift/list', roles.is('logged in'), (req, res)->
 		#fetch both inbound and outbound gifts

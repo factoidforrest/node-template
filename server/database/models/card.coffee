@@ -46,13 +46,7 @@ module.exports = (bookshelf) ->
 		TCCSync: (done) ->
 			console.log('syncing card')
 			card = this
-			TCC.cardInfo(@get('number'), @get('client_id')).then( (data) ->
-				newBalance = Number(data.balance)
-				console.log('read card data from tcc: ', data)
-				card.set('balance', newBalance)
-				#card.set('status', data.status) Ignore the TCC status, it doesn't void properly
-				done(null, card)
-			).catch( (err) ->
+			TCC.cardInfo(@get('number'), @get('client_id')).catch( (err) ->
 				console.log('sync error with tcc', err)
 				if err.name == 'connectionError'
 					done({name:'connectionError', error:err, message: 'Trouble contacting the card server'})
@@ -60,6 +54,12 @@ module.exports = (bookshelf) ->
 					done({name:'TCCErr', error: err, message: 'Please double check the card number'})
 				else 
 					done(err)
+			).then( (data) ->
+				newBalance = Number(data.balance)
+				console.log('read card data from tcc: ', data)
+				card.set('balance', newBalance)
+				#card.set('status', data.status) Ignore the TCC status, it doesn't void properly
+				done(null, card)
 			)
 
 		refill: (properties, done) ->

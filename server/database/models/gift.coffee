@@ -85,37 +85,31 @@ module.exports = (bookshelf) ->
 	},{
 		#class methods
 		send: (params, from, done) ->
-			if params.email == from.get('email')
-				return done('You cannot send a gift to yourself.')
-			forged = @forge({
-				from_id: from.get('id')
-				balance: params.balance
-				card_id: params.card
-				to_email: params.email
-			})
+			try 
 
-			Card.forge({id: params.card}).fetch().then (card) ->
-				if !card?
-					return done('No card with this id was found.')
-				card.TCCSync (err) ->
-					return done(err) if err?
-					if card.get('balance') < params.balance
-						return done(code: 400, name:'insufficientFunds', message: 'Not enough value in the card to gift.')
-					###
-					newBalance = card.get('balance') - params.balance  
 
-					card.set('balance', newBalance)
-					###
-					card.changeTCCBalance 'subtract', params.balance, (err) ->
+				forgedGift = @forge(params)
+
+				Card.forge({id: params.card_id, user_id: params.from_id}).fetch().then (card) ->
+					if !card?
+						return done({err:'cardNotFound', code: 404, message: 'No card with this ID belonging to you was found.'})
+					card.TCCSync (err) ->
 						return done(err) if err?
-						card.save().then (savedCard) -> 
-							forged.save().then (savedGift) ->
-								console.log('saved gift:', savedGift)
-								Mail.giftNotify savedGift, from, (err) ->
-									if (err)
-										logger.error('error sending gift notification email:', err)
-									done(null, savedGift)
-
+						if card.get('balance') < params.balance
+							return done(code: 400, name:'insufficientFunds', message: 'Not enough value in the card to gift.')
+						card.changeTCCBalance 'subtract', params.balance, (err) ->
+							return done(err) if err?
+							card.save().then (savedCard) -> 
+								forgedGift.save().then (savedGift) ->
+									console.log('saved gift:', savedGift)
+									Mail.giftNotify savedGift, from, (err) ->
+										if (err)
+											logger.error('error sending gift notification email:', err)
+										done(null, savedGift)
+			catch e
+				console.log('CAUGHT EXCEPTION ',e)
+				console.log(e.stack)
+			
 
 
 
