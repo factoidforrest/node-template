@@ -10,7 +10,8 @@ header = (clientId) ->
     #partner ID
     'pauid': process.env.TCC_PARTNER_ID || 'CAB44F07-5038-4576-A43C-FD1A108CDB4A',
     #client ID
-    'mauid': clientId,
+    'mauid': clientId || '01685DF1-3D7A-46D6-BB2C-EEFE632015CC',
+    'locId': 1, 
     ###
     'uid':process.env.TCC_UID || 'CAB44F07-5038-4576-A43C-FD1A108CDB4A',
     'cliUid':process.env.TCC_CLI_UID || '2EC26589-258A-448E-A1DA-AA0F443C5152',
@@ -67,6 +68,16 @@ createBody = (amount, clientId, program) ->
     } ]
   }
 
+voidBody = (card) ->
+  merge header(null),#card.get('client_id')),
+  {
+    'txs': [ {
+      'typ': 6
+      'crd': card.get('number')
+      'ser': card.get('serial')
+    } ]
+  }
+
 module.exports =
   createCard: (amount, program) ->
     deferred = q.defer()
@@ -75,12 +86,13 @@ module.exports =
     console.log('url is' , url)
     options = 
       method: 'post'
-      body: createBody(amount, program)
+      body: createBody(amount, null, program)
       json: true
       url: url
     console.log 'request to tcc for creating card is  ', options.body
     request options, (err, httpResponse, body) ->
       console.log 'res for creating card is ', body
+      console.log 'card header is ', body.txs[0].hdr
       if err or body.txs.length == 0
         return handleError(err, body, deferred)
       console.log 'resolving promise'
@@ -90,6 +102,7 @@ module.exports =
         status: txn.crdStat
         balance: txn.bal
         previousBalance: txn.prevBal
+        serial: txn.hdr.ser
       return
     deferred.promise
 
@@ -149,9 +162,10 @@ module.exports =
     url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
-      body: redeemBody(card_number, amount)
+      body: redeemBody(card_number, null, amount)
       json: true
       url: url
+    console.log 'request to tcc for redeeming card is  ', options.body
     request options, (err, httpResponse, body) ->
       console.log 'res body is', body
       if err or body.txs.length == 0
@@ -165,6 +179,20 @@ module.exports =
         previousBalance: txn.prevBal
       return
     deferred.promise
+
+  voidCard: (card, done) ->
+    url = app.get('tccURL') + '/ProcessJson'
+    options = 
+      method: 'post'
+      body: redeemBody(card_number, null, amount)
+      json: true
+      url: url
+    console.log 'request to void card:  ', options.body
+    request options, (err, httpResponse, body) ->
+      if err? 
+        return done({code:500, name: 'TCCErr', message: 'Failed to void card.', error: err, response: httpResponse, body: body})
+      done()
+
 
   getPrograms: (done) ->
     url = app.get('tccURL') + '/WLapiAdmInqJson'

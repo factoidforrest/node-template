@@ -11,6 +11,7 @@ exports.up = (knex, Promise) ->
 	  t.string('status')
 	  t.string('client_id')
 	  t.integer('program_id')
+	  t.string('serial')
 	  t.timestamps()
 
 exports.down = (knex, Promise) ->

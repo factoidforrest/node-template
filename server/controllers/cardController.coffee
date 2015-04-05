@@ -21,7 +21,7 @@ module.exports = (app) ->
 		console.log('card create controller called with params ', req.body)
 		properties = {
 			balance: req.body.balance
-			program: req.body.program
+			program_id: req.body.program_id
 			user_id: req.user.get('id')
 			nonce: req.body.nonce
 			#payment stuff
@@ -60,7 +60,7 @@ module.exports = (app) ->
 
 	app.post '/card/info', roles.is('logged in'), (req, res) ->
 		cardId = req.body.id
-		Card.forge(user_id: req.user.id, id: cardId).fetch().then((card) ->
+		Card.forge(user_id: req.user.id, id: cardId).fetch(withRelated: 'program').then((card) ->
 			if card?
 				res.json(card)
 			else
@@ -69,7 +69,7 @@ module.exports = (app) ->
 
 	app.post '/card/list', roles.is('logged in'),  (req, res) ->
 		#maybe take more params and join them to the query to optionally filter
-		Card.forge(user_id: req.user.id).fetchAll().then((cards) ->
+		Card.forge(user_id: req.user.id).fetchAll(withRelated: 'program').then((cards) ->
 			console.log('retreived cards ', JSON.stringify(cards))
 			Card.syncGroup cards, (err, syncedCards) ->
 				console.log('synced with tcc and saved cards ', JSON.stringify(syncedCards))

@@ -8,23 +8,24 @@ userLib.createHooks()
 login = userLib.login
 
 testCard = null
-
+program = null
 describe 'card', ->
 	this.timeout 10000 
 	
 	before (done) -> 
-		User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
-
-			return user.related('cards').create({number:'2073183100123127', balance: 2}).yield(user)#.save().then (card) ->
-		).then (user) ->
-				card = user.related('cards').models[0]
-				Card.syncGroup [card], (err, cards) ->
-					card = cards[0]
-					console.log('associated to user', user)
-					console.log('with  card', card)
-					testCard = card
-					done()
-
+		Program.refresh ->
+			Program.fetchAll().then (programs) ->
+				program = programs.first()
+				User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
+					return user.related('cards').create({number:'2073183100123127', balance: 2, program_id: program.get('id')}).yield(user)#.save().then (card) ->
+				).then (user) ->
+						card = user.related('cards').models[0]
+						Card.syncGroup [card], (err, cards) ->
+							card = cards[0]
+							console.log('associated to user', user)
+							console.log('with  card', card)
+							testCard = card
+							done()
 
 
 
@@ -34,10 +35,10 @@ describe 'card', ->
 			session
 			.post('/card/create').
 			send({
-				program: '183'
 				balance: 10
 				nonce: braintree.Test.Nonces.Transactable
-				token:token})
+				token:token
+				program_id: program.get('id')})
 			.expect(200).end (err, res) ->
 				console.log('got response creating card ', res.body)
 
@@ -139,5 +140,10 @@ describe 'card', ->
 				console.log('synced cards: ', cards)
 				done(err)
 		
+	it 'should void a card', (done) ->
+		Card.forge(number:'2073183100123127').fetch().then (card) ->
+			card.void (err) ->
+				expect(card.get('status')).to.equal('void')
+				done(err)
 
 

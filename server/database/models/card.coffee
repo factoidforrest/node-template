@@ -13,7 +13,14 @@ module.exports = (bookshelf) ->
 	global.Card = bookshelf.Model.extend({
 		tableName: 'cards'
 		hasTimestamps: true
-
+		virtuals: 
+			description: () ->
+				console.log('attempting to attach program: ', @related('program').attributes, ' for card program id ', @get('program_id'))
+				if @related('program')?	
+					return @related('program').get('description')
+				else
+					return 'Description not available'
+			
 
 		initialize: () ->
 			###
@@ -33,11 +40,14 @@ module.exports = (bookshelf) ->
 		transactions: ->
 			return @hasMany(Transaction)
 
+		program: ->
+			return @belongsTo(Program)
+
 		#doesn't save, just updates in place
 		TCCSync: (done) ->
 			console.log('syncing card')
 			card = this
-			TCC.cardInfo(@get('number')).then( (data) ->
+			TCC.cardInfo(@get('number'), @get('client_id')).then( (data) ->
 				newBalance = Number(data.balance)
 				console.log('read card data from tcc: ', data)
 				card.set('balance', newBalance)
@@ -115,11 +125,11 @@ module.exports = (bookshelf) ->
 				request = TCC.refillCard
 			else if action == 'subtract'
 				request = TCC.redeemCard
-			request(@get('number'), amount).then((data) ->
+			request(@get('number'), @get('client_id'), amount).then((data) ->
 				self.set({balance: data.balance, status: data.status})
 				done(null)
 			).catch (err) ->
-				logger.error('error with tcc', err, ' changing balance of card: ', self.attributes)
+				logger.lopg('error','error with tcc', err, ' changing balance of card: ', self.attributes)
 				if err.name == 'connectionError'
 					done({code: 500, name:'connectionError', error:err, message: 'Trouble contacting the card server'})
 				else if err.name == 'TCCError'
@@ -129,6 +139,20 @@ module.exports = (bookshelf) ->
 
 		unredeem: (properties, done) ->
 			Meal.forge(key: properties.meal_key).fetch().then (meal) ->
+				#TODO
+
+		void: (done) ->
+			self = this
+			TCC.void self, (err) ->
+				logger.log 'voided card: ', self.attributes, 'with tcc error: ', err
+				#we ignore the tcc error here pretty much because even if the card isn't void at tcc
+				#it needs to be void in our system anyway, which is probably good enough since we are
+				#the only ones who know the card number
+				self.set('status', 'void')
+				self.set('balance', 0)
+				self.save().then (savedCard) ->
+					done(err)
+
 
 
 
@@ -144,7 +168,7 @@ module.exports = (bookshelf) ->
 
 		#create
 		purchase: (properties, done) ->
-			if !properties.balance? or !properties.program? or !properties.nonce?
+			if !properties.balance? or !properties.program_id? or !properties.nonce?
 				return done({code: 400, name:'argumentsInvalid', message: 'You must specify a restaurant, amount, and payment method'})
 			Card.build properties, (err, card) ->
 				if err?
@@ -152,19 +176,21 @@ module.exports = (bookshelf) ->
 					return done(err)
 				Payment.authorize {amount: properties.balance, nonce: properties.nonce, settle: true},  (paymentErr, authorization) ->
 					if paymentErr?
-						#void card if failed
-						return done(paymentErr)
+						console.log('payment error, about to void card')
+						card.void (err) ->
+							logger.error err if err?
+							return done(paymentErr)
 					console.log('authorized payment ', authorization)
-
 					Transaction.forge(
 						user_id: properties.user_id
 						card_id: card.get('id')
 						card_number: card.get('number')
-						amount: settlement.transaction.amount
+						amount: authorization.transaction.amount
 						type: 'purchase'
-						status: settlement.transaction.status
-						data: {authorization: authorization.transaction, settlement: settlement.transaction}
+						status: authorization.transaction.status
+						data: {authorization: authorization.transaction}#, settlement: settlement.transaction}
 					).save().then (savedTransaction) ->
+						console.log('created a transaction')
 						logger.info('transaction saved: ', savedTransaction)
 						#pretty print to the console
 						console.log(savedTransaction)
@@ -177,6 +203,7 @@ module.exports = (bookshelf) ->
 				card.set('balance', data.balance)
 				card.set('status', data.status)
 				card.set('number', data.card_number)
+				card.set('serial', data.serial)
 
 				card.save().then (savedCard) ->
 					done(null, savedCard)
