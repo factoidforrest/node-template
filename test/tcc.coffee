@@ -7,6 +7,7 @@ request = require('supertest')
 tcc = require '../server/services/tcc'
 
 cardNumber = null
+testCard = null
 
 describe 'TCC API', ->
 
@@ -17,6 +18,7 @@ describe 'TCC API', ->
 		TCC.createCard(10, '183').then((card) ->
 			console.log 'new card created:', card
 			cardNumber = card.card_number
+			testCard = card
 			done()
 			return
 		).fail (err) ->
@@ -28,7 +30,7 @@ describe 'TCC API', ->
 
 	it 'should query card data from tcc', (done) ->
 		#cardNumber = '2073183100123127'
-		TCC.cardInfo(cardNumber).then((tcc_card) ->
+		TCC.cardInfo(testCard).then((tcc_card) ->
 			console.log 'got card: ', tcc_card
 			expect(tcc_card.balance).to.equal('10.00')
 			done()

@@ -26,50 +26,50 @@ header = (clientId) ->
     'chk':'12345'
 
 
-inquiryBody = (card, clientId) ->
+inquiryBody = (number, clientId) ->
 	merge header(clientId),
 	{
     'txs': [ {
       'typ': 2
-      'crd': card
+      'crd': number
       'amt': ''
     } ]
   }
 
 #activate can also refill
-activateBody = (card, clientId, amount) ->
+activateBody = (number, clientId, amount) ->
 	merge header(clientId),
  	{
     'txs': [ {
       'typ': 4
-      'crd': card
+      'crd': number
       'amt': amount
     } ]
   }
 
-redeemBody = (card, clientId, amount) ->
+redeemBody = (number, clientId, amount) ->
 	merge header(clientId),
   {
     'txs': [ {
       'typ': 5
-      'crd': card
+      'crd': number
       'amt': amount
     } ]
   }
 
 createBody = (amount, clientId, program) ->
+  #THIS NEEDS TO HANDLE LOCATION AS WELL, FOR NOW JUST USING 1  !!!!!!
 	merge header(clientId),
   {
     'txs': [ {
       'typ': 3
       'amt': amount
-      'prog': program
-      #'crd': "2073183100123127"
+      #'prog': program
     } ]
   }
 
 voidBody = (card, serial) ->
-  merge header(null),#card.get('client_id')),
+  merge header(card.get('')),#card.get('client_id')),
   {
     'txs': [ {
       'typ': 6
@@ -107,12 +107,12 @@ module.exports =
     deferred.promise
 
 
-  cardInfo: (card_number) ->
+  cardInfo: (card) ->
     deferred = q.defer()
     url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
-      body: inquiryBody(card_number)
+      body: inquiryBody(card.get('number'), card.get('client_id'))
       json: true
       url: url
     console.log 'request to tcc is  ', options.body
