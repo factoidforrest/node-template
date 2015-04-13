@@ -42,21 +42,22 @@ module.exports.getUser = () ->
 savedSession = null
 savedToken = null
 module.exports.login = (params, callback) ->
-  if !savedSession or params? and params.email?
-    session = request.agent(app)
-    userDetails =  {email: "light24bulbs@gmail.com", password: "secretpassword"}
-    objectAssign userDetails, params
-    session.post("/auth/local").send(userDetails).expect(200).end (err, res) ->
-      
-      #console.log('login response:', res)
-      console.log "logged in to new session with response", res.body
-      console.log "login err: ", err
-      savedSession = session
-      savedToken = res.body.token.key
-      callback session, res.body.token.key
-      return
+	params ?= {}
+	if !savedSession or params? and params.email?
+		session = request.agent(app)
+		userDetails =  {email: "light24bulbs@gmail.com", password: "secretpassword"}
+		objectAssign userDetails, params
+		session.post("/auth/local").send(userDetails).expect(200).end (err, res) ->
+			
+			#console.log('login response:', res)
+			console.log "logged in to new session with response", res.body
+			console.log "login err: ", err
+			savedSession = session
+			savedToken = res.body.token.key
+			callback session, res.body.token.key
+			return
 
-  else
-    console.log "using saved session"
-    callback savedSession, savedToken
-  return
+	else
+		console.log "using saved session"
+		callback savedSession, savedToken
+	return

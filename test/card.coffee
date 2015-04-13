@@ -17,7 +17,7 @@ describe 'card', ->
 	before (done) -> 
 		Program.refresh ->
 			Program.fetchAll().then (programs) ->
-				program = programs.first()
+				program = programs.last()
 				User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
 					return user.related('cards').create({number:'2073183100123127', balance: 2, program_id: program.get('id')}).yield(user)#.save().then (card) ->
 				).then (user) ->

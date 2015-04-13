@@ -46,7 +46,7 @@ module.exports = (bookshelf) ->
 		TCCSync: (done) ->
 			console.log('syncing card')
 			card = this
-			TCC.cardInfo(@get('number'), @get('client_id')).catch( (err) ->
+			TCC.cardInfo(this).catch( (err) ->
 				console.log('sync error with tcc', err)
 				if err.name == 'connectionError'
 					done({code: 500, name:'connectionError', error:err, message: 'Trouble contacting the card server'})
@@ -56,7 +56,7 @@ module.exports = (bookshelf) ->
 					done(err)
 			).then( (data) ->
 				newBalance = Number(data.balance)
-				console.log('read card data from tcc: ', data)
+				#console.log('read card data from tcc: ', data)
 				card.set('balance', newBalance)
 				#card.set('status', data.status) Ignore the TCC status, it doesn't void properly
 				done(null, card)
@@ -202,19 +202,21 @@ module.exports = (bookshelf) ->
 						done(null, card)
 
 		build: (properties, done) ->
-			card = Card.forge(user_id: properties.user_id, program_id: properties.program_id)
-			TCC.createCard(properties.balance, properties.program_id).then((data) ->
+			Program.forge(id: properties.program_id).fetch().then (program) ->
+				return done({code:404, name: 'programNotFound', message: 'No program matching that ID was found'}) if !program?
+				card = Card.forge(user_id: properties.user_id, program_id: properties.program_id, client_id: program.get('client_id'))
+				TCC.createCard(properties.balance, properties.program_id).then((data) ->
 
-				card.set('balance', data.balance)
-				card.set('status', data.status)
-				card.set('number', data.card_number)
-				card.set('serial', data.serial)
+					card.set('balance', data.balance)
+					card.set('status', data.status)
+					card.set('number', data.card_number)
+					card.set('serial', data.serial)
 
-				card.save().then (savedCard) ->
-					done(null, savedCard)
-			).catch (err) ->
-				logger.log('error', 'tcc error when building new card', err)
-				done(err)
+					card.save().then (savedCard) ->
+						done(null, savedCard)
+				).catch (err) ->
+					logger.log('error', 'tcc error when building new card', err)
+					done(err)
 
 
 		import: (properties, done) ->

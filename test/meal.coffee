@@ -26,6 +26,7 @@ describe 'Meals', ->
 			meal: 
 				balance: 5.52, 
 				program_id: 183, 
+				location_id: 1,
 				items: {test1:'test1', test2: {nested1: 'nested1', nested2: 'nested2'}}
 		
 		).expect(200)
@@ -86,3 +87,4 @@ describe 'Meals', ->
 			Meal.fetchAll(withRelated: 'transactions.card').then (meals) ->
 				console.log 'meal in database is ', meals.first().toJSON()
 				done(err)
+

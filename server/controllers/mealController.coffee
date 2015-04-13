@@ -20,6 +20,7 @@ module.exports = (app) ->
 	###
 	app.post '/meal/create', roles.is('POS'), (req, res) ->
 		req.body.meal.price ?= req.body.meal.balance
+		#token logic happens in a before save hook on model
 		Meal.forge(req.body.meal).save().then (meal) ->
 			logger.info('created meal: ', meal)
 			response = meal
@@ -41,7 +42,7 @@ module.exports = (app) ->
 			logger.info('got meal ', meal.attributes)
 			console.log(meal)
 			if !meal?
-				return res.send(400, {name: 'notFound', message: 'No meal matching that key was found'})
+				return res.send(404, {name: 'mealNotFound', message: 'No meal matching that key was found'})
 			meal.checkout (err, meal) ->
 				if err?
 					return res.send(err.code, err)
