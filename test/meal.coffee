@@ -8,16 +8,18 @@ userLib.createHooks()
 session = request.agent(app)
 mealKey = null
 cardId = null
-
+allPrograms = null
 describe 'Meals', ->
 	before (done) -> 
-		User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
-			#this card won't sync unless we change the number to something valid
-			return user.related('cards').create({number: '2073183100123127', program_id: '183', balance: 2}).yield(user)#.save().then (card) ->
-		).then (user) ->
-			console.log('created card', user.related('cards').first())
-			cardId = user.related('cards').first().get('id')
-			done()
+		Program.fetchAll().then (programs) ->
+			allPrograms = programs
+			program = programs.first()
+			User.where(email: 'light24bulbs@gmail.com').fetch().then (user) ->
+				Card.build {program_id: program.get('id'), balance: 5, user_id: user.get('id')}, (err, card) ->
+					#if err? return done(err)
+					testCard = card
+					cardId = card.get('id')
+					done()
 
 	it 'should create a meal and return a token', (done) ->
 		session
@@ -25,7 +27,7 @@ describe 'Meals', ->
 			pos_secret:'123abc'
 			meal: 
 				balance: 5.52, 
-				program_id: 183, 
+				programs: [allPrograms.first().get('client_id'), allPrograms.last().get('client_id')]
 				location_id: 1,
 				items: {test1:'test1', test2: {nested1: 'nested1', nested2: 'nested2'}}
 		

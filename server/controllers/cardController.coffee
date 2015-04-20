@@ -60,10 +60,10 @@ module.exports = (app) ->
 			res.send card
 
 
-	app.post '/card/redeem', roles.is('logged in'), (req, res) ->
+	app.post '/card/redeem', roles.is('user or POS'), (req, res) ->
 		console.log('card redeem with props', req.body)
 		properties = req.body
-		properties.user_id = req.user.get('id')
+		if req.user? then properties.user_id = req.user.get('id')
 
 		Card.redeem properties, (err, data) ->
 			if err?
@@ -80,6 +80,13 @@ module.exports = (app) ->
 			else
 				res.send(404, error: "Card not found")
 		)
+
+	app.post '/card/posinfo', roles.is('POS'), (req,res) ->
+		number = req.body.number
+		Card.forge(number:number).fetch(withRelated: 'program').then (card) ->
+			return res.send(404, {name:'cardNotFound', message:'No card with that number was found in the system.'}) if !card?
+			res.json(card)
+
 
 	app.post '/card/list', roles.is('logged in'),  (req, res) ->
 		#maybe take more params and join them to the query to optionally filter

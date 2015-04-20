@@ -20,13 +20,16 @@ module.exports = (app) ->
 	###
 	app.post '/meal/create', roles.is('POS'), (req, res) ->
 		req.body.meal.price ?= req.body.meal.balance
+		clientIds = req.body.meal.programs 
+		delete req.body.meal.programs
 		#token logic happens in a before save hook on model
 		Meal.forge(req.body.meal).save().then (meal) ->
-			logger.info('created meal: ', meal)
-			response = meal
-			res.send(response)
-		
+			meal.attachPrograms clientIds, (err, meal) ->
+				logger.info('created meal: ', meal.attributes)
+				res.send(meal)
+			
 	app.post '/meal/update', roles.is('POS'), (req, res) ->
+		delete req.body.meal.programs
 		properties = req.body.meal
 		properties.balance ?= properties.price
 		Meal.forge(key: properties.key).fetch().then (meal) ->

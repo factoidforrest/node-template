@@ -113,10 +113,12 @@ module.exports = (bookshelf) ->
 			if @balance < properties.amount
 				return done({code: 400, name: 'balanceExceeded', message: 'Your card does not have enough value remaining to make this transaction'})
 			card = this
-			Meal.forge(key: properties.meal_key).fetch().then (meal) ->
+			Meal.forge(key: properties.meal_key).fetch(withRelated:'programs').then (meal) ->
 				logger.info 'redeeming card on meal: ', meal.attributes
 				return done({code: 400, name: 'mealNotFound', message: 'No meal matching that key was found'}) if !meal?
-				if meal.get('program_id') != card.get('program_id')
+
+				program = card.related('program')
+				if meal.related('programs').where({id:program.get('id')}).length != 1
 					return done({code:400, name: 'programErr', message: 'Card cannot be used at this restaurant'})
 				if meal.get('status') != 'pending'
 					return done({code: 400, name: 'mealClosed', message: 'The meal has already been checked out'}) 
@@ -293,7 +295,11 @@ module.exports = (bookshelf) ->
 
 		redeem: (properties, done) ->
 			logger.info 'card redeeming by properties: ', properties
-			Card.forge(id: properties.id, user_id: properties.user_id).fetch().then (card) ->
+			searchParameters = {id: properties.id}
+			#optionally take user_id since POS will not know the user ID but the mobile clients will.  
+			if properties.user_id? then searchParameters.user_id = properties.user_id
+			logger.info 'searching for card to redeem with attributes', searchParameters
+			Card.forge(id: properties.id, user_id: properties.user_id).fetch(withRelated:'program').then (card) ->
 				logger.info 'found card to redeem', card
 				return done({code: 400, name:'cardNotFound', message: 'No matching card was found'}) if !card?
 				card.redeem properties, done

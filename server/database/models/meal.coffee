@@ -26,6 +26,20 @@ module.exports = (bookshelf) ->
 			@hasMany(Transaction)
 
 
+		programs: ->
+			@belongsToMany(Program)
+
+		attachPrograms: (clientIds, done) ->
+			meal = this
+			Program.query('whereIn', 'client_id', clientIds).fetchAll().then (programs) ->
+				db.knex('meals_programs').insert(programs.map((program) ->
+					return {program_id: program.get('id'), meal_id: meal.get('id')}
+				)).then () ->
+					meal.load('programs').then (mealWithPrograms) ->
+						done(null, mealWithPrograms)
+
+
+
 		###
 		#not sure through is what we want to use here
 		cards: ->

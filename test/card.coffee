@@ -17,14 +17,13 @@ describe 'card', ->
 	this.timeout 10000 
 	
 	before (done) -> 
-		Program.refresh ->
-			Program.fetchAll().then (programs) ->
-				program = programs.first()
-				User.where(email: 'light24bulbs@gmail.com').fetch().then (user) ->
-					Card.build {program_id: program.get('id'), balance: 2, user_id: user.get('id')}, (err, card) ->
-						#if err? return done(err)
-						testCard = card
-						done()
+		Program.fetchAll().then (programs) ->
+			program = programs.first()
+			User.where(email: 'light24bulbs@gmail.com').fetch().then (user) ->
+				Card.build {program_id: program.get('id'), balance: 2, user_id: user.get('id')}, (err, card) ->
+					#if err? return done(err)
+					testCard = card
+					done()
 
 
 
@@ -50,6 +49,32 @@ describe 'card', ->
 					expect(transactions.length).to.equal(1)
 					console.log('transaction created: ', transactions.first())
 					done(err)
+
+	it 'should retrieve card info', (done) ->
+		login {}, (session, token) ->
+			session
+			.post('/card/info').
+			send({
+				id: testCard.get('id')
+				token: token
+			})
+			.expect(200).end (err, res) ->
+				console.log('retrieved card info: ', res.body)
+				expect(res.body.id).to.equal(testCard.get('id'))
+				done(err)
+
+	it 'should retrieve info by POS', (done) ->
+		login {}, (session, token) ->
+			session
+			.post('/card/posinfo').
+			send({
+				number: testCard.get('number')
+				pos_secret: '123abc'
+			})
+			.expect(200).end (err, res) ->	
+				console.log('retrieved card info: ', res.body)
+				expect(res.body.id).to.equal(testCard.get('id'))
+				done(err)	
 
 	it 'should refill a card', (done) ->
 		previousBalance = Number(testCard.get('balance'))
@@ -211,3 +236,4 @@ describe 'card', ->
 			.expect(400).end (err, res) ->
 				console.log('failing card purchase response: ', res.body)
 				done(err)
+
