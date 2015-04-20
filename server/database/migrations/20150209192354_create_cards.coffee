@@ -7,7 +7,7 @@ exports.up = (knex, Promise) ->
 	  t.float('remaining_value')
 	  t.float('balance')
 	  t.string('gift_status')
-	  t.integer('user_id').notNull().index()
+	  t.integer('user_id').index()
 	  t.string('status')
 	  t.string('client_id')
 	  t.integer('program_id')

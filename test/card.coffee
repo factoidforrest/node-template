@@ -11,23 +11,20 @@ previousBalance = null
 testCard = null
 program = null
 newCardId = null
+POSCardNumber = null
+
 describe 'card', ->
 	this.timeout 10000 
 	
 	before (done) -> 
 		Program.refresh ->
 			Program.fetchAll().then (programs) ->
-				program = programs.last()
-				User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
-					return user.related('cards').create({number:'2073183100123127', balance: 2, program_id: program.get('id')}).yield(user)#.save().then (card) ->
-				).then (user) ->
-						card = user.related('cards').models[0]
-						Card.syncGroup [card], (err, cards) ->
-							card = cards[0]
-							console.log('associated to user', user)
-							console.log('with  card', card)
-							testCard = card
-							done()
+				program = programs.first()
+				User.where(email: 'light24bulbs@gmail.com').fetch().then (user) ->
+					Card.build {program_id: program.get('id'), balance: 2, user_id: user.get('id')}, (err, card) ->
+						#if err? return done(err)
+						testCard = card
+						done()
 
 
 
@@ -55,7 +52,7 @@ describe 'card', ->
 					done(err)
 
 	it 'should refill a card', (done) ->
-		previousBalance = testCard.get('balance')
+		previousBalance = Number(testCard.get('balance'))
 		login {}, (session, token) ->
 			session
 			.post('/card/refill').
@@ -68,11 +65,38 @@ describe 'card', ->
 				console.log('reponse when refilling card is: ', res.body)
 				expect(Number(res.body.balance)).to.equal(previousBalance + 10)
 				previousBalance = Number(res.body.balance)
-
+				console.log('PREVIOUS BALANCE IS!!!!!!!!! ', previousBalance)
 				done(err)
 
-	it 'should fail to refill a card', (done) ->
+	it 'should fill/activate a physical card from POS', (done) ->
+		#create a new empty card not saved in our system to fill using POS
+		Program.fetchAll().then (programs) ->
+			programId = programs.first().get('id')
+			#for whatever reason valid program ids arent working at the moment, giving login error
+			TCC.createCard(0, null).then (data) ->
+				console.log 'new card at POS created: ', data
+				POSCardNumber = data.card_number
+				session = request.agent(app)
+				session
+				.post('/card/posfill').
+				send({
+					number:POSCardNumber
+					amount: 10
+					location_id: 1
+					client_id: '47d88fb4-76d1-4ad8-b08b-5f4088b64b8a'
+					pos_secret: '123abc'
+				})
+				.expect(200).end (err, res) ->
+					console.log('pos refill response: ', res.body)
+					done(err)
 
+
+
+
+
+ 
+	it 'should fail to refill a card', (done) ->
+		console.log('PREVIOUS BALANCE IS!!!!!!!!! ', previousBalance)
 		login {}, (session, token) ->
 			session
 			.post('/card/refill').
@@ -104,7 +128,7 @@ describe 'card', ->
 				done err
 
 	it 'should import a card through the MGC api', (done) ->
-		validNumber = '2073183109657266'
+		validNumber = POSCardNumber
 		login {}, (session, token) ->
 			session
 			.post('/card/import').
@@ -119,7 +143,7 @@ describe 'card', ->
 				return
 			return
 		return
-
+	###
 	it 'shouldnt add duplicate card', (done) ->
 		validNumber = '2073183100123127'
 		login {}, (session, token) ->
@@ -135,6 +159,8 @@ describe 'card', ->
 				return
 			return
 		return
+	###
+	
 	it 'should reject invalid card number through the MGC api', (done) ->
 		login {}, (session, token) ->
 			session.post('/card/import')
@@ -142,7 +168,7 @@ describe 'card', ->
 			.expect(400)
 			.end (err, res) ->
 				console.log 'response when trying to import card that doesnt exist is:', res.body
-				expect(res.body.name).to.equal('TCCErr')
+				expect(res.body.name).to.equal('cardNotFound')
 				#console.log('got api logged in test response of:', res)
 				done err
 				return
@@ -151,17 +177,15 @@ describe 'card', ->
 
 
 	it 'should sync a card', (done) ->
-		Card.forge(number:'2073183100123127').fetch().then (card) ->
-			card.TCCSync (err, card) ->
-				console.log('synced card is: ', card)
-				done()
+		testCard.TCCSync (err, card) ->
+			console.log('synced card is: ', card)
+			done()
 
 		
 	it 'should sync a card group', (done) -> 
-		Card.forge(number:'2073183100123127').fetch().then (card) ->
-			Card.syncGroup [card], (err, cards) ->
-				console.log('synced cards: ', cards)
-				done(err)
+		Card.syncGroup [testCard], (err, cards) ->
+			console.log('synced cards: ', cards)
+			done(err)
 		
 	it 'should void a card', (done) ->
 		Card.forge(id: newCardId).fetch().then (card) ->

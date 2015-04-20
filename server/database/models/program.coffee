@@ -34,4 +34,3 @@ findOrCreate = (program, cb) ->
 			logger.info('program already existed: ', fetchedProgram.attributes)
 			cb()
 
-			

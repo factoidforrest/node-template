@@ -30,6 +30,14 @@ module.exports = (app) ->
 			#from the connect-roles api it seems that returning false here prevents the below roles from activating, not sure
 			return false
 
+	#some of the endpoints can be used by both the POS or a normal
+	roles.use 'user or POS', (req) ->
+		user = req.user
+		if user.is('logged in') || user.is('POS')
+			return true
+		else
+			return false
+
 		
 	roles.use 'admin', (req) -> 
 		if req.user? and req.user.get('admin') == true 

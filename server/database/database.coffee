@@ -38,6 +38,7 @@ class Database
 
 
 
+
 #connect the db the first time it is required by server.coffee
 db = new Database()
 

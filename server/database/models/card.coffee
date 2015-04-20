@@ -19,6 +19,10 @@ module.exports = (bookshelf) ->
 					return @related('program').get('description')
 				else
 					return 'Description not available'
+
+			#the maUid defined by TCC
+
+
 			
 
 		initialize: () ->
@@ -64,7 +68,7 @@ module.exports = (bookshelf) ->
 
 		refill: (properties, done) ->
 			card = this
-			@changeTCCBalance 'add', properties.amount, (err, serial) ->
+			@changeTCCBalance 'add', properties, (err, serial) ->
 				return done(err) if err?
 				Payment.authorize {amount: properties.amount, nonce: properties.nonce, settle: true},  (paymentErr, authorization) ->
 					if paymentErr?
@@ -88,6 +92,23 @@ module.exports = (bookshelf) ->
 
 							done(null, card)
 
+		posFill: (properties, done) ->
+			card = this
+			#needs to include location in request? 
+			@changeTCCBalance 'add', properties, (err, serial) ->
+				return done(err) if err?
+				card.save().then () ->
+					Transaction.forge(
+						card_id: card.get('id')
+						card_number: card.get('number')
+						amount: properties.amount
+						type: 'posFill'
+						status: 'success'
+						data: {}
+					).save().then (savedTransaction) ->
+
+						done(null, card)			
+
 		redeem: (properties, done) ->
 			if @balance < properties.amount
 				return done({code: 400, name: 'balanceExceeded', message: 'Your card does not have enough value remaining to make this transaction'})
@@ -103,9 +124,9 @@ module.exports = (bookshelf) ->
 					return done({code: 400, name: 'overpaid', message: 'Payed more than the cost of the meal'}) 
 
 				Transaction.forge(
-					user_id: properties.user_id
+					user_id: properties.user_id || null
 					card_number: card.get('number')
-					card_id: @get('id')
+					card_id: card.get('id')
 					meal_id: meal.get('id')
 					amount: properties.amount
 					type: 'redeem'
@@ -116,20 +137,20 @@ module.exports = (bookshelf) ->
 						console.log 'got redeemed card: ', tccResponse
 						card.set(balance:tccResponse.balance).save().then (savedCard) ->
 					###
-					card.changeTCCBalance 'subtract', properties.amount, (err) ->
+					card.changeTCCBalance 'subtract', properties, (err) ->
 						card.save().then (savedCard) ->
 							meal.query().decrement('balance', properties.amount).then () ->
 								#update decremented meal from database..not super efficient but it works
 								Meal.forge({id:meal.get('id')}).fetch(withRelated: ['transactions.card']).then (savedMeal) ->
 									done(null, {card: savedCard, meal: savedMeal})
 
-		changeTCCBalance: (action, amount, done) ->
+		changeTCCBalance: (action, properties, done) ->
 			self = this
 			if action == 'add'
 				request = TCC.refillCard
 			else if action == 'subtract'
 				request = TCC.redeemCard
-			request(@get('number'), @get('client_id'), amount).then((data) ->
+			request(@get('number'), @get('client_id'), properties.location_id, properties.amount).then((data) ->
 				self.set({balance: data.balance, status: data.status})
 				done(null, data.serial)
 			).catch (err) ->
@@ -143,7 +164,7 @@ module.exports = (bookshelf) ->
 
 		unredeem: (properties, done) ->
 			Meal.forge(key: properties.meal_key).fetch().then (meal) ->
-				#TODO
+				#TODO - use the serial from the transaction to void the transaction, then remove the card from the meal
 
 		void: (done) ->
 			self = this
@@ -203,9 +224,9 @@ module.exports = (bookshelf) ->
 
 		build: (properties, done) ->
 			Program.forge(id: properties.program_id).fetch().then (program) ->
-				return done({code:404, name: 'programNotFound', message: 'No program matching that ID was found'}) if !program?
+				return done({code:404, name: 'programNotFound', message: 'No program matching that ID was found.'}) if !program?
 				card = Card.forge(user_id: properties.user_id, program_id: properties.program_id, client_id: program.get('client_id'))
-				TCC.createCard(properties.balance, properties.program_id).then((data) ->
+				TCC.createCard(properties.balance, program.get('client_id')).then((data) ->
 
 					card.set('balance', data.balance)
 					card.set('status', data.status)
@@ -224,19 +245,31 @@ module.exports = (bookshelf) ->
 			if !properties.number?
 				return done({name:'numberInvalid', message:'Card number empty'})
 			card = Card.forge(number: properties.number)
-			card.fetch().then((existing)->
-				if existing?
-					return done({name: 'dupCard', message: 'Card has already been imported'})
+			card.fetch().then (existing)->
+				if existing? and existing.get('user_id')?
+					return done({code:400, name: 'dupCard', message: 'Card has already been imported by someone.'})
+				else if existing?
+					logger.info 'attaching physical card to user.  card: ', card.attributes
+					card.set('user_id', properties.user_id)
+					card.TCCSync (err) ->
+						return done(err) if err?
+						card.save().then (savedCard) ->
+							done(null, savedCard)
 				else
+					return done({code:404, name: 'cardNotFound', message: "No card with that number was found. Please double check the card number and make sure it is part of the Gift It system."})
+			###
+				else
+					#this should never happen because cards should have been activated through our system, consider 
 					card.set(properties)	
 					card.TCCSync (err) ->
 						return done(err) if err?
 						card.save().then (savedCard) ->
 							done(null, savedCard)
 
-			).catch (err) ->#done
+			#).catch (err) ->#done
 				logger.error(err)
 				done(err)
+				###
 
 		refill: (properties, done) ->
 			if !properties.amount? or !properties.id? or !properties.nonce?
@@ -245,6 +278,18 @@ module.exports = (bookshelf) ->
 			Card.forge(id: properties.id, user_id: properties.user_id).fetch().then (card) ->
 				return done({code: 400, name:'cardNotFound', message: 'No matching card was found'}) if !card?
 				card.refill properties, done
+
+		posFill: (properties, done) ->
+			#properties.client_id is the TCC ID called maUid
+			program = Program.forge(client_id: properties.client_id).fetch().then (program) ->
+				if not program? then return done({code:404, name: 'programNotFound', message: "No program with that id(maUid) was found.  Please use the program ID(maUid) issued by TCC"})
+				forgedCard = Card.forge(number: properties.number, program_id: program.get('id'))
+				forgedCard.fetch().then (existingCard) ->
+					card = existingCard || forgedCard
+					card.posFill(properties, done)
+
+
+
 
 		redeem: (properties, done) ->
 			logger.info 'card redeeming by properties: ', properties

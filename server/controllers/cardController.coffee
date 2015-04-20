@@ -38,14 +38,27 @@ module.exports = (app) ->
 		properties = {
 			amount: req.body.amount
 			id: req.body.id
+			location_id: 1 || req.body.location_id
 			user_id: req.user.get('id')
 			nonce: req.body.nonce
-			#payment stuff
 		}
 		Card.refill properties, (err, card) ->
 			if err?
 				return res.send(err.code, err)
 			res.send card
+
+	app.post '/card/posfill', roles.is('POS'), (req, res) ->
+		properties = {
+			amount: req.body.amount
+			number: req.body.number
+			location_id: req.body.location_id
+			client_id: req.body.client_id
+		}
+		Card.posFill properties, (err, card) ->
+			if err?
+				return res.send(err.code, err)
+			res.send card
+
 
 	app.post '/card/redeem', roles.is('logged in'), (req, res) ->
 		console.log('card redeem with props', req.body)

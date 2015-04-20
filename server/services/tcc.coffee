@@ -2,7 +2,7 @@ merge = require('merge')
 request = require('request')
 q = require('q')
 
-header = (clientId) ->
+header = (clientId, locationId) ->
   hdr:
     'live':'',
     'fmt':'MGC',
@@ -11,7 +11,7 @@ header = (clientId) ->
     'pauid': process.env.TCC_PARTNER_ID || 'CAB44F07-5038-4576-A43C-FD1A108CDB4A',
     #client ID
     'mauid': clientId || '01685DF1-3D7A-46D6-BB2C-EEFE632015CC',
-    'locId': 1, 
+    'locId': locationId || 1, 
     ###
     'uid':process.env.TCC_UID || 'CAB44F07-5038-4576-A43C-FD1A108CDB4A',
     'cliUid':process.env.TCC_CLI_UID || '2EC26589-258A-448E-A1DA-AA0F443C5152',
@@ -22,8 +22,9 @@ header = (clientId) ->
     'term':'1',
     'srvId':518,
     'srvNm':'',
-    'key':'',
-    'chk':'12345'
+    'key':''
+    #REMOVED CHECK NUMBER TO SEE WHAT HAPPENS
+    #'chk':'12345'
 
 
 inquiryBody = (number, clientId) ->
@@ -37,7 +38,7 @@ inquiryBody = (number, clientId) ->
   }
 
 #activate can also refill
-activateBody = (number, clientId, amount) ->
+activateBody = (number, clientId, locationId, amount) ->
 	merge header(clientId),
  	{
     'txs': [ {
@@ -47,8 +48,8 @@ activateBody = (number, clientId, amount) ->
     } ]
   }
 
-redeemBody = (number, clientId, amount) ->
-	merge header(clientId),
+redeemBody = (number, clientId, locationId, amount) ->
+	merge header(clientId, locationId),
   {
     'txs': [ {
       'typ': 5
@@ -57,8 +58,8 @@ redeemBody = (number, clientId, amount) ->
     } ]
   }
 
-createBody = (amount, clientId, program) ->
-  #THIS NEEDS TO HANDLE LOCATION AS WELL, FOR NOW JUST USING 1  !!!!!!
+createBody = (amount, clientId) ->
+  #THIS NEEDS TO HANDLE LOCATION AS WELL, FOR NOW JUST USING 1  !!!!!! or maybe it doesn't matter
 	merge header(clientId),
   {
     'txs': [ {
@@ -69,7 +70,7 @@ createBody = (amount, clientId, program) ->
   }
 
 voidBody = (card, serial) ->
-  merge header(card.get('')),#card.get('client_id')),
+  merge header(card.related('program').get('client_id')),
   {
     'txs': [ {
       'typ': 6
@@ -79,20 +80,20 @@ voidBody = (card, serial) ->
   }
 
 module.exports =
-  createCard: (amount, program) ->
+  createCard: (amount, clientId) ->
     deferred = q.defer()
 
     url = app.get('tccURL') + '/ProcessJson'
     console.log('url is' , url)
     options = 
       method: 'post'
-      body: createBody(amount, null, program)
+      body: createBody(amount, clientId)
       json: true
       url: url
     console.log 'request to tcc for creating card is  ', options.body
     request options, (err, httpResponse, body) ->
       console.log 'res for creating card is ', body
-      console.log 'card header is ', body.txs[0].hdr
+      if body.txs[0]? then console.log 'card header is ', body.txs[0].hdr
       if err or body.txs.length == 0
         return handleError(err, body, deferred)
       console.log 'resolving promise'
@@ -133,10 +134,10 @@ module.exports =
     deferred.promise
 
   #can also activate a card
-  refillCard: (card_number, client_id, amount) ->
+  refillCard: (card_number, client_id, location_id, amount) ->
     console.log('refilling card $', amount)
     deferred = q.defer()
-    body = activateBody(card_number, null, amount)
+    body = activateBody(card_number, client_id, location_id, amount)
     url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
@@ -160,12 +161,12 @@ module.exports =
 
 
 
-  redeemCard: (card_number, client_id, amount) ->
+  redeemCard: (card_number, client_id, location_id, amount) ->
     deferred = q.defer()
     url = app.get('tccURL') + '/ProcessJson'
     options = 
       method: 'post'
-      body: redeemBody(card_number, null, amount)
+      body: redeemBody(card_number, client_id, location_id, amount)
       json: true
       url: url
     console.log 'request to tcc for redeeming card is  ', options.body
@@ -185,19 +186,20 @@ module.exports =
     deferred.promise
 
   void: (card, serial, done) ->
-    url = app.get('tccURL') + '/ProcessJson'
-    options = 
-      method: 'post'
-      body: voidBody(card, serial)
-      json: true
-      url: url
-    console.log 'request to void card:  ', options.body
-    request options, (err, httpResponse, body) ->
-      logger.info('TCC response voiding card: ', body)
-      console.log(body)
-      if err? || body.hdr.rslt != 1
-        return done({code:500, name: 'TCCErr', message: 'Failed to void card.', error: err, response: httpResponse, body: body})
-      done()
+    card.load('program').then (card) ->
+      url = app.get('tccURL') + '/ProcessJson'
+      options = 
+        method: 'post'
+        body: voidBody(card, serial)
+        json: true
+        url: url
+      console.log 'request to void card:  ', options.body
+      request options, (err, httpResponse, body) ->
+        logger.info('TCC response voiding card: ', body)
+        console.log(body)
+        if err? || body.hdr.rslt != 1
+          return done({code:500, name: 'TCCErr', message: 'Failed to void card.', error: err, response: httpResponse, body: body})
+        done()
 
 
   getPrograms: (done) ->
