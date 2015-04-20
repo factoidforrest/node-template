@@ -17,26 +17,13 @@ module.exports = (app) ->
 
 	app.use(roles.middleware())
 
-	roles.use 'POS', (req)->
-		if req.body.pos_secret == (process.env.POS_SECRET || '123abc')
-			return true
-		else
-			return null
+	roles.use 'POS', POS
 
-	roles.use 'logged in', (req) -> 
-		if req.user? and req.user.get('active')
-			return true
-		else
-			#from the connect-roles api it seems that returning false here prevents the below roles from activating, not sure
-			return false
+	roles.use 'logged in', loggedIn
 
 	#some of the endpoints can be used by both the POS or a normal
 	roles.use 'user or POS', (req) ->
-		user = req.user
-		if user.is('logged in') || user.is('POS')
-			return true
-		else
-			return false
+		loggedIn(req) or POS(req)
 
 		
 	roles.use 'admin', (req) -> 
@@ -44,3 +31,8 @@ module.exports = (app) ->
 			return true
 
 		
+loggedIn = (req) ->
+	req.user? and req.user.get('active')
+
+POS = (req) ->
+	req.body.pos_secret == (process.env.POS_SECRET || '123abc')

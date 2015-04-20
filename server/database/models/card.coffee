@@ -295,11 +295,15 @@ module.exports = (bookshelf) ->
 
 		redeem: (properties, done) ->
 			logger.info 'card redeeming by properties: ', properties
-			searchParameters = {id: properties.id}
-			#optionally take user_id since POS will not know the user ID but the mobile clients will.  
-			if properties.user_id? then searchParameters.user_id = properties.user_id
+			searchParameters = {}
+			#if we have a user id we are processing an online redemption by a client, otherwise a POS redemption by a physical card  
+			if properties.user_id?
+				searchParameters = {user_id: properties.user_id, id: properties.id}
+			else
+				searchParameters = {number: properties.number}
+
 			logger.info 'searching for card to redeem with attributes', searchParameters
-			Card.forge(id: properties.id, user_id: properties.user_id).fetch(withRelated:'program').then (card) ->
+			Card.forge(searchParameters).fetch(withRelated:'program').then (card) ->
 				logger.info 'found card to redeem', card
 				return done({code: 400, name:'cardNotFound', message: 'No matching card was found'}) if !card?
 				card.redeem properties, done

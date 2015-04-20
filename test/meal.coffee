@@ -9,6 +9,7 @@ session = request.agent(app)
 mealKey = null
 cardId = null
 allPrograms = null
+testCard = null
 describe 'Meals', ->
 	before (done) -> 
 		Program.fetchAll().then (programs) ->
@@ -54,7 +55,7 @@ describe 'Meals', ->
 			console.log('created meal with response', res.body)
 			done(err)
 
-	it 'should spend a card on the meal', (done) ->
+	it 'redeem', (done) ->
 		this.timeout 10000
 		Card.fetchAll().then (cards) ->
 			console.log('found existing cards ', cards)			
@@ -76,6 +77,28 @@ describe 'Meals', ->
 					Card.fetchAll().then (cards) ->
 						console.log('redeemed card in db is: ', cards.first())
 						done(err)
+
+	it 'POS redeem', (done) ->
+		this.timeout 10000
+		
+		userLib.login {}, (session, token) ->
+			session
+			.post('/card/redeem').send(
+				pos_secret: '123abc'
+				meal_key: mealKey
+				number: testCard.get('number')
+				amount: 1
+			).expect(200)
+			.end (err, res) ->
+				console.log('pos redeem', res.body)
+				if err?
+					return done(err)
+				console.log('redeemed card with response', res.body)
+				console.log('meal transactions: ', res.body.meal.transactions)
+				expect(res.body.meal.balance).to.equal(Math.round((res.body.meal.price - 2) * 100) / 100)
+				Card.fetchAll().then (cards) ->
+					console.log('redeemed card in db is: ', cards.first())
+					done(err)	
 
 	it 'should checkout the meal', (done) ->
 		this.timeout 10000
