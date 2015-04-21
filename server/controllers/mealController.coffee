@@ -32,16 +32,22 @@ module.exports = (app) ->
 		delete req.body.meal.programs
 		properties = req.body.meal
 		properties.balance ?= properties.price
-		Meal.forge(key: properties.key).fetch().then (meal) ->
+		Meal.forge(key: properties.key).fetch(withRelated:['transactions.card', 'programs']).then (meal) ->
 			if !meal?
-				return res.send(400, {name: 'notFound', message: 'No meal matching that key was found'})
+				return res.send(400, {name: 'mealNotFound', message: 'No meal matching that key was found'})
 			meal.set(properties).save().then(savedMeal) ->
 				res.send savedMeal
+
+	app.post '/meal/info', roles.is('user or POS'), (req,res) ->
+		Meal.forge(key: req.body.meal_key).fetch(withRelated: ['transactions.card', 'programs']).then (meal) ->
+			res.send(404, {name: 'mealNotFound', message: 'No meal matching that key was found'}) if !meal?
+			res.send(meal)
+
 
 
 	app.post '/meal/checkout', roles.is('POS'), (req, res) ->
 		console.log('checkout with params:' , req.body)
-		Meal.forge(key: req.body.key).fetch(withRelated: ['transactions.card']).then (meal) ->
+		Meal.forge(key: req.body.key).fetch(withRelated: ['transactions.card', 'programs']).then (meal) ->
 			logger.info('got meal ', meal.attributes)
 			console.log(meal)
 			if !meal?

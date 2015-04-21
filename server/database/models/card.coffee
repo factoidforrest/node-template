@@ -113,7 +113,7 @@ module.exports = (bookshelf) ->
 			if @balance < properties.amount
 				return done({code: 400, name: 'balanceExceeded', message: 'Your card does not have enough value remaining to make this transaction'})
 			card = this
-			Meal.forge(key: properties.meal_key).fetch(withRelated:'programs').then (meal) ->
+			Meal.forge(key: properties.meal_key).fetch(withRelated:['transactions.card', 'programs']).then (meal) ->
 				logger.info 'redeeming card on meal: ', meal.attributes
 				return done({code: 400, name: 'mealNotFound', message: 'No meal matching that key was found'}) if !meal?
 
@@ -143,7 +143,7 @@ module.exports = (bookshelf) ->
 						card.save().then (savedCard) ->
 							meal.query().decrement('balance', properties.amount).then () ->
 								#update decremented meal from database..not super efficient but it works
-								Meal.forge({id:meal.get('id')}).fetch(withRelated: ['transactions.card']).then (savedMeal) ->
+								Meal.forge({id:meal.get('id')}).fetch(withRelated: ['transactions.card', 'programs']).then (savedMeal) ->
 									done(null, {card: savedCard, meal: savedMeal})
 
 		changeTCCBalance: (action, properties, done) ->
