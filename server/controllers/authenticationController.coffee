@@ -62,11 +62,17 @@ module.exports = (app) ->
 	app.post '/auth/google/clientside', (req, res) ->
 		accessToken = req.body.access_token
 		refreshToken = req.body.refresh_token
-		Authentication.findOrCreateGoogle accessToken, refreshToken, (err, user) ->
+		oneTimeToken = req.body.one_time_token
+		respond = (err, user) ->
 			if (err) 
-				return res.send(401, {error: err})
-
+				return res.send(err.code || 400, err)
 			loginIfActive(user, res)
+
+		if oneTimeToken?
+			Authentication.googleOneTimeToken oneTimeToken, respond
+		else
+			Authentication.findOrCreateGoogle accessToken, refreshToken, respond
+
 
 	app.post '/auth/facebook/clientside', (req, res) ->
 		token = req.body.access_token

@@ -8,6 +8,8 @@ Mail = Promise.promisifyAll require '../../services/mail'
 google = require('googleapis')
 OAuth2 = google.auth.OAuth2;
 plus = google.plus('v1')
+googleId = '808716966460-mu0tt4jvafitf5vvf2rolj2dpjfvdrba.apps.googleusercontent.com' || process.env.GOOGLE_ID
+googleSecret = 'lU9f7TS-4fP38bpbFB8eDu9R' || process.env.GOOGLE_SECRET
 
 #facebook
 FB = require 'fb'
@@ -58,12 +60,24 @@ module.exports = (bookshelf) ->
 
 		###
 		},{
+			#exchange one time token for refresh token and access token before attempting to get user info
+			googleOneTimeToken: (oneTimeToken, next) ->
+				self = this
+				console.log('google id is ', googleId)
+				oauth2Client = new OAuth2(googleId,googleSecret,'https://developers.google.com/oauthplayground')	
+				oauth2Client.getToken oneTimeToken, (err, tokens) -> 
+					console.log('google gettoken responded!!! ')
+					console.log('the tokens are ', tokens)
+					if err?
+						err.kind = err.type
+						delete err.type
+						console.log('the error is', err, ' and the tokens are ', tokens)
+					if err? then return next({code:400, name: 'tokenError', error:err.toString()})
+
+					self.findOrCreateGoogle(tokens.access_token, tokens.refresh_token, next)
+
 			findOrCreateGoogle: (accessToken, refreshToken, next) ->
-				oauth2Client = new OAuth2(
-					process.env.GOOGLE_ID,
-					process.env.GOOGLE_SECRET
-				)
-				# Retrieve tokens via token exchange explained above or set them:
+				oauth2Client = new OAuth2(googleId, googleSecret)
 				oauth2Client.setCredentials
 					access_token: accessToken
 					refresh_token: refreshToken
@@ -124,7 +138,7 @@ module.exports = (bookshelf) ->
 findOrCreate = (profile, next) ->
 	if not profile.email?
 		return next('No email associated with this account')
-	logger.info('finding or creating auth from', profile)
+	logger.info('finding or creating auth from ', profile)
 	forgedAuth = Authentication.forge({uid: profile.uid, provider: profile.provider})
 
 	#check if already authenticated using this provider

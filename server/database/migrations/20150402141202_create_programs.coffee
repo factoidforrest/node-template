@@ -5,6 +5,7 @@ exports.up = (knex, Promise) ->
 		t.string 'description'
 		#this is the mauid
 		t.string('client_id').index()
+		t.string('client')
 		t.timestamps()
 		
 

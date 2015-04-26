@@ -4,9 +4,9 @@ expect = require('chai').expect
 userLib = require('./libs/user')
 
 key = null
-googleToken= 'ya29.MwHRPqs5R2qLjUGmCr6MX86YbmYN0CEztaHRcup_e8y3ln2o-VOs502auzCQODsq1hMEMWzQc0zI-A' # ya29.GwFbNhm2pVQjNPDXw9SmvozWQ1HjhBQ2z6sKkOvfifPO9ugyx7Zxl_lwHb1mVVMXmv_W_R4JL5Jg_w'
-googleRefresh= '1/ma7PBK9uyrB0U__v6tDUeu14cdXBv-iYZQ_z6jiCzGQMEudVrK5jSpoR30zcRFq6'#1/og6EOVAm_JL-8AOCZYktYSpW4WzfIAMGmlGcBtFlbd0MEudVrK5jSpoR30zcRFq6'
-
+googleToken= 'ya29.YQGsIcdZjLE0PkBarNRWvRnDVeh1wC5dbfNlklVwuxEk2i4HkYL2wWh0G3R9hFIhfzGm6xJl6MUTkw' # ya29.GwFbNhm2pVQjNPDXw9SmvozWQ1HjhBQ2z6sKkOvfifPO9ugyx7Zxl_lwHb1mVVMXmv_W_R4JL5Jg_w'
+googleRefresh= '1/pEBrMtmF-qJEdRUDQsMFgzwB8UoN58kxJTSLH-pMIlEMEudVrK5jSpoR30zcRFq6'#1/og6EOVAm_JL-8AOCZYktYSpW4WzfIAMGmlGcBtFlbd0MEudVrK5jSpoR30zcRFq6'
+googleOneTimeToken = '4/KvCD3wszxRH0xi2nsEtrrmEYErZW6IJfckIRwQZqGTg.Ug3E66Z5q4QcEnp6UAPFm0FOVT7nmQI'
 facebookToken= 'CAAEuSSIjkhoBAGr3ZAmtyU9LZBPKSMmtKZAQH9xqfISHqf6y1DC0Yu4t3lwZCYZC4MPL4gN6hzOoBye2fSCwUb3a8ZAMazga5ZAWBXZAr4Lv6F2uxmeJbCUvxxqUZCNQIJjGqx5eRxZA43CTkmZApgZCO1y4VfEYhPbZBCsDaaN47muybsWIKQ39y24ZAvOfJkQ1SZA6HgCflAb0HNHbO4XFe6yGtGBM9PwvHQHBIkZD'
 
 describe 'third party auth', ()->
@@ -34,6 +34,17 @@ describe 'third party auth', ()->
 				expect(user).to.exist
 				done(err)
 		)
+
+	it 'google api with one time token', (done) ->
+		this.timeout 15000
+		session = request.agent(app)
+		session.post("/auth/google/clientside")
+		.send(one_time_token:googleOneTimeToken )
+		.expect(200)
+		.end (err, res) ->
+			console.log('got response for one time token login: ', res.body)
+			done(err)
+
 
 	it 'test google signin using mobile gift card api', (done) ->
 		this.timeout(15000)
