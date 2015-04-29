@@ -29,3 +29,14 @@ describe 'programs', () ->
 		.end (err, res) ->
 			console.log('got program list: ', res.body)
 			done(err)
+
+	it 'should show a list of programs by client through the api', (done) ->
+		request.agent(app)
+		.post("/program/listbyclient")
+		.send({})
+		.expect(200)
+		.end (err, res) ->
+			console.log('got program list: ', res.body)
+			console.log(JSON.stringify(res.body))
+			console.log('the first clients programs are ', res.body[0].programs)
+			done(err)
