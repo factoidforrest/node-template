@@ -25,14 +25,11 @@ module.exports = (bookshelf) ->
 						console.log('fetched programs ', programs.models)
 						groupedPrograms = []
 						programs.each (program) ->
-							console.log('looping through program: ', program.attributes)
 							clientName = program.get('client')
 							#if we haven't already grouped those clients
 							if _.where(groupedPrograms, {client: clientName}).length == 0
 								client = {client: clientName}
 								client.programs = programs.where {client: clientName}
-								console.log('programs are ', programs.where {client: clientName})
-								console.log('saving client: ', client)
 								groupedPrograms.push client
 						return done(groupedPrograms)
 				catch e
