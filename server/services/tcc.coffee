@@ -213,9 +213,9 @@ module.exports =
       body: programBody
       json: true
       url: url
-    console.log('making request with options ', options)
+    logger.info('making program request with options ', options)
     request options, (err, httpResponse, body) ->
-      logger.log('tcc responded with programs: ', body)
+      logger.info('tcc responded with programs: ', body)
       if err? || !body.pa?
         return done({code:500, name: 'TCCErr', message: 'Failed to get program list from tcc.', error: err, response: httpResponse, body: body})
       done(null, body.pa)

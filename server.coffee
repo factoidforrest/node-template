@@ -92,7 +92,7 @@ app.listen(process.env.PORT || 3000)
 #replify('realtime-101', app)
 
 global.app = module.exports = app
-logger.log('Server launched in mode: ' + process.env.NODE_ENV + ' and connected to database environment: ' + process.env.DATABASE_URL)
+logger.info('Server launched in mode: ' + process.env.NODE_ENV + ' and connected to database environment: ' + process.env.DATABASE_URL)
 
 Program.refresh ->
   logger.info('Refreshed Programs on startup')
