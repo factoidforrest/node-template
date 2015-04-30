@@ -50,9 +50,9 @@ findOrCreate = (program, cb) ->
 			forged.set('description', program.desc)
 			forged.set('client', program.cli)
 			forged.save().then (savedProgram) ->
-				logger.verbose('created new program ', savedProgram.attributes)
+				logger.log('created new program ', savedProgram.attributes)
 				cb()
 		else
-			logger.verbose('program already existed: ', fetchedProgram.attributes)
+			logger.log('program already existed: ', fetchedProgram.attributes)
 			cb()
 
