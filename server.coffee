@@ -96,4 +96,4 @@ global.app = module.exports = app
 logger.info('Server launched in mode: ' + process.env.NODE_ENV + ' and connected to database environment: ' + process.env.DATABASE_URL)
 
 Program.refresh ->
-  logger.info('Refreshed Programs on startup')
+  logger.verbose('Refreshed Programs on startup')
