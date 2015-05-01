@@ -17,6 +17,7 @@ module.exports = (bookshelf) ->
 				tcc.getPrograms (err, programs) ->
 					return done(err) if err?
 					async.each programs, findOrCreate, (err) ->
+						logger.info 'Refreshed ', programs.length, 'programs'
 						done()
 
 			listByClient: (done) ->
@@ -49,9 +50,9 @@ findOrCreate = (program, cb) ->
 			forged.set('description', program.desc)
 			forged.set('client', program.cli)
 			forged.save().then (savedProgram) ->
-				logger.info('created new program ', savedProgram.attributes)
+				logger.verbose('created new program ', savedProgram.attributes)
 				cb()
 		else
-			logger.info('program already existed: ', fetchedProgram.attributes)
+			logger.verbose('program already existed: ', fetchedProgram.attributes)
 			cb()
 
