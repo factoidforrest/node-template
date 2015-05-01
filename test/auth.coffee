@@ -7,16 +7,14 @@ userLib = require('./libs/user')
 
 key = null
 
-describe 'user', ->
+describe 'authentication', ->
 	this.timeout(20000)
 
 	before userLib.manuallyDestroyUser
-
-	it 'sign up', (done) ->
-		this.timeout(10000)
+	signUp = (email, done) ->
 		session = request.agent(app)
 		session.post("/auth/register").send({
-			email: "light24bulbs@gmail.com"
+			email: email
 			password: "secretpassword"
 			password_confirmation: 'secretpassword'
 		}).expect(200).end (err, res) ->
@@ -25,6 +23,10 @@ describe 'user', ->
 			console.log "created user with response", res.body
 			console.log "creation err: ", err
 			done(err)
+
+	it 'sign up', (done) ->
+		this.timeout(10000)
+		signUp('light24bulbs@gmail.com', done)
 
 
 	it 'confirm email', (done) ->
@@ -41,13 +43,27 @@ describe 'user', ->
 
 					done(err)
 
+	it 'sign up again', (done) ->
+		this.timeout(10000)
+		signUp('light24bulbs+confirmjson@gmail.com', done)		
+
+	it 'confirm email through json api', (done) ->
+		User.where(email: 'light24bulbs+confirmjson@gmail.com').fetch().then (user) ->
+			session = request.agent(app)
+			session
+			.post("/user/confirm_json")
+			.send(confirmation_token: user.get('confirmation_token'))
+			.expect(200).end (err, res) ->
+				console.log('got response confirming via json', res.body)
+				done(err)
+
 	it 'confirm email should fail when already confirmed', (done) ->
 		User.where(email: 'light24bulbs@gmail.com').fetch().then (user) ->
 			session = request.agent(app)
 			session
 			.get("/user/confirm?token=" + user.get('confirmation_token') )
 			.expect(302).end (err, res) ->
-				console.log "confirm email with response", res
+				console.log "confirm email with response", res.body
 				console.log "confirmation err: ", err
 				User.where(email: 'light24bulbs@gmail.com').fetch().then (confirmed) ->
 					expect(confirmed.get('confirmation_token')).to.equal(null)

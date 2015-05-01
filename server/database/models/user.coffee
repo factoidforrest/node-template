@@ -171,9 +171,9 @@ module.exports = (bookshelf) ->
 			confirmEmail: (token, next) ->
 				console.log "searching for user with token:", token
 				User.where(confirmation_token: token).fetch().then (user) ->
-					return next("Invalid token")  if user is null or typeof (user) is "undefined"
-					logger.info "found user to confirm by token: ", user
-					return next("This user is already confirmed, please log in.")  if user.get('confirmation_token') is null
+					return next({code: 400, name: 'tokenInvalid', message:"Invalid token"})  if not user?
+					logger.info "found user to confirm by token: ", user.attributes
+					return next({code: 400, name: 'alreadyConfirmed', message: "This user is already confirmed, please log in."})  if user.get('confirmation_token') is null
 					
 					#swap with new email if the user was updating an existing email
 					if user.get("new_email")?

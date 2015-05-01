@@ -3,14 +3,20 @@ acceptablePassword = require('./authenticationController').acceptablePassword
 
 module.exports = (app) ->
 
+	#HTML redirect confirm
 	app.get '/user/confirm', (req, res) ->
 		token = req.query.token
-		console.log('got confirm request with token: ', token)
-
 		User.confirmEmail token, (err) ->
-			return res.redirect(app.get('assetRoot') + '#/?message=confirmfail') if (err) 
+			return res.redirect(app.get('assetRoot') + '#/?message=confirmfail') if err? 
 			console.log('confirmed user email by token')
 			res.redirect(app.get('assetRoot') + '#/?message=confirmsuccess')
+
+	#JSON confirm
+	app.post '/user/confirm_json', (req, res) ->
+		token = req.body.confirmation_token
+		User.confirmEmail token, (err) ->
+			return res.send(err.code, err) if err?
+			res.json(status: 'success')
 
 
 	app.post '/user/info', roles.is('logged in'), (req, res) ->
@@ -46,9 +52,6 @@ module.exports = (app) ->
 				return res.send(err.code, err)
 			else
 				return res.json(req.user)
-
-
-	app.post '/user/testtoken'
 
 	app.post '/user/testtoken', roles.is('logged in'), (req, res) ->
 		console.log('called token test')
