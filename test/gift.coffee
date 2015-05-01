@@ -15,7 +15,7 @@ describe 'gift', ->
 	before (done) -> 
 		userLib.createUser {email: 'light24bulbs+gifted@gmail.com'}, ->
 			User.where(email: 'light24bulbs@gmail.com').fetch().then((user) ->
-				return user.related('cards').create({number:'2073183100123127', balance: 2}).yield(user)#.save().then (card) ->
+				return user.related('cards').create({number:'2073183100123127', program_id: 1, balance: 2}).yield(user)#.save().then (card) ->
 			).then (user) ->
 				testCard = user.related('cards').models[0]
 				Card.syncGroup [testCard], (err, cards) ->

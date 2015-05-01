@@ -12,6 +12,13 @@ module.exports = (bookshelf) ->
 	global.Gift = bookshelf.Model.extend({
 		tableName: 'gifts'
 		hasTimestamps: true
+		virtuals: 
+			description: () ->
+				if @related('card')?	
+					return @related('card').related('program').get('description')
+				else
+					return 'Description not available'
+
 
 
 		initialize: () ->
@@ -55,7 +62,7 @@ module.exports = (bookshelf) ->
 			card = @related('card')
 			#refundedBalance = card.get('balance') + @get('balance')
 			#card.set('balance', refundedBalance)
-			card.changeTCCBalance 'add', @get('balance'), (err) ->
+			card.changeTCCBalance 'add', {location_id: 1, amount: @get('balance')}, (err) ->
 				return done(err) if err?
 				self.set('status', 'revoked')
 
@@ -85,32 +92,27 @@ module.exports = (bookshelf) ->
 	},{
 		#class methods
 		send: (params, from, done) ->
-			try 
 
 
-				forgedGift = @forge(params)
 
-				Card.forge({id: params.card_id, user_id: params.from_id}).fetch().then (card) ->
-					if !card?
-						return done({err:'cardNotFound', code: 404, message: 'No card with this ID belonging to you was found.'})
-					card.TCCSync (err) ->
+			forgedGift = @forge(params)
+
+			Card.forge({id: params.card_id, user_id: params.from_id}).fetch(withRelated: ['program']).then (card) ->
+				if !card?
+					return done({err:'cardNotFound', code: 404, message: 'No card with this ID belonging to you was found.'})
+				card.TCCSync (err) ->
+					return done(err) if err?
+					if card.get('balance') < params.balance
+						return done(code: 400, name:'insufficientFunds', message: 'Not enough value in the card to gift.')
+					card.changeTCCBalance 'subtract', {location_id: 1, amount: params.balance}, (err) ->
 						return done(err) if err?
-						if card.get('balance') < params.balance
-							return done(code: 400, name:'insufficientFunds', message: 'Not enough value in the card to gift.')
-						card.changeTCCBalance 'subtract', params.balance, (err) ->
-							return done(err) if err?
-							card.save().then (savedCard) -> 
-								forgedGift.save().then (savedGift) ->
-									console.log('saved gift:', savedGift)
-									Mail.giftNotify savedGift, from, (err) ->
-										if (err)
-											logger.error('error sending gift notification email:', err)
-										done(null, savedGift)
-			catch e
-				console.log('CAUGHT EXCEPTION ',e)
-				console.log(e.stack)
-			
-
+						card.save().then (savedCard) -> 
+							forgedGift.save().then (savedGift) ->
+								console.log('saved gift:', savedGift)
+								Mail.giftNotify savedGift, card.get('description'), from, (err) ->
+									if (err)
+										logger.error('error sending gift notification email:', err)
+									done(null, savedGift)
 
 
 

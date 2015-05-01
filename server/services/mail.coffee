@@ -44,7 +44,7 @@ module.exports.sendConfirmation = (userAttrs, to, next) ->
     return
   return
 
-module.exports.giftNotify = (gift, from, next) ->
+module.exports.giftNotify = (gift, description, from, next) ->
   console.log 'sending a gift notification email'
   fs.readFile 'views/gift-email.jade', 'utf8', (err, file) ->
     if err
@@ -56,11 +56,12 @@ module.exports.giftNotify = (gift, from, next) ->
       from: from.get('name')
       balance: gift.get('balance')
       link: link
+      description: description
     )
     mail =
       to: gift.get('to_email')
       from: 'no-reply@mobilegiftcard.com'
-      text: 'Your email client does not support HTML.  You have received a gift card on Mobile Gift Card.  Please visit the site to accept your gift: ' + link
+      text: 'Your email client does not support HTML.  You have received a Gift It gift.  Please visit the site to claim your gift: ' + link
       attachment:
         data: html
         alternative: true
