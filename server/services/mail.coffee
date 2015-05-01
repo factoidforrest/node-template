@@ -33,8 +33,8 @@ module.exports.sendConfirmation = (userAttrs, to, next) ->
       link: link)
     mail =
       to: to or userAttrs.email
-      from: 'no-reply@mobilegiftcard.com'
-      text: 'You have HTML disabled in your email client.  Paste this link into your browser to confirm your email: ' + link
+      from: 'Gift It <no-reply@gift.it>'
+      text: 'Gift It email confirmation. Paste this link into your browser to confirm your email: ' + link
       attachment:
         data: html
         alternative: true
@@ -60,8 +60,8 @@ module.exports.giftNotify = (gift, description, from, next) ->
     )
     mail =
       to: gift.get('to_email')
-      from: 'no-reply@mobilegiftcard.com'
-      text: 'Your email client does not support HTML.  You have received a Gift It gift.  Please visit the site to claim your gift: ' + link
+      from: 'Gift It <no-reply@gift.it>'
+      text: 'You have received a Gift It gift.  Please visit the site to claim your gift: ' + link
       attachment:
         data: html
         alternative: true
@@ -83,8 +83,8 @@ module.exports.sendPasswordReset = (user, token, next) ->
       link: link)
     mail =
       to: user.get('email')
-      from: 'no-reply@mobilegiftcard.com'
-      text: 'Diners Group password reset.  You have HTML disabled in your email client.  Paste this link into your browser to reset your password: ' + link
+      from: 'Gift It <no-reply@gift.it>'
+      text: 'Diners Group password reset.    Paste this link into your browser to reset your password: ' + link
       attachment:
         data: html
         alternative: true
@@ -104,8 +104,8 @@ module.exports.invite = (email, next) ->
     html = template(link: link)
     mail =
       to: email
-      from: 'no-reply@mobilegiftcard.com'
-      text: 'Diners Group Invitation.  You have HTML disabled in your email client.  Paste this link into your browser to accept your invitation: ' + link
+      from: 'Gift It <no-reply@gift.it>'
+      text: 'Diners Group Invitation.  Paste this link into your browser to accept your invitation: ' + link
       attachment:
         data: html
         alternative: true
