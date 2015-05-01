@@ -1,3 +1,4 @@
+process.env.PORT = '12345'
 require '../../../server'
 async = require 'async'
 
