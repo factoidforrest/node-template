@@ -30,7 +30,8 @@ global.logger = new (winston.Logger)({
 ### 
 winston.remove(winston.transports.Console)
 winston.add(winston.transports.Console, {'timestamp':true})
-winston.add(Logentries, { token: process.env.LOG_ENTRIES_TOKEN || 'ac8d24c3-67fe-45d5-a4fb-81a1bd8da98e' }) if production
+if production?
+  winston.add(Logentries, { token: process.env.LOG_ENTRIES_TOKEN || 'ac8d24c3-67fe-45d5-a4fb-81a1bd8da98e' }) if production
 global.logger = winston
 
 
