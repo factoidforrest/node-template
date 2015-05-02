@@ -94,7 +94,7 @@ module.exports = (app) ->
 		).then undefined, next
 
 
-	app.post '/card/list', roles.is('logged in'),  (req, res) ->
+	app.post '/card/list', roles.is('logged in'),  (req, res, next) ->
 		#maybe take more params and join them to the query to optionally filter
 		Card.forge(user_id: req.user.id).fetchAll(withRelated: 'program').then((cards) ->
 			console.log('retreived cards ', JSON.stringify(cards))
@@ -105,4 +105,4 @@ module.exports = (app) ->
 				res.json cards.models.map (card)  ->
 					return card.json()
 				###
-		).next undefined, next
+		).then undefined, next
