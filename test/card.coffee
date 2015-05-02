@@ -63,6 +63,18 @@ describe 'card', ->
 				expect(res.body.id).to.equal(testCard.get('id'))
 				done(err)
 
+	it 'should fail to retrieve card with a really long and invalid id', (done) ->
+		login {}, (session, token) ->
+			session
+			.post('/card/info').
+			send({
+				id: 123456789012345
+				token: token
+			})
+			.expect(500).end (err, res) ->	
+				console.log('got response from long token info request ', res.body)
+				done(err)
+
 	it 'should retrieve info by POS', (done) ->
 		login {}, (session, token) ->
 			session

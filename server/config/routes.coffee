@@ -16,3 +16,4 @@ module.exports = (app) ->
 	require('../controllers/invitationController')(app)
 	require('../controllers/paymentController')(app)
 	require('../controllers/programController')(app)
+

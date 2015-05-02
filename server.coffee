@@ -13,26 +13,25 @@ expressWinston = require('express-winston')
 rate = require 'express-rate'
 Logentries = require('winston-logentries-transport').Logentries
 
-production = app.get('env') != 'development' || 'test'
-###
-process.on 'uncaughtException',  (error) ->
-  console.log(error.stack)
-###
+production = app.get('env') != 'development' and app.get('env') != 'test'
+
 #logging
-###
+
 logLevel = production ? 'silly' : 'info'
-global.logger = new (winston.Logger)({
+global.logger = new (winston.Logger)()
+###
   transports: [
     new (winston.transports.Console)({ level: logLevel, 'timestamp':true }),
     #new (winston.transports.File)({ filename: 'somefile.log', level: 'error', 'timestamp':true})
   ]
 })
 ### 
-winston.remove(winston.transports.Console)
-winston.add(winston.transports.Console, {'timestamp':true})
+#winston.remove(winston.transports.Console)
+
+logger.add(winston.transports.Console, {'timestamp':true})
 if production?
-  winston.add(Logentries, { token: process.env.LOG_ENTRIES_TOKEN || 'ac8d24c3-67fe-45d5-a4fb-81a1bd8da98e' }) if production
-global.logger = winston
+  logger.add(Logentries, { token: process.env.LOG_ENTRIES_TOKEN || 'ac8d24c3-67fe-45d5-a4fb-81a1bd8da98e' }) if production
+#global.logger = winston
 
 
 app.use(express.compress())
@@ -87,7 +86,26 @@ require('./server/config/roles')(app)
 require('./server/config/routes')(app)
 
 logger.info("Node Env: " +  app.get('env'))
-logger.log('silly', 'a silly log');
+logger.log('silly', 'a silly log')
+
+#catch any unhandled error callbacks.  This catches
+
+app.use (err, req, res, next) ->
+  logger.log('error', 'caught unhandled express error: ', err)
+  logger.log('error', err.stack)
+  response = {name: 'internalServerError', message: err.message}
+
+  response.stack = err.stack if !production
+  console.log('the response is ', response)
+  res.send(500, response)
+
+#app.use(express.errorHandler({ dumpExceptions: true, showStack: true }))
+
+
+process.on 'uncaughtException', (err) ->
+  console.log("FATAL EXCEPTION ", err)
+  logger.log('error', 'CAUGHT FATAL EXCEPTION ', err.message,  err)
+  process.exit(1)
 
 app.listen(process.env.PORT || 3000)
 #replify('realtime-101', app)

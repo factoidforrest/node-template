@@ -62,36 +62,36 @@ module.exports = (app) ->
 
 	app.post '/card/redeem', roles.is('user or POS'), (req, res) ->
 		console.log('got redeem req')
-		try
-			console.log('card redeem with props', req.body)
-			properties = req.body
-			if req.user? then properties.user_id = req.user.get('id')
 
-			Card.redeem properties, (err, data) ->
-				if err?
-					console.log 'card redeem error ', err
-					return res.send(err.code, err)
-				res.send data
-		catch e
-			console.log('caught exception ',e )
-			console.log(e.trace)
-		
+		console.log('card redeem with props', req.body)
+		properties = req.body
+		if req.user? then properties.user_id = req.user.get('id')
+
+		Card.redeem properties, (err, data) ->
+			if err?
+				console.log 'card redeem error ', err
+				return res.send(err.code, err)
+			res.send data
+
+	
 
 
-	app.post '/card/info', roles.is('logged in'), (req, res) ->
+	app.post '/card/info', roles.is('logged in'), (req, res, next) ->
 		cardId = req.body.id
-		Card.forge(user_id: req.user.id, id: cardId).fetch(withRelated: 'program').then((card) ->
+		Card.forge(user_id: req.user.id, id: cardId).fetch(withRelated: 'program').then((card) -> 
 			if card?
 				res.json(card)
 			else
 				res.send(404, error: "Card not found")
-		)
+		).then undefined, next
 
-	app.post '/card/posinfo', roles.is('POS'), (req,res) ->
+
+	app.post '/card/posinfo', roles.is('POS'), (req, res, next) ->
 		number = req.body.number
-		Card.forge(number:number).fetch(withRelated: 'program').then (card) ->
+		Card.forge(number:number).fetch(withRelated: 'program').then((card) ->
 			return res.send(404, {name:'cardNotFound', message:'No card with that number was found in the system.'}) if !card?
 			res.json(card)
+		).then undefined, next
 
 
 	app.post '/card/list', roles.is('logged in'),  (req, res) ->
@@ -105,4 +105,4 @@ module.exports = (app) ->
 				res.json cards.models.map (card)  ->
 					return card.json()
 				###
-		)
+		).next undefined, next
