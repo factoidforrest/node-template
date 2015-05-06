@@ -6,7 +6,7 @@ userLib = require('./libs/user')
 key = null
 googleToken= 'ya29.YQGsIcdZjLE0PkBarNRWvRnDVeh1wC5dbfNlklVwuxEk2i4HkYL2wWh0G3R9hFIhfzGm6xJl6MUTkw' # ya29.GwFbNhm2pVQjNPDXw9SmvozWQ1HjhBQ2z6sKkOvfifPO9ugyx7Zxl_lwHb1mVVMXmv_W_R4JL5Jg_w'
 googleRefresh= '1/pEBrMtmF-qJEdRUDQsMFgzwB8UoN58kxJTSLH-pMIlEMEudVrK5jSpoR30zcRFq6'#1/og6EOVAm_JL-8AOCZYktYSpW4WzfIAMGmlGcBtFlbd0MEudVrK5jSpoR30zcRFq6'
-googleOneTimeToken = '4/KvCD3wszxRH0xi2nsEtrrmEYErZW6IJfckIRwQZqGTg.Ug3E66Z5q4QcEnp6UAPFm0FOVT7nmQI'
+googleOneTimeToken = 'ya29.ZAFjB2dh68Cc8REjf5rSrUnCJYfAjw_cTbV6r8cv-uqGTkmCoyqzOrQT-dTY5mFwKLbi-YyLlmeA0w'
 facebookToken= 'CAAEuSSIjkhoBAGr3ZAmtyU9LZBPKSMmtKZAQH9xqfISHqf6y1DC0Yu4t3lwZCYZC4MPL4gN6hzOoBye2fSCwUb3a8ZAMazga5ZAWBXZAr4Lv6F2uxmeJbCUvxxqUZCNQIJjGqx5eRxZA43CTkmZApgZCO1y4VfEYhPbZBCsDaaN47muybsWIKQ39y24ZAvOfJkQ1SZA6HgCflAb0HNHbO4XFe6yGtGBM9PwvHQHBIkZD'
 
 describe 'third party auth', ()->

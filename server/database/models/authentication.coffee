@@ -64,14 +64,15 @@ module.exports = (bookshelf) ->
 			googleOneTimeToken: (oneTimeToken, next) ->
 				self = this
 				console.log('google id is ', googleId)
-				oauth2Client = new OAuth2(googleId,googleSecret,'https://developers.google.com/oauthplayground')	
+				oauth2Client = new OAuth2(googleId,googleSecret)#,'https://developers.google.com/oauthplayground')	redirect is only needed if the request was sent with one!
 				oauth2Client.getToken oneTimeToken, (err, tokens) -> 
-					console.log('google gettoken responded!!! ')
-					console.log('the tokens are ', tokens)
+					console.log()
+					logger.info('google gettoken responded with error ', err, ' and the tokens ', tokens)
 					if err?
 						err.kind = err.type
+						#the type property makes toString crash node
 						delete err.type
-						console.log('the error is', err, ' and the tokens are ', tokens)
+						logger.warn('One time token error: ', err)
 					if err? then return next({code:400, name: 'tokenError', error:err.toString()})
 
 					self.findOrCreateGoogle(tokens.access_token, tokens.refresh_token, next)
