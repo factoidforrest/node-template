@@ -84,19 +84,19 @@ module.exports =
     deferred = q.defer()
 
     url = app.get('tccURL') + '/ProcessJson'
-    console.log('url is' , url)
+    logger.info('url is' , url)
     options = 
       method: 'post'
       body: createBody(amount, clientId)
       json: true
       url: url
-    console.log 'request to tcc for creating card is  ', options.body
+    logger.info 'request to tcc for creating card is  ', options.body
     request options, (err, httpResponse, body) ->
-      console.log 'res for creating card is ', body
-      if body.txs[0]? then console.log 'card header is ', body.txs[0].hdr
+      logger.info 'res for creating card is ', body
+      if body.txs[0]? then logger.info 'card header is ', body.txs[0].hdr
       if err or body.txs.length == 0
         return handleError(err, body, deferred)
-      console.log 'resolving promise'
+      logger.info 'resolving promise'
       txn = body.txs[0]
       deferred.resolve
         card_number: txn.crd
@@ -116,14 +116,14 @@ module.exports =
       body: inquiryBody(card.get('number'), card.get('client_id'))
       json: true
       url: url
-    console.log 'request to tcc is  ', options.body
+    logger.info 'request to tcc is  ', options.body
     request options, (err, httpResponse, body) ->
       logger.info 'tcc res body is', body
       if err or body.txs.length == 0
         return handleError(err, body, deferred)
-      console.log('card header is: ', body.txs[0].hdr)
+      logger.info('card header is: ', body.txs[0].hdr)
 
-      console.log 'resolving promise'
+      logger.info 'resolving promise'
       txn = body.txs[0]
       deferred.resolve
         card_number: txn.crd
@@ -135,7 +135,7 @@ module.exports =
 
   #can also activate a card
   refillCard: (card_number, client_id, location_id, amount) ->
-    console.log('refilling card $', amount)
+    logger.info('refilling card $', amount)
     deferred = q.defer()
     body = activateBody(card_number, client_id, location_id, amount)
     url = app.get('tccURL') + '/ProcessJson'
@@ -144,7 +144,7 @@ module.exports =
       body: body
       json: true
       url: url
-    console.log 'request to tcc for refilling card is  ', options.body
+    logger.info 'request to tcc for refilling card is  ', options.body
     request options, (err, httpResponse, body) ->
       if err or body.txs.length == 0
         return handleError(err, body, deferred)
@@ -169,12 +169,12 @@ module.exports =
       body: redeemBody(card_number, client_id, location_id, amount)
       json: true
       url: url
-    console.log 'request to tcc for redeeming card is  ', options.body
+    logger.info 'request to tcc for redeeming card is  ', options.body
     request options, (err, httpResponse, body) ->
-      console.log 'res body is', body
+      logger.info 'res body is', body
       if err or body.txs.length == 0
         return handleError(err, body, deferred)
-      console.log 'resolving promise'
+      logger.info 'resolving promise'
       txn = body.txs[0]
       deferred.resolve
         card_number: txn.crd
@@ -193,10 +193,10 @@ module.exports =
         body: voidBody(card, serial)
         json: true
         url: url
-      console.log 'request to void card:  ', options.body
+      logger.info 'request to void card:  ', options.body
       request options, (err, httpResponse, body) ->
         logger.info('TCC response voiding card: ', body)
-        console.log(body)
+        logger.info(body)
         if err? || body.hdr.rslt != 1
           return done({code:500, name: 'TCCErr', message: 'Failed to void card.', error: err, response: httpResponse, body: body})
         done()

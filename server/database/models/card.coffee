@@ -243,11 +243,10 @@ module.exports = (bookshelf) ->
 
 
 		import: (properties, done) ->
-
 			if !properties.number?
 				return done({name:'numberInvalid', message:'Card number empty'})
 			card = Card.forge(number: properties.number)
-			card.fetch().then (existing)->
+			card.fetch(withRelated:'program').then (existing)->
 				if existing? and existing.get('user_id')?
 					return done({code:400, name: 'dupCard', message: 'Card has already been imported by someone.'})
 				else if existing?

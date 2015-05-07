@@ -27,11 +27,12 @@ Program.fetchAll().then (programs) ->
 				serial: data.serial
 				balance: data.balance
 				program_id: program.get('id')
+				client_id: program.get('client_id')
 			}).save().then (card) ->
 
 				cb(null, card.get('number'))
 
-	async.times 100, createCard, (err, cardNumbers) ->
+	async.times 10, createCard, (err, cardNumbers) ->
 		console.log('async err: ', err)
 		console.log('created test cards: ', cardNumbers)
 		process.exit()
