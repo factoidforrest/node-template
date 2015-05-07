@@ -32,7 +32,7 @@ Program.fetchAll().then (programs) ->
 
 				cb(null, card.get('number'))
 
-	async.times 10, createCard, (err, cardNumbers) ->
+	async.times 200, createCard, (err, cardNumbers) ->
 		console.log('async err: ', err)
 		console.log('created test cards: ', cardNumbers)
 		process.exit()
