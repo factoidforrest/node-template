@@ -116,7 +116,8 @@ module.exports = (bookshelf) ->
 			Meal.forge(key: properties.meal_key).fetch(withRelated:['transactions.card', 'programs']).then (meal) ->
 				logger.info 'redeeming card on meal: ', meal.attributes
 				return done({code: 400, name: 'mealNotFound', message: 'No meal matching that key was found'}) if !meal?
-
+				if meal.related('transactions').where({card_id: card.get('id'), status: 'pending'}).length > 0
+					return done({code:400, 'duplicateRedeem', message: 'This card has already been used on this meal.'})
 				program = card.related('program')
 				if meal.related('programs').where({id:program.get('id')}).length != 1
 					return done({code:400, name: 'programErr', message: 'Card cannot be used at this restaurant'})
