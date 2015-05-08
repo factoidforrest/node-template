@@ -133,18 +133,38 @@ module.exports = (bookshelf) ->
 					amount: properties.amount
 					type: 'redeem'
 					data: {card_type: 'local'}
-					).save().then (transaction) ->
+				).save().then (transaction) ->
 					###
 					TCC.redeemCard(card.get('number'), properties.amount).then((tccResponse) ->
 						console.log 'got redeemed card: ', tccResponse
 						card.set(balance:tccResponse.balance).save().then (savedCard) ->
 					###
+					properties.location_id = meal.get('location_id')
 					card.changeTCCBalance 'subtract', properties, (err) ->
 						card.save().then (savedCard) ->
 							meal.query().decrement('balance', properties.amount).then () ->
 								#update decremented meal from database..not super efficient but it works
 								Meal.forge({id:meal.get('id')}).fetch(withRelated: ['transactions.card', 'programs']).then (savedMeal) ->
 									done(null, {card: savedCard, meal: savedMeal})
+
+
+		unredeem: (properties, done) ->
+			card = this
+			Meal.forge(key: properties.meal_key).fetch().then (meal) ->
+				Transaction.forge(meal_id: meal.get('id'), card_id: card.get('id')).fetch().then (transaction) ->
+					if transaction.get('status') != 'pending'
+						return done({code:400, name: 'transactionState', message:"Failed to cancel the transaction because its status was: " + transaction.get('status')})
+					transaction.set('status', 'void')
+					card.changeTCCBalance 'add', {amount: transaction.get('amount'), location_id: meal.get('location_id')}, (err) ->
+						return err if err?
+						card.save().then (savedCard) ->
+							transaction.save().then (savedTransaction) ->
+								meal.query().increment('balance', transaction.get('amount')).then () ->
+									Meal.forge({id:meal.get('id')}).fetch(withRelated: ['transactions.card', 'programs']).then (savedMeal) ->
+										done(null, {card: savedCard, meal: savedMeal})
+
+
+
 
 		changeTCCBalance: (action, properties, done) ->
 			self = this
@@ -164,9 +184,6 @@ module.exports = (bookshelf) ->
 				else 
 					done(err)
 
-		unredeem: (properties, done) ->
-			Meal.forge(key: properties.meal_key).fetch().then (meal) ->
-				#TODO - use the serial from the transaction to void the transaction, then remove the card from the meal
 
 		void: (done) ->
 			self = this
@@ -306,6 +323,20 @@ module.exports = (bookshelf) ->
 				logger.info 'found card to redeem', card
 				return done({code: 400, name:'cardNotFound', message: 'No matching card was found'}) if !card?
 				card.redeem properties, done
+
+		unredeem: (properties, done) ->
+			logger.info 'card unredeeming by properties: ', properties
+			searchParameters = {}
+			#if we have a user id we are processing an online redemption by a client, otherwise a POS redemption by a physical card  
+			if properties.user_id?
+				searchParameters = {user_id: properties.user_id, id: properties.id}
+			else
+				searchParameters = {number: properties.number}
+			logger.info 'searching for card to redeem with attributes', searchParameters
+			Card.forge(searchParameters).fetch(withRelated:'program').then (card) ->
+				logger.info 'found card to unredeem', card
+				return done({code: 400, name:'cardNotFound', message: 'No matching card was found'}) if !card?
+				card.unredeem properties, done
 
 
 	})

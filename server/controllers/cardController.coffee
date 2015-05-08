@@ -61,17 +61,25 @@ module.exports = (app) ->
 
 
 	app.post '/card/redeem', roles.is('user or POS'), (req, res) ->
-		console.log('got redeem req')
 
-		console.log('card redeem with props', req.body)
 		properties = req.body
 		if req.user? then properties.user_id = req.user.get('id')
 
 		Card.redeem properties, (err, data) ->
 			if err?
-				console.log 'card redeem error ', err
+				logger.log 'warn', 'card redeem error ', err
 				return res.send(err.code, err)
 			res.send data
+
+	app.post '/card/unredeem', roles.is('user or POS'), (req, res) ->
+		properties = req.body
+		if req.user? then properties.user_id = req.user.get('id')
+
+		Card.unredeem properties, (err, data) ->
+			if err?
+				logger.log 'warn', 'card unredeem error ', err
+				return res.send err.code, err
+			res.send(data)
 
 	
 

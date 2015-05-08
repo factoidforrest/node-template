@@ -78,6 +78,29 @@ describe 'Meals', ->
 						console.log('redeemed card in db is: ', cards.first())
 						done(err)
 
+	it 'unredeem', (done) ->
+		this.timeout 10000
+		Card.fetchAll().then (cards) ->
+			console.log('found existing cards ', cards)			
+			console.log('test attempting to redeem card id: ', cardId)
+			userLib.login {}, (session, token) ->
+				session
+				.post('/card/unredeem').send(
+					token: token
+					meal_key: mealKey
+					id: cardId
+				).expect(200)
+				.end (err, res) ->
+					if err?
+						return done(err)
+					console.log('redeemed card with response', res.body)
+					console.log('meal transactions: ', res.body.meal.transactions)
+					expect(res.body.meal.balance).to.equal(res.body.meal.price)
+					Card.fetchAll().then (cards) ->
+						console.log('redeemed card in db is: ', cards.first())
+						done(err)
+
+
 	it 'POS redeem', (done) ->
 		this.timeout 10000
 		
@@ -95,7 +118,7 @@ describe 'Meals', ->
 					return done(err)
 				console.log('redeemed card with response', res.body)
 				console.log('meal transactions: ', res.body.meal.transactions)
-				expect(res.body.meal.balance).to.equal(Math.round((res.body.meal.price - 2) * 100) / 100)
+				expect(res.body.meal.balance).to.equal(Math.round((res.body.meal.price - 1) * 100) / 100)
 				Card.fetchAll().then (cards) ->
 					console.log('redeemed card in db is: ', cards.first())
 					done(err)	
