@@ -77,7 +77,8 @@ limiterMiddleware = rate.middleware({handler: limiter, interval: 20, limit: 300}
 
 
 #authentication stuff, refactor to config file in time
-app.set('token_expiry', [1, 'days'])
+
+app.set('token_expiry', [process.env.LOGIN_TOKEN_EXPIRY || 365, 'days'])
 app.use require './server/middleware/token'
 require('./server/config/roles')(app)
 
@@ -101,7 +102,8 @@ app.use (err, req, res, next) ->
 
 #app.use(express.errorHandler({ dumpExceptions: true, showStack: true }))
 
-
+#for now this MIGHT do while volume is low but it will drop all other connections while the system is restarting and any other calls that were in a 
+#partially complete database state could stay that way.  Basically, it's bad.  Proper handling will require use of Node's cluster.  They have an offical example online
 process.on 'uncaughtException', (err) ->
   console.log("FATAL EXCEPTION ", err)
   logger.log('error', 'CAUGHT FATAL EXCEPTION ', err.message,  err)
