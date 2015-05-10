@@ -89,10 +89,10 @@ require('./server/config/routes')(app)
 logger.info("Node Env: " +  app.get('env'))
 logger.log('silly', 'a silly log')
 
-#catch any unhandled error callbacks.  This catches
+#catch any unhandled error callbacks.  
 
 app.use (err, req, res, next) ->
-  logger.log('error', 'caught unhandled express error: ', err)
+  logger.log('error', 'caught unhandled error passed to express: ', err)
   logger.log('error', err.stack)
   response = {name: 'internalServerError', message: err.message}
 

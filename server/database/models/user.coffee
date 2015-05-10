@@ -41,6 +41,10 @@ module.exports = (bookshelf) ->
 
 		transactions: ->
 			return @hasMany(Transaction)
+
+		#for users who manage programs, like restaurant owners
+		managedPrograms: ->
+			return @belongsToMany(Programs)
 			
 		createToken: (attrs) ->
 			#returns a promise
